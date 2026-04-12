@@ -24,7 +24,8 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
             database.habitTrackingDao(),
             database.lifeAreaDao(),
             database.quoteDao(),
-            UserPreferencesRepository(context)
+              UserPreferencesRepository(context),
+              database.routineNotificationSettingsDao()
         )
     }
 

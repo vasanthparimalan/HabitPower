@@ -12,6 +12,7 @@ import com.example.habitpower.data.dao.HabitTrackingDao
 import com.example.habitpower.data.dao.LifeAreaDao
 import com.example.habitpower.data.dao.QuoteDao
 import com.example.habitpower.data.dao.RoutineDao
+import com.example.habitpower.data.dao.RoutineNotificationSettingsDao
 import com.example.habitpower.data.dao.UserDao
 import com.example.habitpower.data.dao.UserStatsDao
 import com.example.habitpower.data.dao.WorkoutSessionDao
@@ -23,6 +24,7 @@ import com.example.habitpower.data.model.LifeArea
 import com.example.habitpower.data.model.Quote
 import com.example.habitpower.data.model.Routine
 import com.example.habitpower.data.model.RoutineExerciseCrossRef
+import com.example.habitpower.data.model.RoutineNotificationSettings
 import com.example.habitpower.data.model.UserHabitAssignment
 import com.example.habitpower.data.model.UserLifeAreaAssignment
 import com.example.habitpower.data.model.UserProfile
@@ -49,9 +51,10 @@ import com.example.habitpower.data.model.WorkoutSession
         UserLifeAreaAssignment::class,
         DailyHabitEntry::class,
         Quote::class,
-        UserStats::class
+        UserStats::class,
+        RoutineNotificationSettings::class
     ],
-    version = 14,
+    version = 17,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -65,6 +68,7 @@ abstract class HabitPowerDatabase : RoomDatabase() {
     abstract fun lifeAreaDao(): LifeAreaDao
     abstract fun quoteDao(): QuoteDao
     abstract fun userStatsDao(): UserStatsDao
+    abstract fun routineNotificationSettingsDao(): RoutineNotificationSettingsDao
 
     companion object {
         @Volatile
@@ -163,6 +167,47 @@ abstract class HabitPowerDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_14_15 = object : Migration(14, 15) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE user_stats ADD COLUMN lastCheckInDate INTEGER")
+                db.execSQL("ALTER TABLE user_stats ADD COLUMN lastCheckInCompletedCount INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE user_stats ADD COLUMN lastCheckInWasPerfect INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE user_stats ADD COLUMN lastCheckInXpAwarded INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE user_stats ADD COLUMN lastCheckInStreakBefore INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE user_stats ADD COLUMN lastCheckInLongestBefore INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
+        val MIGRATION_15_16 = object : Migration(15, 16) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Add new columns to exercises table
+                db.execSQL("ALTER TABLE exercises ADD COLUMN instructions TEXT")
+                db.execSQL("ALTER TABLE exercises ADD COLUMN tags TEXT NOT NULL DEFAULT ''")
+
+                // Add new columns to routines table
+                db.execSQL("ALTER TABLE routines ADD COLUMN type TEXT NOT NULL DEFAULT 'NORMAL'")
+                db.execSQL("ALTER TABLE routines ADD COLUMN restTimeSeconds INTEGER NOT NULL DEFAULT 0")
+
+                // Add routine reference to habits table
+                db.execSQL("ALTER TABLE habit_definitions ADD COLUMN routineId INTEGER")
+            }
+        }
+
+        val MIGRATION_16_17 = object : Migration(16, 17) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Create routine notification settings table
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS `routine_notification_settings` (
+                        `id` INTEGER PRIMARY KEY NOT NULL,
+                        `enableExerciseStartSound` INTEGER NOT NULL DEFAULT 1,
+                        `enableExerciseEndSound` INTEGER NOT NULL DEFAULT 1,
+                        `exerciseStartSoundUri` TEXT,
+                        `exerciseEndSoundUri` TEXT
+                    )"""
+                )
+            }
+        }
+
         /**
          * Obtain the singleton database instance.
          *
@@ -183,7 +228,10 @@ abstract class HabitPowerDatabase : RoomDatabase() {
                         MIGRATION_10_11,
                         MIGRATION_11_12,
                         MIGRATION_12_13,
-                        MIGRATION_13_14
+                        MIGRATION_13_14,
+                        MIGRATION_14_15,
+                        MIGRATION_15_16,
+                        MIGRATION_16_17
                     )
                     .build()
                 INSTANCE = instance

@@ -40,14 +40,43 @@ class GamificationRepository(
         val isDayPerfect = total > 0 && completed == total
 
         val existing = getStats(userId)
-        val (newStats, newBadgesMask) = GamificationEngine.computeUpdatedStats(
-            existing = existing,
+
+        // Idempotency: if the same date is saved again, remove prior contribution for that
+        // date first, then recompute from current entries. This prevents XP inflation when
+        // users uncheck/recheck and save again.
+        val baseStats = if (existing.lastCheckInDate == date) {
+            existing.copy(
+                currentStreak = existing.lastCheckInStreakBefore,
+                longestStreak = existing.lastCheckInLongestBefore,
+                totalXp = (existing.totalXp - existing.lastCheckInXpAwarded).coerceAtLeast(0),
+                totalHabitsCompleted = (existing.totalHabitsCompleted - existing.lastCheckInCompletedCount).coerceAtLeast(0),
+                totalDaysPerfect = (existing.totalDaysPerfect - if (existing.lastCheckInWasPerfect) 1 else 0).coerceAtLeast(0)
+            )
+        } else {
+            existing
+        }
+
+        val streakBeforeThisCheckIn = baseStats.currentStreak
+        val longestBeforeThisCheckIn = baseStats.longestStreak
+
+        val (computedStats, newBadgesMask) = GamificationEngine.computeUpdatedStats(
+            existing = baseStats,
             habitsCompleted = completed,
             totalHabits = total,
             isDayPerfect = isDayPerfect
         )
-        val xpGained = newStats.totalXp - existing.totalXp
-        val didLevelUp = newStats.level > existing.level
+        val xpGained = computedStats.totalXp - baseStats.totalXp
+        val didLevelUp = computedStats.level > baseStats.level
+
+        val newStats = computedStats.copy(
+            lastPerfectDate = if (isDayPerfect) date else computedStats.lastPerfectDate,
+            lastCheckInDate = date,
+            lastCheckInCompletedCount = completed,
+            lastCheckInWasPerfect = isDayPerfect,
+            lastCheckInXpAwarded = xpGained,
+            lastCheckInStreakBefore = streakBeforeThisCheckIn,
+            lastCheckInLongestBefore = longestBeforeThisCheckIn
+        )
 
         userStatsDao.upsertStats(newStats)
 
@@ -57,7 +86,7 @@ class GamificationRepository(
             stats = newStats,
             xpGained = xpGained,
             didLevelUp = didLevelUp,
-            previousLevel = existing.level,
+            previousLevel = baseStats.level,
             isDayPerfect = isDayPerfect,
             newBadges = newBadges,
             completedCount = completed,

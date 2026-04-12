@@ -52,6 +52,7 @@ import com.example.habitpower.data.model.TargetOperator
 import com.example.habitpower.reminder.HabitReminderScheduler
 import com.example.habitpower.ui.AppViewModelProvider
 import com.example.habitpower.ui.theme.AppSpacing
+import com.example.habitpower.ui.theme.LeafSectionItemCard
 import com.example.habitpower.ui.theme.SectionHeader
 import java.time.DayOfWeek
 
@@ -62,6 +63,7 @@ fun AdminHabitsScreen(
     viewModel: AdminHabitsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val habits by viewModel.habits.collectAsState()
+    val routines by viewModel.routines.collectAsState()
     val context = LocalContext.current
 
     var editingHabit by remember { mutableStateOf<HabitDefinition?>(null) }
@@ -73,6 +75,7 @@ fun AdminHabitsScreen(
         viewModel.goalIdentityStatement.trim().isNotBlank() &&
         viewModel.description.trim().isNotBlank() &&
         viewModel.commitmentLocation.trim().isNotBlank() &&
+        (viewModel.selectedType != HabitType.ROUTINE || viewModel.selectedRoutineId != null) &&
         (!viewModel.preReminderEnabled || viewModel.preReminderMinutes.toIntOrNull() in 1..1440) &&
         viewModel.recurrenceStartDateText.matches(Regex("^\\d{4}-\\d{2}-\\d{2}$")) &&
         (viewModel.recurrenceEndDateText.isBlank() || viewModel.recurrenceEndDateText.matches(Regex("^\\d{4}-\\d{2}-\\d{2}$"))) &&
@@ -518,6 +521,39 @@ fun AdminHabitsScreen(
                             )
                         }
 
+                        if (viewModel.selectedType == HabitType.ROUTINE) {
+                            var routineExpanded by remember { mutableStateOf(false) }
+                            Text(
+                                text = "Choose a routine to link",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Box {
+                                TextButton(onClick = { routineExpanded = true }) {
+                                    Text(
+                                        "Routine: ${routines.firstOrNull { it.id == viewModel.selectedRoutineId }?.name ?: "Select routine"}"
+                                    )
+                                    Icon(Icons.Default.ArrowDropDown, contentDescription = "Select routine")
+                                }
+                                DropdownMenu(expanded = routineExpanded, onDismissRequest = { routineExpanded = false }) {
+                                    routines.forEach { routine ->
+                                        DropdownMenuItem(
+                                            text = { Text(routine.name) },
+                                            onClick = {
+                                                routineExpanded = false
+                                                viewModel.updateSelectedRoutine(routine.id)
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                            Text(
+                                text = "Completing this routine will automatically mark the habit done.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
                         // Life area selector
                         val lifeAreas by viewModel.lifeAreas.collectAsState()
                         var lifeAreaExpanded by remember { mutableStateOf(false) }
@@ -742,60 +778,44 @@ private fun HabitSummaryCard(
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Text(habit.name, style = MaterialTheme.typography.titleMedium)
-                if (habit.description.isNotBlank()) {
-                    Text(habit.description, style = MaterialTheme.typography.bodyMedium)
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("Type: ${habit.type.name}", style = MaterialTheme.typography.bodySmall)
-                    Text("Recurs: ${habit.recurrenceType.name}", style = MaterialTheme.typography.bodySmall)
-                    habit.unit?.takeIf { it.isNotBlank() }?.let {
-                        Text("Unit: $it", style = MaterialTheme.typography.bodySmall)
-                    }
-                    habit.targetValue?.let {
-                        val opLabel = when (habit.operator) {
-                            TargetOperator.LESS_THAN_OR_EQUAL -> "≤"
-                            TargetOperator.GREATER_THAN_OR_EQUAL -> "≥"
-                            TargetOperator.EQUAL -> "="
-                        }
-                        if (habit.type == HabitType.TIME) {
-                            val totalMins = ((it + 12 * 60) % (24 * 60)).toInt()
-                            val h = totalMins / 60
-                            val m = totalMins % 60
-                            val amPm = if (h >= 12) "PM" else "AM"
-                            val h12 = if (h % 12 == 0) 12 else h % 12
-                            Text(
-                                "Sleep $opLabel %02d:%02d $amPm".format(h12, m),
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        } else {
-                            Text("Target $opLabel $it ${habit.unit ?: ""}", style = MaterialTheme.typography.bodySmall)
-                        }
-                    }
-                }
-            }
-            Row(modifier = Modifier.padding(end = 8.dp)) {
-                IconButton(onClick = onEdit) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit")
-                }
-                IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
-                }
-            }
+    val targetLabel = habit.targetValue?.let {
+        val opLabel = when (habit.operator) {
+            TargetOperator.LESS_THAN_OR_EQUAL -> "≤"
+            TargetOperator.GREATER_THAN_OR_EQUAL -> "≥"
+            TargetOperator.EQUAL -> "="
+        }
+        if (habit.type == HabitType.TIME) {
+            val totalMins = ((it + 12 * 60) % (24 * 60)).toInt()
+            val h = totalMins / 60
+            val m = totalMins % 60
+            val amPm = if (h >= 12) "PM" else "AM"
+            val h12 = if (h % 12 == 0) 12 else h % 12
+            "$opLabel %02d:%02d $amPm".format(h12, m)
+        } else {
+            "$opLabel $it ${habit.unit ?: ""}".trim()
         }
     }
+
+    val attributes = buildList {
+        add("Type" to habit.type.name)
+        add("Recurs" to recurrenceLabel(habit.recurrenceType))
+        habit.unit?.takeIf { it.isNotBlank() }?.let { add("Unit" to it) }
+        targetLabel?.let { add("Target" to it) }
+    }
+
+    LeafSectionItemCard(
+        title = habit.name,
+        subtitle = habit.description.takeIf { it.isNotBlank() },
+        attributes = attributes,
+        trailingActions = {
+            IconButton(onClick = onEdit) {
+                Icon(Icons.Default.Edit, contentDescription = "Edit")
+            }
+            IconButton(onClick = onDelete) {
+                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+            }
+        }
+    )
 }
 
 @Composable
@@ -834,6 +854,7 @@ private fun habitTypeLabel(type: HabitType): String = when (type) {
     HabitType.TIMER -> "Timer Minutes"
     HabitType.TIME -> "Time of Day"
     HabitType.TEXT -> "Text / Notes"
+    HabitType.ROUTINE -> "Routine"
 }
 
 private fun habitTypeDescription(type: HabitType): String = when (type) {
@@ -845,6 +866,7 @@ private fun habitTypeDescription(type: HabitType): String = when (type) {
     HabitType.TIMER -> "Track a timed session in minutes. Example: Deep work = 45 min"
     HabitType.TIME -> "Track timing relative to a target time. Example: Sleep by 10:30 PM"
     HabitType.TEXT -> "Capture notes. Example: Journal reflection"
+    HabitType.ROUTINE -> "Execute a pre-configured routine of exercises. Example: Morning workout"
 }
 
 private fun recurrenceLabel(type: HabitRecurrenceType): String = when (type) {

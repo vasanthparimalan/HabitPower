@@ -9,6 +9,7 @@ import com.example.habitpower.data.dao.RoutineDao
 import com.example.habitpower.data.dao.UserDao
 import com.example.habitpower.data.dao.WorkoutSessionDao
 import com.example.habitpower.data.model.DailyHabitEntry
+import com.example.habitpower.data.dao.RoutineNotificationSettingsDao
 import com.example.habitpower.data.model.DailyHabitItem
 import com.example.habitpower.data.model.DailyHealthStat
 import com.example.habitpower.data.model.Exercise
@@ -18,8 +19,9 @@ import com.example.habitpower.data.model.HabitType
 import com.example.habitpower.data.model.LifeArea
 import com.example.habitpower.data.model.Routine
 import com.example.habitpower.data.model.RoutineExerciseCrossRef
-import com.example.habitpower.data.model.TargetOperator
+import com.example.habitpower.data.model.RoutineNotificationSettings
 import com.example.habitpower.data.model.UserHabitAssignment
+import com.example.habitpower.data.model.TargetOperator
 import com.example.habitpower.data.model.UserLifeAreaAssignment
 import com.example.habitpower.data.model.UserProfile
 import com.example.habitpower.data.model.WorkoutSession
@@ -47,7 +49,8 @@ class HabitPowerRepository(
     private val habitTrackingDao: HabitTrackingDao,
     private val lifeAreaDao: LifeAreaDao,
     private val quoteDao: com.example.habitpower.data.dao.QuoteDao,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val routineNotificationSettingsDao: RoutineNotificationSettingsDao
 ) {
     private val refreshTrigger = MutableStateFlow(0)
 
@@ -71,6 +74,7 @@ class HabitPowerRepository(
                 HabitType.BOOLEAN -> habit.entryBooleanValue == true
                 HabitType.NUMBER, HabitType.DURATION, HabitType.COUNT, HabitType.POMODORO, HabitType.TIMER -> habit.entryNumericValue != null
                 HabitType.TIME -> habit.entryNumericValue != null
+                HabitType.ROUTINE -> habit.entryBooleanValue == true
                 HabitType.TEXT -> !habit.entryTextValue.isNullOrBlank()
             }
             WidgetHabit(
@@ -94,17 +98,24 @@ class HabitPowerRepository(
     suspend fun insertQuote(quote: com.example.habitpower.data.model.Quote) = quoteDao.insertQuote(quote)
     suspend fun deleteQuote(quote: com.example.habitpower.data.model.Quote) = quoteDao.deleteQuote(quote)
     suspend fun seedQuotesIfNeeded() {
-        if (quoteDao.getQuoteCount() == 0) {
-            val defaults = listOf(
-                "You do not rise to the level of your goals. You fall to the level of your systems.",
-                "Every action you take is a vote for the type of person you wish to become.",
-                "Habits are the compound interest of self-improvement.",
-                "You should be far more concerned with your current trajectory than with your current results.",
-                "Success is the product of daily habits—not once-in-a-lifetime transformations.",
-                "The most effective way to change your habits is to focus not on what you want to achieve, but on who you wish to become."
-            )
-            defaults.forEach { text -> quoteDao.insertQuote(com.example.habitpower.data.model.Quote(text = text)) }
-        }
+        val defaults = listOf(
+            "Make the cue obvious: redesign your environment so the next right action is easy to see. (Atomic Habits)",
+            "Make it attractive: pair a difficult habit with something you already enjoy. (Atomic Habits)",
+            "Make it easy: shrink today's version until starting feels effortless. (Atomic Habits)",
+            "Make it satisfying: close your day with a visible win, however small. (Atomic Habits)",
+            "Small daily gains compound into major change over time. (Atomic Habits)",
+            "Focus on systems and processes, not only goals and outcomes. (Atomic Habits)",
+            "A habit loop has cue, routine, and reward - improve one loop at a time. (The Power of Habit)",
+            "When a cue appears, decide your routine before the moment arrives. (The Power of Habit)",
+            "Cravings drive habits; attach your routine to a meaningful identity. (The Power of Habit)",
+            "Keystone habits trigger progress in other areas - protect your keystone first. (The Power of Habit)",
+            "Tiny actions done consistently beat intense actions done occasionally. (Tiny Habits)",
+            "Reduce friction for good habits and add friction for distracting ones. (Behavior Design)"
+        )
+
+        val existing = quoteDao.getAllQuotesSync().map { it.text.trim() }.toSet()
+        defaults.filterNot { it in existing }
+            .forEach { text -> quoteDao.insertQuote(com.example.habitpower.data.model.Quote(text = text)) }
     }
     fun getAllExercises(): Flow<List<Exercise>> = exerciseDao.getAllExercises()
     suspend fun getExerciseById(id: Long): Exercise? = exerciseDao.getExerciseById(id)
@@ -127,6 +138,18 @@ class HabitPowerRepository(
     suspend fun clearRoutineExercises(routineId: Long) {
         routineDao.deleteRoutineExercises(routineId)
     }
+
+    // Routine Notification Settings
+    fun getRoutineNotificationSettings(): Flow<RoutineNotificationSettings?> =
+        routineNotificationSettingsDao.getSettings()
+
+    suspend fun updateRoutineNotificationSettings(settings: RoutineNotificationSettings) =
+        routineNotificationSettingsDao.updateSettings(settings)
+
+    fun getRoutineStartSoundEnabled(): Flow<Boolean> = userPreferencesRepository.routineStartSoundEnabled
+    fun getRoutineStartSoundId(): Flow<String> = userPreferencesRepository.routineStartSoundId
+    fun getRoutineEndSoundEnabled(): Flow<Boolean> = userPreferencesRepository.routineEndSoundEnabled
+    fun getRoutineEndSoundId(): Flow<String> = userPreferencesRepository.routineEndSoundId
 
     fun getSessionsForDate(date: LocalDate): Flow<List<WorkoutSession>> = workoutSessionDao.getSessionsForDate(date)
     fun getSessionsForDateRange(startDate: LocalDate, endDate: LocalDate): Flow<List<WorkoutSession>> =
@@ -187,6 +210,12 @@ class HabitPowerRepository(
         updateWidgetState()
     }
 
+    suspend fun updateHabitCommitmentTime(habitId: Long, time: String?) {
+        val habit = habitTrackingDao.getHabitById(habitId) ?: return
+        habitTrackingDao.updateHabit(habit.copy(commitmentTime = time))
+        syncHabitReminders()
+    }
+
     suspend fun deleteHabit(habit: HabitDefinition) {
         habitTrackingDao.deleteHabit(habit)
         HabitReminderScheduler.cancelForHabit(context, habit.id)
@@ -198,6 +227,7 @@ class HabitPowerRepository(
         goalIdentityStatement: String,
         description: String,
         type: HabitType,
+        routineId: Long? = null,
         unit: String?,
         targetValue: Double?,
         operator: TargetOperator = TargetOperator.GREATER_THAN_OR_EQUAL,
@@ -246,6 +276,7 @@ class HabitPowerRepository(
                 displayOrder = nextOrder,
                 operator = operator,
                 lifeAreaId = lifeAreaId,
+                routineId = routineId,
                 showInDailyCheckIn = showInDailyCheckIn
             )
         )
@@ -330,16 +361,19 @@ class HabitPowerRepository(
                 .sortedBy { it.effectiveDisplayOrder }
         }
 
+    fun getFocusHabitItems(userId: Long, date: LocalDate): Flow<List<DailyHabitItem>> =
+        observeRefresh().flatMapLatest {
+            habitTrackingDao.getDailyHabitItems(userId, date).map { items ->
+                items
+                    .filter { it.isScheduledOn(date) }
+                    .sortedBy { it.effectiveDisplayOrder }
+            }
+        }
+
     /**
      * Focus needs assigned habits (e.g., TIMER/POMODORO) even when they are hidden
      * from Daily Check-In. So we intentionally do not filter by `showInDailyCheckIn`.
      */
-    fun getFocusHabitItems(userId: Long, date: LocalDate): Flow<List<DailyHabitItem>> =
-        habitTrackingDao.getDailyHabitItems(userId, date).map { items ->
-            items
-                .filter { it.isScheduledOn(date) }
-                .sortedBy { it.effectiveDisplayOrder }
-        }
 
     fun getWidgetHabitItems(userId: Long, date: LocalDate): Flow<List<DailyHabitItem>> =
         observeRefresh().flatMapLatest {
@@ -380,24 +414,42 @@ class HabitPowerRepository(
             HabitType.NUMBER, HabitType.DURATION, HabitType.COUNT, HabitType.POMODORO, HabitType.TIMER -> numericValue != null
             HabitType.TIME -> numericValue != null
             HabitType.TEXT -> !textValue.isNullOrBlank()
+            HabitType.ROUTINE -> booleanValue == true
         }
         if (!hasValue) {
             habitTrackingDao.deleteDailyEntry(userId, habitId, date)
             updateWidgetState()
             return
         }
-
         habitTrackingDao.upsertDailyEntry(
             DailyHabitEntry(
                 userId = userId,
                 habitId = habitId,
                 date = date,
-                booleanValue = if (type == HabitType.BOOLEAN) booleanValue else null,
-                numericValue = if (type == HabitType.BOOLEAN || type == HabitType.TEXT) null else numericValue,
+                booleanValue = if (type == HabitType.BOOLEAN || type == HabitType.ROUTINE) booleanValue else null,
+                numericValue = if (
+                    type == HabitType.BOOLEAN || type == HabitType.TEXT || type == HabitType.ROUTINE
+                ) null else numericValue,
                 textValue = if (type == HabitType.TEXT) textValue?.trim() else null
             )
         )
         updateWidgetState()
+    }
+
+    suspend fun completeRoutineLinkedHabits(routineId: Long, date: LocalDate = LocalDate.now()) {
+        val activeUser = getResolvedActiveUser().firstOrNull() ?: return
+        val linkedHabits = habitTrackingDao.getDailyHabitItems(activeUser.id, date).first()
+            .filter { it.type == HabitType.ROUTINE && it.routineId == routineId }
+
+        linkedHabits.forEach { habit ->
+            saveDailyHabitEntry(
+                userId = activeUser.id,
+                date = date,
+                habitId = habit.habitId,
+                type = HabitType.ROUTINE,
+                booleanValue = true
+            )
+        }
     }
 
     /** Snap current wall-clock time and log it against a TIME habit immediately (used by widget). */
@@ -465,6 +517,7 @@ class HabitPowerRepository(
                         true
                     }
                 }
+                HabitType.ROUTINE -> entry.booleanValue == true
                 HabitType.TEXT -> !entry.textValue.isNullOrBlank()
             }
         }.map { it.date }.distinct()

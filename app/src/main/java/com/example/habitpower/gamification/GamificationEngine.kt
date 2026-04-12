@@ -10,10 +10,12 @@ import com.example.habitpower.data.model.UserStats
 object GamificationEngine {
 
     // ── XP values ────────────────────────────────────────────────────────────
-    private const val XP_PER_HABIT = 10
-    private const val XP_DAY_COMPLETE_BONUS = 20
-    private const val XP_STREAK_BONUS_PER_DAY = 5
-    private const val XP_STREAK_BONUS_CAP = 50
+    private const val XP_FOR_SHOWING_UP = 12
+    private const val XP_EXTRA_HABIT_BONUS = 2
+    private const val XP_EXTRA_HABIT_BONUS_CAP = 4
+    private const val XP_DAY_COMPLETE_BONUS = 8
+    private const val XP_STREAK_BONUS_PER_DAY = 6
+    private const val XP_STREAK_BONUS_CAP = 90
 
     // ── Level thresholds (index = level - 1) ─────────────────────────────────
     private val LEVEL_XP_THRESHOLDS = intArrayOf(
@@ -133,11 +135,18 @@ object GamificationEngine {
      * [isDayPerfect] = all assigned habits were completed.
      */
     fun computeXpGain(habitsCompletedToday: Int, isDayPerfect: Boolean, currentStreak: Int): Int {
-        var xp = habitsCompletedToday * XP_PER_HABIT
+        if (habitsCompletedToday <= 0) return 0
+
+        // Reward daily consistency first, with diminishing returns for high daily volume.
+        var xp = XP_FOR_SHOWING_UP
+        val extraHabits = (habitsCompletedToday - 1).coerceAtLeast(0)
+        xp += (extraHabits * XP_EXTRA_HABIT_BONUS).coerceAtMost(XP_EXTRA_HABIT_BONUS_CAP)
+
+        val streakBonus = (currentStreak * XP_STREAK_BONUS_PER_DAY).coerceAtMost(XP_STREAK_BONUS_CAP)
+        xp += streakBonus
+
         if (isDayPerfect) {
             xp += XP_DAY_COMPLETE_BONUS
-            val streakBonus = (currentStreak * XP_STREAK_BONUS_PER_DAY).coerceAtMost(XP_STREAK_BONUS_CAP)
-            xp += streakBonus
         }
         return xp
     }
@@ -181,7 +190,11 @@ object GamificationEngine {
     ): Pair<UserStats, Long> { // returns (newStats, newBadgesMask)
         val hasAssignedHabits = totalHabits > 0
         val perfectDay = isDayPerfect && hasAssignedHabits
-        val newStreak = if (perfectDay) existing.currentStreak + 1 else 0
+
+        // Streak represents daily consistency (at least one completed habit),
+        // not strict "all habits done" behavior.
+        val activeDay = habitsCompleted > 0
+        val newStreak = if (activeDay) existing.currentStreak + 1 else 0
         val newLongest = maxOf(existing.longestStreak, newStreak)
         val xpGain = computeXpGain(habitsCompleted, perfectDay, newStreak)
         val newXp = existing.totalXp + xpGain

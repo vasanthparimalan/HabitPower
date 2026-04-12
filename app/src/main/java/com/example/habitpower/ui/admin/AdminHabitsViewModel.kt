@@ -10,6 +10,7 @@ import com.example.habitpower.data.model.HabitDefinition
 import com.example.habitpower.data.model.HabitRecurrenceType
 import com.example.habitpower.data.model.HabitType
 import com.example.habitpower.data.model.LifeArea
+import com.example.habitpower.data.model.Routine
 import com.example.habitpower.data.model.TargetOperator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -33,6 +34,8 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
     var unit by mutableStateOf("")
         private set
     var targetValue by mutableStateOf("")
+        private set
+    var selectedRoutineId by mutableStateOf<Long?>(null)
         private set
 
     /** For TIME habits: the hour component of the target bedtime (24h). */
@@ -87,13 +90,20 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
         initialValue = emptyList()
     )
 
+    val routines: StateFlow<List<Routine>> = repository.getAllRoutines().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = emptyList()
+    )
+
     fun updateName(value: String) { name = value }
     fun updateGoalIdentityStatement(value: String) { goalIdentityStatement = value }
     fun updateDescription(value: String) { description = value }
+    fun updateSelectedRoutine(routineId: Long?) { selectedRoutineId = routineId }
 
     fun updateType(type: HabitType) {
         selectedType = type
-        if (type == HabitType.BOOLEAN || type == HabitType.TEXT) {
+        if (type == HabitType.BOOLEAN || type == HabitType.TEXT || type == HabitType.ROUTINE) {
             unit = ""
             targetValue = ""
         }
@@ -104,6 +114,9 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
         // Default operator for time: LESS_THAN_OR_EQUAL (sleep BEFORE target)
         if (type == HabitType.TIME) {
             selectedOperator = TargetOperator.LESS_THAN_OR_EQUAL
+        }
+        if (type != HabitType.ROUTINE) {
+            selectedRoutineId = null
         }
     }
 
@@ -157,7 +170,7 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
 
         viewModelScope.launch {
             val resolvedTarget: Double? = when (selectedType) {
-                HabitType.BOOLEAN, HabitType.TEXT -> null
+                HabitType.BOOLEAN, HabitType.TEXT, HabitType.ROUTINE -> null
                 HabitType.TIME -> minutesFromNoon(targetHour, targetMinute)
                 HabitType.TIMER -> targetValue.toDoubleOrNull()?.coerceIn(1.0, 1440.0)
                 else -> targetValue.toDoubleOrNull()
@@ -217,15 +230,16 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
                 goalIdentityStatement = trimmedGoalIdentity,
                 description = trimmedDescription,
                 type = selectedType,
+                routineId = selectedRoutineId,
                 unit = when (selectedType) {
-                    HabitType.BOOLEAN, HabitType.TEXT -> null
+                    HabitType.BOOLEAN, HabitType.TEXT, HabitType.ROUTINE -> null
                     HabitType.TIMER -> "minutes"
                     else -> unit
                 },
                 targetValue = resolvedTarget,
                 operator = selectedOperator,
                 lifeAreaId = selectedLifeAreaId,
-                showInDailyCheckIn = selectedType != HabitType.TIMER,
+                showInDailyCheckIn = selectedType != HabitType.TIMER && selectedType != HabitType.ROUTINE,
                 commitmentTime = "%02d:%02d".format(commitmentHour, commitmentMinute),
                 commitmentLocation = trimmedLocation,
                 preReminderMinutes = resolvedReminderMinutes,
@@ -246,6 +260,7 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
             selectedType = HabitType.BOOLEAN
             unit = ""
             targetValue = ""
+            selectedRoutineId = null
             targetHour = 22
             targetMinute = 0
             commitmentHour = 7
@@ -272,7 +287,7 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
         val trimmed = newName.trim()
         if (trimmed.isBlank()) return
         val resolvedTarget = when (habit.type) {
-            HabitType.BOOLEAN, HabitType.TEXT -> null
+            HabitType.BOOLEAN, HabitType.TEXT, HabitType.ROUTINE -> null
             HabitType.TIME -> newTarget?.toDoubleOrNull()
             else -> newTarget?.toDoubleOrNull()
         }
@@ -308,7 +323,7 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
         if (trimmed.isBlank()) return
 
         val resolvedTarget = when (habit.type) {
-            HabitType.BOOLEAN, HabitType.TEXT -> null
+            HabitType.BOOLEAN, HabitType.TEXT, HabitType.ROUTINE -> null
             HabitType.TIME -> newTarget?.toDoubleOrNull()
             else -> newTarget?.toDoubleOrNull()
         }

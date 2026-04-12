@@ -262,7 +262,7 @@ private fun HabitInputCard(
             }
 
             when (habit.type) {
-                HabitType.BOOLEAN -> {
+                HabitType.BOOLEAN, HabitType.ROUTINE -> {
                     val haptic = LocalHapticFeedback.current
                     val toggleScale by animateFloatAsState(
                         targetValue = if (habit.booleanValue) 1.02f else 1f,
@@ -282,7 +282,7 @@ private fun HabitInputCard(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Completed")
+                        Text(if (habit.type == HabitType.ROUTINE) "Completed via routine" else "Completed")
                         Switch(
                             checked = habit.booleanValue,
                             onCheckedChange = {

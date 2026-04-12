@@ -41,6 +41,7 @@ import com.example.habitpower.data.model.HabitDefinition
 import com.example.habitpower.data.model.LifeArea
 import com.example.habitpower.data.model.UserProfile
 import com.example.habitpower.ui.AppViewModelProvider
+import com.example.habitpower.ui.theme.LeafSectionItemCard
 import com.example.habitpower.ui.theme.SectionHeader
 import com.example.habitpower.ui.theme.StatusChip
 
@@ -226,35 +227,20 @@ private fun HabitAssignmentCard(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(habit.name, style = MaterialTheme.typography.titleMedium)
-                Text(
-                    text = buildString {
-                        append(habit.type.name)
-                        habit.unit?.takeIf { it.isNotBlank() }?.let {
-                            append(" • ")
-                            append(it)
-                        }
-                        habit.targetValue?.let {
-                            append(" • target ")
-                            append(it)
-                        }
-                    },
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
+    val attributes = buildList {
+        add("Type" to habit.type.name)
+        habit.unit?.takeIf { it.isNotBlank() }?.let { add("Unit" to it) }
+        habit.targetValue?.let { add("Target" to it.toString()) }
+    }
+
+    LeafSectionItemCard(
+        title = habit.name,
+        attributes = attributes,
+        trailingActions = {
             Checkbox(
                 checked = checked,
                 onCheckedChange = onCheckedChange
             )
         }
-    }
+    )
 }

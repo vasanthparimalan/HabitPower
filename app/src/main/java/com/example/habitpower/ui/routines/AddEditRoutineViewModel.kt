@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.habitpower.data.HabitPowerRepository
 import com.example.habitpower.data.model.Exercise
 import com.example.habitpower.data.model.Routine
+import com.example.habitpower.data.model.RoutineType
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -26,6 +27,10 @@ class AddEditRoutineViewModel(
         private set
     var description by mutableStateOf("")
         private set
+    var routineType by mutableStateOf(RoutineType.NORMAL)
+        private set
+    var restTimeSeconds by mutableStateOf("")
+        private set  // For timed routines
 
     var isSaving by mutableStateOf(false)
         private set
@@ -50,6 +55,8 @@ class AddEditRoutineViewModel(
                 routine?.let {
                     name = it.name
                     description = it.description
+                    routineType = it.type
+                    restTimeSeconds = it.restTimeSeconds.toString()
                 }
                 // Load initially-assigned exercises ONE TIME (first emission).
                 // We do NOT use collect() here to avoid the live-update overwriting
@@ -67,6 +74,8 @@ class AddEditRoutineViewModel(
 
     fun updateName(input: String) { name = input }
     fun updateDescription(input: String) { description = input }
+    fun updateRoutineType(type: RoutineType) { routineType = type }
+    fun updateRestTimeSeconds(input: String) { restTimeSeconds = input }
 
     fun addExercise(exercise: Exercise) {
         if (_addedExercises.none { it.id == exercise.id }) {
@@ -99,7 +108,9 @@ class AddEditRoutineViewModel(
                 val routine = Routine(
                     id = routineId ?: 0,
                     name = name.trim(),
-                    description = description.trim()
+                    description = description.trim(),
+                    type = routineType,
+                    restTimeSeconds = restTimeSeconds.toIntOrNull() ?: 0
                 )
 
                 val savedId = if (routineId == null) {

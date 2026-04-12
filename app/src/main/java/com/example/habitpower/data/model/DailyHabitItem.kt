@@ -8,6 +8,8 @@ import java.time.temporal.ChronoUnit
 data class DailyHabitItem(
     @ColumnInfo(name = "habitId")
     val habitId: Long,
+    @ColumnInfo(name = "routineId")
+    val routineId: Long?,
     @ColumnInfo(name = "lifeAreaId")
     val lifeAreaId: Long?,
     val name: String,
@@ -37,7 +39,11 @@ data class DailyHabitItem(
     val recurrenceYearlyDates: String = "",
     val recurrenceAnchorDate: LocalDate? = null,
     val recurrenceStartDate: LocalDate? = null,
-    val recurrenceEndDate: LocalDate? = null
+    val recurrenceEndDate: LocalDate? = null,
+    @ColumnInfo(name = "commitmentTime")
+    val commitmentTime: String? = null,
+    @ColumnInfo(name = "commitmentLocation")
+    val commitmentLocation: String = ""
 ) {
     val effectiveDisplayOrder: Int
         get() = if (assignmentDisplayOrder >= 0) assignmentDisplayOrder else habitDisplayOrder

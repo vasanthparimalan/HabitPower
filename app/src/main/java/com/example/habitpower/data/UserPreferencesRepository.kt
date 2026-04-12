@@ -42,6 +42,10 @@ class UserPreferencesRepository(private val context: Context) {
 
     private val SOUND_ENABLED_KEY = booleanPreferencesKey("notification_sound_enabled")
     private val SOUND_ID_KEY = stringPreferencesKey("notification_sound_id")
+    private val ROUTINE_START_SOUND_ENABLED_KEY = booleanPreferencesKey("routine_start_sound_enabled")
+    private val ROUTINE_START_SOUND_ID_KEY = stringPreferencesKey("routine_start_sound_id")
+    private val ROUTINE_END_SOUND_ENABLED_KEY = booleanPreferencesKey("routine_end_sound_enabled")
+    private val ROUTINE_END_SOUND_ID_KEY = stringPreferencesKey("routine_end_sound_id")
 
     /** Whether the completion notification sound is enabled (default: true). */
     val soundEnabled: Flow<Boolean> = context.dataStore.data.map { preferences ->
@@ -53,11 +57,43 @@ class UserPreferencesRepository(private val context: Context) {
         preferences[SOUND_ID_KEY] ?: NotificationSoundOption.entries.first().id
     }
 
+    val routineStartSoundEnabled: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[ROUTINE_START_SOUND_ENABLED_KEY] ?: true
+    }
+
+    val routineStartSoundId: Flow<String> = context.dataStore.data.map { preferences ->
+        preferences[ROUTINE_START_SOUND_ID_KEY] ?: NotificationSoundOption.SHORT_BEEP.id
+    }
+
+    val routineEndSoundEnabled: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[ROUTINE_END_SOUND_ENABLED_KEY] ?: true
+    }
+
+    val routineEndSoundId: Flow<String> = context.dataStore.data.map { preferences ->
+        preferences[ROUTINE_END_SOUND_ID_KEY] ?: NotificationSoundOption.POSITIVE.id
+    }
+
     suspend fun saveSoundEnabled(enabled: Boolean) {
         context.dataStore.edit { it[SOUND_ENABLED_KEY] = enabled }
     }
 
     suspend fun saveNotificationSoundId(id: String) {
         context.dataStore.edit { it[SOUND_ID_KEY] = id }
+    }
+
+    suspend fun saveRoutineStartSoundEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[ROUTINE_START_SOUND_ENABLED_KEY] = enabled }
+    }
+
+    suspend fun saveRoutineStartSoundId(id: String) {
+        context.dataStore.edit { it[ROUTINE_START_SOUND_ID_KEY] = id }
+    }
+
+    suspend fun saveRoutineEndSoundEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[ROUTINE_END_SOUND_ENABLED_KEY] = enabled }
+    }
+
+    suspend fun saveRoutineEndSoundId(id: String) {
+        context.dataStore.edit { it[ROUTINE_END_SOUND_ID_KEY] = id }
     }
 }

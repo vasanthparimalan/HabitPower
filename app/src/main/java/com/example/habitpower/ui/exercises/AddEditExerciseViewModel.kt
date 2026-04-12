@@ -38,6 +38,10 @@ class AddEditExerciseViewModel(
         private set
     var notes by mutableStateOf("")
         private set
+    var instructions by mutableStateOf("")
+        private set
+    var tags by mutableStateOf("")
+        private set  // CSV format: "gym,yoga,flexibility"
 
     // Helper state to toggle UI between Reps and Duration
     var isTimeBased by mutableStateOf(false)
@@ -64,6 +68,8 @@ class AddEditExerciseViewModel(
                     }
 
                     notes = exercise.notes ?: ""
+                    instructions = exercise.instructions ?: ""
+                    tags = exercise.tags
                 }
             }
         }
@@ -115,6 +121,8 @@ class AddEditExerciseViewModel(
     fun updateTargetReps(input: String) { if (!isTimeBased) targetReps = input }
 
     fun updateNotes(input: String) { notes = input }
+    fun updateInstructions(input: String) { instructions = input }
+    fun updateTags(input: String) { tags = input }
 
     fun saveExercise() {
         if (name.isBlank()) return
@@ -127,7 +135,9 @@ class AddEditExerciseViewModel(
             targetSets = targetSets.toIntOrNull(),
             targetDurationSeconds = if (isTimeBased) targetDuration.toIntOrNull() else null,
             targetReps = if (!isTimeBased) targetReps.toIntOrNull() else null,
-            notes = notes
+            notes = notes,
+            instructions = instructions.ifBlank { null },
+            tags = tags
         )
 
         viewModelScope.launch {

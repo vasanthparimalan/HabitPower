@@ -16,7 +16,9 @@ import com.example.habitpower.ui.execution.WorkoutRunnerViewModel
 import com.example.habitpower.ui.exercises.AddEditExerciseViewModel
 import com.example.habitpower.ui.exercises.ExercisesViewModel
 import com.example.habitpower.ui.routines.AddEditRoutineViewModel
+import com.example.habitpower.ui.routines.ExecuteRoutineRouterViewModel
 import com.example.habitpower.ui.routines.RoutinesViewModel
+import com.example.habitpower.ui.routines.TimedRoutineExecutorViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
@@ -34,6 +36,18 @@ object AppViewModelProvider {
         }
         initializer {
             AddEditRoutineViewModel(
+                this.createSavedStateHandle(),
+                habitPowerApplication().container.habitPowerRepository
+            )
+        }
+        initializer {
+            TimedRoutineExecutorViewModel(
+                this.createSavedStateHandle(),
+                habitPowerApplication().container.habitPowerRepository
+            )
+        }
+        initializer {
+            ExecuteRoutineRouterViewModel(
                 this.createSavedStateHandle(),
                 habitPowerApplication().container.habitPowerRepository
             )

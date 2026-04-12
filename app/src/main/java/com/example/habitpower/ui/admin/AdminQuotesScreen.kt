@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.data.model.Quote
 import com.example.habitpower.ui.AppViewModelProvider
+import com.example.habitpower.ui.theme.LeafSectionItemCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,24 +96,14 @@ fun AdminQuotesScreen(
 
 @Composable
 fun QuoteCard(quote: Quote, onDelete: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = quote.text,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.bodyMedium
-            )
+    LeafSectionItemCard(
+        title = quote.text,
+        trailingActions = {
             IconButton(onClick = onDelete) {
                 Icon(Icons.Default.Delete, contentDescription = "Delete Quote", tint = MaterialTheme.colorScheme.error)
             }
         }
-    }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

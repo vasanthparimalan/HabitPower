@@ -1,26 +1,19 @@
 package com.example.habitpower.ui.routines
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,6 +42,7 @@ import com.example.habitpower.ui.AppViewModelProvider
 import com.example.habitpower.ui.exercises.ExerciseItem
 import com.example.habitpower.ui.exercises.ExercisesViewModel
 import com.example.habitpower.ui.navigation.Screen
+import com.example.habitpower.ui.theme.LeafSectionItemCard
 
 enum class RoutinesSection {
     ROUTINES,
@@ -160,7 +154,7 @@ private fun RoutinesList(
                 RoutineItem(
                     routine = routine,
                     exerciseCount = exerciseCount,
-                    onItemClick = { onNavigate(Screen.AddEditRoutine.createRoute(routine.id)) },
+                    onEditClick = { onNavigate(Screen.AddEditRoutine.createRoute(routine.id)) },
                     onDeleteClick = { onDeleteRoutine(routine) },
                     onPlayClick = { onNavigate(Screen.ExecuteRoutine.createRoute(routine.id)) }
                 )
@@ -196,7 +190,7 @@ private fun ExercisesList(
             items(exercises, key = { it.id }) { exercise ->
                 ExerciseItem(
                     exercise = exercise,
-                    onItemClick = { onNavigate(Screen.AddEditExercise.createRoute(exercise.id)) },
+                    onEditClick = { onNavigate(Screen.AddEditExercise.createRoute(exercise.id)) },
                     onDeleteClick = { onDeleteExercise(exercise) }
                 )
             }
@@ -208,38 +202,20 @@ private fun ExercisesList(
 fun RoutineItem(
     routine: Routine,
     exerciseCount: Int,
-    onItemClick: () -> Unit,
+    onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onPlayClick: () -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onItemClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .height(IntrinsicSize.Min),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = routine.name, style = MaterialTheme.typography.titleMedium)
-                if (routine.description.isNotBlank()) {
-                    Text(text = routine.description, style = MaterialTheme.typography.bodySmall, maxLines = 2)
-                }
-                Text(
-                    text = "$exerciseCount exercise${if (exerciseCount == 1) "" else "s"}",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = if (exerciseCount == 0) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    }
-                )
-            }
+    val attributes = buildList {
+        add("Type" to routine.type.name)
+        add("Exercises" to exerciseCount.toString())
+    }
 
+    LeafSectionItemCard(
+        title = routine.name,
+        subtitle = routine.description.takeIf { it.isNotBlank() },
+        attributes = attributes,
+        trailingActions = {
             IconButton(onClick = onPlayClick, enabled = exerciseCount > 0) {
                 Icon(
                     Icons.Default.PlayArrow,
@@ -251,10 +227,12 @@ fun RoutineItem(
                     }
                 )
             }
-
+            IconButton(onClick = onEditClick) {
+                Icon(Icons.Default.Edit, contentDescription = "Edit")
+            }
             IconButton(onClick = onDeleteClick) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete")
+                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
             }
         }
-    }
+    )
 }

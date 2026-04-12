@@ -18,6 +18,12 @@ data class UserStats(
     val totalHabitsCompleted: Int = 0,
     val totalDaysPerfect: Int = 0,
     val lastPerfectDate: LocalDate? = null,
+    val lastCheckInDate: LocalDate? = null,
+    val lastCheckInCompletedCount: Int = 0,
+    val lastCheckInWasPerfect: Boolean = false,
+    val lastCheckInXpAwarded: Int = 0,
+    val lastCheckInStreakBefore: Int = 0,
+    val lastCheckInLongestBefore: Int = 0,
     /** Bitmask of earned badge IDs from GamificationEngine.Badge */
     val earnedBadgesMask: Long = 0L
 )

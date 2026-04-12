@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.data.model.LifeArea
 import com.example.habitpower.ui.AppViewModelProvider
+import com.example.habitpower.ui.theme.LeafSectionItemCard
 import com.example.habitpower.ui.theme.SectionHeader
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
@@ -148,30 +149,16 @@ fun AdminLifeAreasScreen(
 
 @Composable
 private fun LifeAreaRow(item: LifeArea, onEdit: (LifeArea) -> Unit, onDelete: (LifeArea) -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = item.name, style = MaterialTheme.typography.titleMedium)
-                item.description?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+    LeafSectionItemCard(
+        title = item.name,
+        subtitle = item.description,
+        trailingActions = {
+            IconButton(onClick = { onEdit(item) }) {
+                Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
             }
-            Row {
-                IconButton(onClick = { onEdit(item) }) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
-                }
-                IconButton(onClick = { onDelete(item) }) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
-                }
+            IconButton(onClick = { onDelete(item) }) {
+                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
             }
         }
-    }
+    )
 }

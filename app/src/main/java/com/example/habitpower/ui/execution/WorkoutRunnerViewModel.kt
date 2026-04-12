@@ -106,6 +106,7 @@ class WorkoutRunnerViewModel(
                     endTime = System.currentTimeMillis()
                 )
             )
+            repository.completeRoutineLinkedHabits(routineId)
         }
     }
 }

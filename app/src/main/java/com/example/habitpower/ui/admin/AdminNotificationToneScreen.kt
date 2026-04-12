@@ -15,8 +15,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.ui.AppViewModelProvider
+import com.example.habitpower.ui.theme.LeafSectionItemCard
 import com.example.habitpower.util.NotificationSoundOption
 import com.example.habitpower.util.SoundPlayer
 
@@ -67,41 +66,12 @@ fun AdminNotificationToneScreen(
             // Master sound toggle
             item {
                 Spacer(Modifier.height(8.dp))
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Icon(
-                                imageVector = if (state.soundEnabled) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff,
-                                contentDescription = null,
-                                tint = if (state.soundEnabled)
-                                    MaterialTheme.colorScheme.primary
-                                else
-                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                            )
-                            Column {
-                                Text("Completion Sound", style = MaterialTheme.typography.titleMedium)
-                                Text(
-                                    if (state.soundEnabled) "Sound is on" else "Sound is off",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                        Switch(
-                            checked = state.soundEnabled,
-                            onCheckedChange = { viewModel.toggleSound() }
-                        )
-                    }
-                }
+                ToneToggleCard(
+                    title = "Completion Sound",
+                    subtitle = if (state.soundEnabled) "Sound is on" else "Sound is off",
+                    enabled = state.soundEnabled,
+                    onToggle = { viewModel.toggleSound() }
+                )
             }
 
             item {
@@ -114,47 +84,94 @@ fun AdminNotificationToneScreen(
 
             items(state.availableOptions) { option ->
                 val isSelected = option.id == state.selectedSoundId
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (isSelected)
-                            MaterialTheme.colorScheme.primaryContainer
-                        else
-                            MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            RadioButton(
-                                selected = isSelected,
-                                onClick = { viewModel.selectSound(option) }
-                            )
-                            Text(
-                                text = option.displayName,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        }
-                        // Preview button
-                        IconButton(onClick = { SoundPlayer.play(option) }) {
-                            Icon(
-                                imageVector = Icons.Default.PlayArrow,
-                                contentDescription = "Preview ${option.displayName}"
-                            )
-                        }
-                    }
-                }
+                ToneOptionRow(
+                    option = option,
+                    isSelected = isSelected,
+                    onSelect = { viewModel.selectSound(option) }
+                )
+            }
+
+            item {
+                Spacer(Modifier.height(16.dp))
+                ToneToggleCard(
+                    title = "Routine Exercise Start Sound",
+                    subtitle = if (state.routineStartSoundEnabled) "Enabled for timed routines" else "Disabled",
+                    enabled = state.routineStartSoundEnabled,
+                    onToggle = { viewModel.toggleRoutineStartSound() }
+                )
+            }
+
+            items(state.availableOptions) { option ->
+                val isSelected = option.id == state.routineStartSoundId
+                ToneOptionRow(
+                    option = option,
+                    isSelected = isSelected,
+                    onSelect = { viewModel.selectRoutineStartSound(option) }
+                )
+            }
+
+            item {
+                Spacer(Modifier.height(16.dp))
+                ToneToggleCard(
+                    title = "Routine Exercise End Sound",
+                    subtitle = if (state.routineEndSoundEnabled) "Enabled for timed routines" else "Disabled",
+                    enabled = state.routineEndSoundEnabled,
+                    onToggle = { viewModel.toggleRoutineEndSound() }
+                )
+            }
+
+            items(state.availableOptions) { option ->
+                val isSelected = option.id == state.routineEndSoundId
+                ToneOptionRow(
+                    option = option,
+                    isSelected = isSelected,
+                    onSelect = { viewModel.selectRoutineEndSound(option) }
+                )
             }
 
             item { Spacer(Modifier.height(24.dp)) }
         }
     }
+}
+
+@Composable
+private fun ToneToggleCard(
+    title: String,
+    subtitle: String,
+    enabled: Boolean,
+    onToggle: () -> Unit
+) {
+    LeafSectionItemCard(
+        title = title,
+        subtitle = subtitle,
+        attributes = listOf("State" to if (enabled) "On" else "Off"),
+        trailingActions = {
+            Switch(
+                checked = enabled,
+                onCheckedChange = { onToggle() }
+            )
+        }
+    )
+}
+
+@Composable
+private fun ToneOptionRow(
+    option: NotificationSoundOption,
+    isSelected: Boolean,
+    onSelect: () -> Unit
+) {
+    LeafSectionItemCard(
+        title = option.displayName,
+        containerColor = if (isSelected) {
+            MaterialTheme.colorScheme.primaryContainer
+        } else {
+            MaterialTheme.colorScheme.surfaceVariant
+        },
+        trailingActions = {
+            RadioButton(selected = isSelected, onClick = onSelect)
+            IconButton(onClick = { SoundPlayer.play(option) }) {
+                Icon(Icons.Default.PlayArrow, contentDescription = "Preview ${option.displayName}")
+            }
+        }
+    )
 }

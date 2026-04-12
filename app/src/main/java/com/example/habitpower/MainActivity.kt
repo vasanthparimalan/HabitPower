@@ -34,6 +34,7 @@ import com.example.habitpower.ui.execution.WorkoutRunnerScreen
 import com.example.habitpower.ui.exercises.AddEditExerciseScreen
 import com.example.habitpower.ui.navigation.Screen
 import com.example.habitpower.ui.routines.AddEditRoutineScreen
+import com.example.habitpower.ui.routines.ExecuteRoutineScreen
 import com.example.habitpower.ui.routines.RoutinesSection
 import com.example.habitpower.ui.routines.RoutinesScreen
 import com.example.habitpower.ui.theme.AppIconography
@@ -180,7 +181,10 @@ fun HabitPowerAppContent() {
                 AddEditRoutineScreen(navigateBack = { navController.popBackStack() })
             }
             composable(Screen.ExecuteRoutine.route) {
-                WorkoutRunnerScreen(navigateBack = { navController.popBackStack() })
+                ExecuteRoutineScreen(
+                    navigateBack = { navController.popBackStack() },
+                    onRoutineComplete = { navController.popBackStack() }
+                )
             }
             composable(Screen.DailyCheckIn.route) { backStackEntry ->
                 val userIdArg = backStackEntry.arguments?.getString("userId")?.toLongOrNull()

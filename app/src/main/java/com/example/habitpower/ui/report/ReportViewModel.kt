@@ -299,7 +299,8 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
                     }
                 }
             }
-            HabitType.TEXT -> !entry.textValue.isNullOrBlank()
+                HabitType.TEXT -> !entry.textValue.isNullOrBlank()
+                HabitType.ROUTINE -> entry.booleanValue == true
         }
     }
 }

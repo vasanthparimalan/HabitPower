@@ -4,6 +4,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -75,8 +77,9 @@ fun AddEditExerciseScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
-                .padding(16.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 88.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Image Picker Area
@@ -129,11 +132,28 @@ fun AddEditExerciseScreen(
             )
 
             OutlinedTextField(
+                value = viewModel.tags,
+                onValueChange = viewModel::updateTags,
+                label = { Text("Tags (CSV, optional)") },
+                modifier = Modifier.fillMaxWidth(),
+                supportingText = { Text("e.g. gym, bodyweight, yoga, flexibility, stretches, cooldown") }
+            )
+
+            OutlinedTextField(
                 value = viewModel.notes,
                 onValueChange = viewModel::updateNotes,
                 label = { Text("Important Notes (e.g. form cues)") },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 2
+            )
+
+            OutlinedTextField(
+                value = viewModel.instructions,
+                onValueChange = viewModel::updateInstructions,
+                label = { Text("Instructions (Step-by-step, optional)") },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 3,
+                supportingText = { Text("e.g. 1. Warm up for 2 min\n2. Do 3 sets\n3. Rest between sets") }
             )
 
             OutlinedTextField(

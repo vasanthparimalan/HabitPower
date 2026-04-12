@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 import java.time.LocalDate
 
 data class LifeAreaCompletion(
@@ -45,6 +46,12 @@ class DashboardViewModel(
         viewModelScope.launch {
             repository.seedQuotesIfNeeded()
         }
+
+        viewModelScope.launch {
+            repository.allQuotes.collect { list ->
+                _dailyQuote.value = if (list.isEmpty()) "" else list[Random.nextInt(list.size)].text
+            }
+        }
     }
 
     val atomicQuotes: StateFlow<List<com.example.habitpower.data.model.Quote>> = repository.allQuotes.stateIn(
@@ -53,9 +60,8 @@ class DashboardViewModel(
         initialValue = emptyList()
     )
 
-    val dailyQuote: StateFlow<String> = atomicQuotes.map { list ->
-        if (list.isEmpty()) "" else list[LocalDate.now().dayOfYear % list.size].text
-    }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = "")
+    private val _dailyQuote = MutableStateFlow("")
+    val dailyQuote: StateFlow<String> = _dailyQuote.asStateFlow()
 
     val users: StateFlow<List<UserProfile>> = repository.getActiveUsers().stateIn(
         scope = viewModelScope,
@@ -241,6 +247,12 @@ class DashboardViewModel(
         }
     }
 
+    fun updateHabitTime(habitId: Long, time: String?) {
+        viewModelScope.launch {
+            repository.updateHabitCommitmentTime(habitId, time?.takeIf { it.isNotBlank() })
+        }
+    }
+
     fun logTwoMinutes(habit: DailyHabitItem, date: LocalDate = selectedDate.value) {
         val user = activeUser.value ?: return
         viewModelScope.launch {
@@ -261,6 +273,7 @@ class DashboardViewModel(
             HabitType.NUMBER, HabitType.DURATION, HabitType.COUNT, HabitType.POMODORO, HabitType.TIMER -> entryNumericValue != null
             HabitType.TIME -> entryNumericValue != null
             HabitType.TEXT -> !entryTextValue.isNullOrBlank()
+            HabitType.ROUTINE -> entryBooleanValue == true
         }
     }
 

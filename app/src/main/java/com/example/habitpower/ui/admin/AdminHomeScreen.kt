@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.example.habitpower.HabitPowerApp
 import com.example.habitpower.ui.navigation.Screen
 import com.example.habitpower.ui.theme.AppSpacing
+import com.example.habitpower.ui.theme.LeafSectionItemCard
 import com.example.habitpower.ui.theme.SectionHeader
 import com.example.habitpower.ui.theme.StatusChip
 import kotlinx.coroutines.launch
@@ -313,21 +314,15 @@ private fun AdminActionCard(
     containerColor: androidx.compose.ui.graphics.Color,
     onClick: () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = containerColor)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(AppSpacing.md)
-        ) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(description, style = MaterialTheme.typography.bodyMedium)
-            Button(onClick = onClick) {
+    LeafSectionItemCard(
+        title = title,
+        subtitle = description,
+        containerColor = containerColor,
+        onClick = onClick,
+        trailingActions = {
+            TextButton(onClick = onClick) {
                 Text(buttonLabel)
             }
         }
-    }
+    )
 }

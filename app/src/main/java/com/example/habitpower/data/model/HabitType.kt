@@ -8,5 +8,6 @@ enum class HabitType {
     TEXT,
     TIME,
     POMODORO,
-    TIMER
+    TIMER,
+    ROUTINE  // New: routine execution type
 }

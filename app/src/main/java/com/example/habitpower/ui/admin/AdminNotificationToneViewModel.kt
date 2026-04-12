@@ -14,7 +14,18 @@ import kotlinx.coroutines.launch
 data class NotificationToneState(
     val soundEnabled: Boolean = true,
     val selectedSoundId: String = NotificationSoundOption.SHORT_BEEP.id,
+    val routineStartSoundEnabled: Boolean = true,
+    val routineStartSoundId: String = NotificationSoundOption.SHORT_BEEP.id,
+    val routineEndSoundEnabled: Boolean = true,
+    val routineEndSoundId: String = NotificationSoundOption.POSITIVE.id,
     val availableOptions: List<NotificationSoundOption> = NotificationSoundOption.entries
+)
+
+data class RoutineSoundSettings(
+    val startEnabled: Boolean,
+    val startSoundId: String,
+    val endEnabled: Boolean,
+    val endSoundId: String
 )
 
 class AdminNotificationToneViewModel(
@@ -27,12 +38,36 @@ class AdminNotificationToneViewModel(
     init {
         viewModelScope.launch {
             combine(
-                prefsRepository.soundEnabled,
-                prefsRepository.notificationSoundId
-            ) { enabled, soundId -> enabled to soundId }
-                .collect { (enabled, soundId) ->
-                    _state.update { it.copy(soundEnabled = enabled, selectedSoundId = soundId) }
+                combine(
+                    prefsRepository.soundEnabled,
+                    prefsRepository.notificationSoundId
+                ) { enabled, soundId -> enabled to soundId },
+                combine(
+                    prefsRepository.routineStartSoundEnabled,
+                    prefsRepository.routineStartSoundId,
+                    prefsRepository.routineEndSoundEnabled,
+                    prefsRepository.routineEndSoundId
+                ) { routineStartEnabled, routineStartId, routineEndEnabled, routineEndId ->
+                    RoutineSoundSettings(
+                        startEnabled = routineStartEnabled,
+                        startSoundId = routineStartId,
+                        endEnabled = routineEndEnabled,
+                        endSoundId = routineEndId
+                    )
                 }
+            ) { completionSound, routineSounds ->
+                NotificationToneState(
+                    soundEnabled = completionSound.first,
+                    selectedSoundId = completionSound.second,
+                    routineStartSoundEnabled = routineSounds.startEnabled,
+                    routineStartSoundId = routineSounds.startSoundId,
+                    routineEndSoundEnabled = routineSounds.endEnabled,
+                    routineEndSoundId = routineSounds.endSoundId,
+                    availableOptions = NotificationSoundOption.entries
+                )
+            }.collect { state ->
+                _state.value = state
+            }
         }
     }
 
@@ -45,5 +80,27 @@ class AdminNotificationToneViewModel(
     fun selectSound(option: NotificationSoundOption) {
         _state.update { it.copy(selectedSoundId = option.id) }
         viewModelScope.launch { prefsRepository.saveNotificationSoundId(option.id) }
+    }
+
+    fun toggleRoutineStartSound() {
+        val newValue = !_state.value.routineStartSoundEnabled
+        _state.update { it.copy(routineStartSoundEnabled = newValue) }
+        viewModelScope.launch { prefsRepository.saveRoutineStartSoundEnabled(newValue) }
+    }
+
+    fun selectRoutineStartSound(option: NotificationSoundOption) {
+        _state.update { it.copy(routineStartSoundId = option.id) }
+        viewModelScope.launch { prefsRepository.saveRoutineStartSoundId(option.id) }
+    }
+
+    fun toggleRoutineEndSound() {
+        val newValue = !_state.value.routineEndSoundEnabled
+        _state.update { it.copy(routineEndSoundEnabled = newValue) }
+        viewModelScope.launch { prefsRepository.saveRoutineEndSoundEnabled(newValue) }
+    }
+
+    fun selectRoutineEndSound(option: NotificationSoundOption) {
+        _state.update { it.copy(routineEndSoundId = option.id) }
+        viewModelScope.launch { prefsRepository.saveRoutineEndSoundId(option.id) }
     }
 }

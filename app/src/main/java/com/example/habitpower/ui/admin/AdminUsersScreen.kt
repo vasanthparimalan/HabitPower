@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.ui.AppViewModelProvider
+import com.example.habitpower.ui.theme.LeafSectionItemCard
 import com.example.habitpower.ui.theme.SectionHeader
 import com.example.habitpower.ui.theme.StatusChip
 
@@ -153,38 +154,25 @@ fun AdminUsersScreen(
                 }
             } else {
                 items(users, key = { it.id }) { user ->
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(user.name, style = MaterialTheme.typography.titleMedium)
-                                Text(
-                                    if (activeUser?.id == user.id) "Currently active" else "Available for selection",
-                                    style = MaterialTheme.typography.bodySmall
-                                )
+                    LeafSectionItemCard(
+                        title = user.name,
+                        subtitle = if (activeUser?.id == user.id) "Currently active" else "Available for selection",
+                        trailingActions = {
+                            IconButton(onClick = { editingUser = user }) {
+                                Icon(Icons.Default.Edit, contentDescription = "Edit")
                             }
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                IconButton(onClick = { editingUser = user }) {
-                                    Icon(androidx.compose.material.icons.Icons.Default.Edit, contentDescription = "Edit")
-                                }
-                                IconButton(onClick = { userToDelete = user }) {
-                                    Icon(androidx.compose.material.icons.Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
-                                }
-                                if (activeUser?.id == user.id) {
-                                    StatusChip(text = "Active", modifier = Modifier.padding(start = 8.dp))
-                                } else {
-                                    TextButton(onClick = { viewModel.setActiveUser(user.id) }) {
-                                        Text("Use")
-                                    }
+                            IconButton(onClick = { userToDelete = user }) {
+                                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                            }
+                            if (activeUser?.id == user.id) {
+                                StatusChip(text = "Active", modifier = Modifier.padding(start = 8.dp))
+                            } else {
+                                TextButton(onClick = { viewModel.setActiveUser(user.id) }) {
+                                    Text("Use")
                                 }
                             }
                         }
-                    }
+                    )
                 }
             }
         }

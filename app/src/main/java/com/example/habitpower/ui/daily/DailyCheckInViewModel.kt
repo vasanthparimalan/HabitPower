@@ -35,6 +35,7 @@ data class DailyCheckInHabitInput(
             HabitType.NUMBER, HabitType.DURATION, HabitType.COUNT, HabitType.POMODORO, HabitType.TIMER -> textValue.toDoubleOrNull() != null
             HabitType.TIME -> textValue.isNotBlank() // textValue stores "HH:MM AM/PM" display; numericValue used for save
             HabitType.TEXT -> textValue.isNotBlank()
+            HabitType.ROUTINE -> booleanValue
         }
 
     val targetMet: Boolean?
@@ -46,6 +47,7 @@ data class DailyCheckInHabitInput(
             }
             HabitType.TIME -> null // evaluated after save via minutesFromNoon
             HabitType.TEXT -> null
+            HabitType.ROUTINE -> if (booleanValue) true else false
         }
 }
 
@@ -170,6 +172,14 @@ class DailyCheckInViewModel(
                         type = habit.type,
                         textValue = habit.textValue
                     )
+
+                    HabitType.ROUTINE -> repository.saveDailyHabitEntry(
+                        userId = userId,
+                        date = date,
+                        habitId = habit.habitId,
+                        type = habit.type,
+                        booleanValue = habit.booleanValue
+                    )
                 }
             }
             overrideInputs.value = emptyMap()
@@ -203,6 +213,7 @@ class DailyCheckInViewModel(
                     }
                 }
                 HabitType.TEXT -> entryTextValue.orEmpty()
+                HabitType.ROUTINE -> ""
             },
             numericTimeValue = entryNumericValue ?: 0.0,
             booleanValue = entryBooleanValue == true

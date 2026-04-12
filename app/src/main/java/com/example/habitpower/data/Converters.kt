@@ -1,8 +1,10 @@
 package com.example.habitpower.data
 
 import androidx.room.TypeConverter
+import com.example.habitpower.data.model.ExerciseTag
 import com.example.habitpower.data.model.HabitRecurrenceType
 import com.example.habitpower.data.model.HabitType
+import com.example.habitpower.data.model.RoutineType
 import com.example.habitpower.data.model.TargetOperator
 import java.time.LocalDate
 
@@ -48,6 +50,18 @@ class Converters {
 
     @TypeConverter
     fun habitRecurrenceTypeToString(type: HabitRecurrenceType?): String? {
+        return type?.name
+    }
+
+    @TypeConverter
+    fun fromRoutineType(value: String?): RoutineType? {
+        return value?.let {
+            runCatching { RoutineType.valueOf(it) }.getOrDefault(RoutineType.NORMAL)
+        }
+    }
+
+    @TypeConverter
+    fun routineTypeToString(type: RoutineType?): String? {
         return type?.name
     }
 }

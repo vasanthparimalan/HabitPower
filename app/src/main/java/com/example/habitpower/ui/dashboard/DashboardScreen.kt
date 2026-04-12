@@ -3,9 +3,10 @@ package com.example.habitpower.ui.dashboard
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -28,12 +30,19 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -46,6 +55,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -61,7 +71,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -70,6 +79,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.unit.dp
@@ -82,13 +92,12 @@ import com.example.habitpower.ui.AppViewModelProvider
 import com.example.habitpower.ui.gamification.GamificationViewModel
 import com.example.habitpower.ui.navigation.Screen
 import com.example.habitpower.ui.theme.AppSpacing
-import com.example.habitpower.ui.theme.CompletionPulse
-import com.example.habitpower.ui.theme.DayCompletionKick
 import com.example.habitpower.ui.theme.GamificationSummaryCard
 import com.example.habitpower.ui.theme.SectionHeader
 import com.example.habitpower.ui.theme.StatusChip
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
@@ -106,12 +115,9 @@ fun DashboardScreen(
 ) {
     val heatmapData by viewModel.heatmapData.collectAsState()
     val selectedDate by viewModel.selectedDate.collectAsState()
-    val sessionsForSelectedDate by viewModel.sessionsForSelectedDate.collectAsState()
     val users by viewModel.users.collectAsState()
     val activeUser by viewModel.activeUser.collectAsState()
-    val selectedDateHabits by viewModel.selectedDateHabits.collectAsState()
     val todayHabits by viewModel.todayHabits.collectAsState()
-    val missedYesterday by viewModel.missedYesterdayHabitIds.collectAsState()
     val dailyQuote by viewModel.dailyQuote.collectAsState()
     val atomicQuotes by viewModel.atomicQuotes.collectAsState()
     val currentStreak by viewModel.currentStreak.collectAsState()
@@ -334,187 +340,37 @@ fun DashboardScreen(
 
             item {
                 SectionHeader(
-                    title = "Recent Days",
-                    subtitle = "Review today and backfill up to last 3 days"
+                    title = "Daily Check-In",
+                    subtitle = "Use one place for all detailed logging and backfill edits"
                 )
                 Spacer(modifier = Modifier.height(AppSpacing.sm))
-                Last7DaysSelector(
-                    selectedDate = selectedDate,
-                    onSelectDate = viewModel::selectDate
-                )
-            }
-
-            if (selectedDateHabits.isNotEmpty()) {
-                item {
-                    val missed = selectedDateHabits.filter { missedYesterday.contains(it.habitId) && !isCompleted(it) }
-
-                    if (selectedDate == LocalDate.now() && missed.isNotEmpty()) {
-                        Card(
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
-                        ) {
-                            Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Warning, contentDescription = "Warning", tint = MaterialTheme.colorScheme.error)
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    "You missed ${missed.size} habits yesterday. Don't break the chain twice!",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        }
-                    }
-
-                    Text(
-                        "Habits - ${selectedDate.format(java.time.format.DateTimeFormatter.ofPattern("EEE, MMM dd"))}",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-
-                val uncompleted = selectedDateHabits.filter { !isCompleted(it) }
-                val completed = selectedDateHabits.filter { isCompleted(it) }
-                val allSorted = uncompleted + completed
-                item {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        DayCompletionKick(
-                            allDone = completed.isNotEmpty() && completed.size == selectedDateHabits.size,
-                            completed = completed.size,
-                            total = selectedDateHabits.size,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        allSorted.chunked(2).forEach { rowHabits ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                rowHabits.forEach { habit ->
-                                    val isDone = isCompleted(habit)
-                                    val isMissed = missedYesterday.contains(habit.habitId) && !isDone
-
-                                    Card(
-                                        modifier = Modifier.weight(1f).height(64.dp),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = if (isDone) {
-                                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                                            } else if (isMissed) {
-                                                MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
-                                            } else {
-                                                MaterialTheme.colorScheme.surfaceVariant
-                                            }
-                                        )
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
-                                            Column(modifier = Modifier.weight(1f)) {
-                                                Text(
-                                                    text = habit.name,
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    fontWeight = if (isDone) FontWeight.Normal else FontWeight.Bold,
-                                                    color = if (isDone) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) else MaterialTheme.colorScheme.onSurface,
-                                                    maxLines = 1
-                                                )
-                                                val statusText = when {
-                                                    isDone -> "Completed"
-                                                    isMissed -> "Missed yesterday"
-                                                    else -> "Pending"
-                                                }
-                                                Text(
-                                                    text = statusText,
-                                                    style = MaterialTheme.typography.labelSmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
-                                                if (!isDone && habit.type != HabitType.BOOLEAN && habit.type != HabitType.POMODORO && habit.type != HabitType.TIMER) {
-                                                    TextButton(
-                                                        onClick = { viewModel.logTwoMinutes(habit, selectedDate) },
-                                                        contentPadding = PaddingValues(0.dp),
-                                                        modifier = Modifier.height(20.dp)
-                                                    ) {
-                                                        Text("Do 2 Mins", fontSize = 10.sp)
-                                                    }
-                                                }
-                                            }
-
-                                            if (habit.type == HabitType.BOOLEAN) {
-                                                Checkbox(
-                                                    checked = isDone,
-                                                    onCheckedChange = { viewModel.toggleHabit(habit.habitId, selectedDate) }
-                                                )
-                                            } else {
-                                                if (isDone) {
-                                                    CompletionPulse(visible = true)
-                                                } else {
-                                                    IconButton(onClick = {
-                                                        if ((habit.type == HabitType.POMODORO || habit.type == HabitType.TIMER) && selectedDate == LocalDate.now()) {
-                                                            onNavigate(Screen.Focus.createRoute(habit.habitId))
-                                                        } else {
-                                                            onNavigate(Screen.DailyCheckIn.createRoute(activeUser?.id, selectedDate))
-                                                        }
-                                                    }) {
-                                                        Icon(if (habit.type == HabitType.POMODORO || habit.type == HabitType.TIMER) Icons.Default.PlayArrow else Icons.Default.Edit, "Log")
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                if (rowHabits.size == 1) {
-                                    Spacer(modifier = Modifier.weight(1f))
-                                }
-                            }
-                        }
-                    }
+                FilledTonalButton(
+                    onClick = { onNavigate(Screen.DailyCheckIn.createRoute(activeUser?.id, LocalDate.now())) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Edit, contentDescription = null)
+                    Spacer(modifier = Modifier.width(AppSpacing.sm))
+                    Text("Open Daily Check-In")
                 }
             }
 
-            if (sessionsForSelectedDate.isNotEmpty()) {
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        "Completed Routines - ${selectedDate.format(java.time.format.DateTimeFormatter.ofPattern("MMM dd"))}",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-
-                items(sessionsForSelectedDate.size) { index ->
-                    val session = sessionsForSelectedDate[index]
-                    Card(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)) {
-                        Row(
-                            modifier = Modifier.padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(session.routineName, style = MaterialTheme.typography.labelLarge)
-                                Text("Completed: ${session.date}", style = MaterialTheme.typography.bodySmall)
-                            }
-                        }
-                    }
-                }
-            } else {
-                item {
-                    Text(
-                        "No specific routines completed on ${selectedDate.format(java.time.format.DateTimeFormatter.ofPattern("MMM dd"))}.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            item { Spacer(modifier = Modifier.height(80.dp)) }
+            item { Spacer(modifier = Modifier.height(12.dp)) }
 
             item {
                 SectionHeader(
                     title = "Today Tasks",
-                    subtitle = "Simple bottom list of what still needs to be done"
+                    subtitle = "Sorted by scheduled time — tap \uD83D\uDD52 to set a time, hold to complete"
                 )
                 Spacer(modifier = Modifier.height(AppSpacing.sm))
 
-                val todayPending = todayHabits.filter { !isCompleted(it) }
-                val todayDone = todayHabits.filter { isCompleted(it) }
+                fun sortByTime(list: List<DailyHabitItem>): List<DailyHabitItem> =
+                    list.sortedWith(compareBy(nullsLast()) { habit ->
+                        habit.commitmentTime?.takeIf { it.isNotBlank() }
+                            ?.let { runCatching { LocalTime.parse(it) }.getOrNull() }
+                    })
+
+                val sortedPending = sortByTime(todayHabits.filter { !isCompleted(it) })
+                val sortedDone = sortByTime(todayHabits.filter { isCompleted(it) })
 
                 if (todayHabits.isEmpty()) {
                     Card(modifier = Modifier.fillMaxWidth()) {
@@ -526,14 +382,40 @@ fun DashboardScreen(
                         )
                     }
                 } else {
-                    StatusChip(text = "${todayDone.size}/${todayHabits.size} done")
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        StatusChip(text = "${sortedDone.size}/${todayHabits.size} done")
+                        if (sortedDone.size == todayHabits.size && todayHabits.isNotEmpty()) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Text(
+                                    text = "All done!",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+                    }
                     Spacer(modifier = Modifier.height(AppSpacing.sm))
 
-                    todayPending.forEach { habit ->
+                    sortedPending.forEach { habit ->
                         TodayTaskRow(
                             habit = habit,
+                            isDone = false,
                             onComplete = {
-                                if (habit.type == HabitType.BOOLEAN) {
+                                if (habit.type == HabitType.BOOLEAN || habit.type == HabitType.ROUTINE) {
                                     viewModel.toggleHabit(habit.habitId, LocalDate.now())
                                 } else {
                                     onNavigate(Screen.DailyCheckIn.createRoute(activeUser?.id, LocalDate.now()))
@@ -545,12 +427,34 @@ fun DashboardScreen(
                                 } else {
                                     onNavigate(Screen.DailyCheckIn.createRoute(activeUser?.id, LocalDate.now()))
                                 }
-                            }
+                            },
+                            onEditTime = { newTime -> viewModel.updateHabitTime(habit.habitId, newTime) }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
 
-                    if (todayDone.size == todayHabits.size) {
+                    if (sortedDone.isNotEmpty()) {
+                        if (sortedPending.isNotEmpty()) {
+                            Text(
+                                text = "Completed",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(vertical = 6.dp)
+                            )
+                        }
+                        sortedDone.forEach { habit ->
+                            TodayTaskRow(
+                                habit = habit,
+                                isDone = true,
+                                onComplete = { viewModel.toggleHabit(habit.habitId, LocalDate.now()) },
+                                onOpen = { onNavigate(Screen.DailyCheckIn.createRoute(activeUser?.id, LocalDate.now())) },
+                                onEditTime = { newTime -> viewModel.updateHabitTime(habit.habitId, newTime) }
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
+
+                    if (sortedDone.size == todayHabits.size) {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
@@ -573,86 +477,112 @@ fun DashboardScreen(
 }
 
 @Composable
-private fun Last7DaysSelector(
-    selectedDate: LocalDate,
-    onSelectDate: (LocalDate) -> Unit
+private fun WeeklyReviewCard(
+    currentStreak: Int,
+    thisWeekConsistency: Int,
+    bestPersonalRecord: Int
 ) {
-    val today = LocalDate.now()
-    val dates = (0L..2L).map { today.minusDays(it) }.reversed()
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    val (momentumIcon, momentumLabel) = when {
+        thisWeekConsistency < 40 -> Pair(Icons.AutoMirrored.Filled.TrendingUp, "Building")
+        thisWeekConsistency < 70 -> Pair(Icons.AutoMirrored.Filled.TrendingUp, "Growing")
+        else -> Pair(Icons.Default.LocalFireDepartment, "Strong")
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        dates.forEach { date ->
-            val selected = date == selectedDate
-            Card(
-                modifier = Modifier.border(
-                    width = if (selected) 1.dp else 0.dp,
-                    color = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
-                    shape = MaterialTheme.shapes.medium
-                ),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
-                ),
-                onClick = { onSelectDate(date) }
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            SectionHeader(title = "Weekly Review", subtitle = "Your momentum at a glance")
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = if (date == today) "Today" else date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                MetricBox(
+                    icon = Icons.Default.LocalFireDepartment,
+                    value = currentStreak.toString(),
+                    label = "Day Streak",
+                    modifier = Modifier.weight(1f)
+                )
+                MetricBox(
+                    icon = Icons.Default.BarChart,
+                    value = "$thisWeekConsistency%",
+                    label = "This Week",
+                    modifier = Modifier.weight(1f)
+                )
+                MetricBox(
+                    icon = Icons.Default.EmojiEvents,
+                    value = "$bestPersonalRecord%",
+                    label = "Best",
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        shape = MaterialTheme.shapes.large
                     )
-                    Text(
-                        text = date.dayOfMonth.toString(),
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                        color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
-                    )
-                    if (selected) {
-                        StatusChip(
-                            text = "Selected",
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.padding(top = AppSpacing.xs)
-                        )
-                    }
-                }
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Icon(
+                    imageVector = momentumIcon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(16.dp)
+                )
+                Text(
+                    text = "Momentum $momentumLabel",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             }
         }
     }
 }
 
 @Composable
-private fun WeeklyReviewCard(
-    currentStreak: Int,
-    thisWeekConsistency: Int,
-    bestPersonalRecord: Int
+private fun MetricBox(
+    icon: ImageVector,
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier
 ) {
-    val improvement = when {
-        thisWeekConsistency < 40 -> "Focus on one non-negotiable habit this week."
-        thisWeekConsistency < 70 -> "You are building momentum. Protect your current streak."
-        else -> "Great consistency. Keep improving one weak life area."
-    }
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        modifier = modifier,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            SectionHeader(title = "Weekly Review", subtitle = "Quick reflection with zero clutter")
-            Text("Current streak: $currentStreak days", style = MaterialTheme.typography.bodySmall)
-            Text("This week consistency: $thisWeekConsistency%", style = MaterialTheme.typography.bodySmall)
-            Text("Best week record: $bestPersonalRecord%", style = MaterialTheme.typography.bodySmall)
-            StatusChip(
-                text = if (thisWeekConsistency >= 70) "Momentum strong" else "Keep one anchor habit",
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(20.dp)
             )
-            Text(improvement, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
@@ -660,48 +590,241 @@ private fun WeeklyReviewCard(
 @Composable
 private fun TodayTaskRow(
     habit: DailyHabitItem,
+    isDone: Boolean,
     onComplete: () -> Unit,
-    onOpen: () -> Unit
+    onOpen: () -> Unit,
+    onEditTime: (String?) -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
+    val title = habit.name.ifBlank { "Untitled habit" }
+    val subtitle = todayTaskSubtitle(habit)
+    var showEditTimeDialog by remember { mutableStateOf(false) }
 
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 72.dp)
-                .padding(12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = habit.name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-                Text(
-                    text = when (habit.type) {
-                        HabitType.BOOLEAN -> "Hold to complete"
-                        HabitType.POMODORO, HabitType.TIMER -> "Open focus"
-                        else -> "Log progress"
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            if (habit.type == HabitType.BOOLEAN) {
-                HoldToCompleteButton(onComplete = onComplete)
-            } else {
-                FilledTonalButton(
-                    onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        onOpen()
-                    },
+    if (showEditTimeDialog) {
+        EditTimeDialog(
+            currentTime = habit.commitmentTime.orEmpty(),
+            onConfirm = { newTime ->
+                onEditTime(newTime.ifBlank { null })
+                showEditTimeDialog = false
+            },
+            onDismiss = { showEditTimeDialog = false }
+        )
+    }
+
+    val cardColors = if (isDone) {
+        CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
+        )
+    } else {
+        CardDefaults.cardColors()
+    }
+
+    Card(modifier = Modifier.fillMaxWidth(), colors = cardColors) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // ── Time / location strip ──────────────────────────────────────
+            val hasTime = !habit.commitmentTime.isNullOrBlank()
+            val hasPlace = habit.commitmentLocation.isNotBlank()
+            if (hasTime || hasPlace) {
+                Row(
                     modifier = Modifier
-                        .heightIn(min = 48.dp)
-                        .widthIn(min = 88.dp)
-                ) { Text("Open") }
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f))
+                        .padding(horizontal = 12.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (hasTime) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Schedule,
+                                contentDescription = "Time",
+                                modifier = Modifier.size(12.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = habit.commitmentTime!!,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                    if (hasPlace) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.LocationOn,
+                                contentDescription = "Location",
+                                modifier = Modifier.size(12.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = habit.commitmentLocation,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+            }
+
+            // ── Main row ──────────────────────────────────────────────────
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 64.dp)
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Completed badge (only for done tasks)
+                if (isDone) {
+                    Box(
+                        modifier = Modifier
+                            .size(28.dp)
+                            .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Completed",
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = if (isDone) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
+                        else MaterialTheme.colorScheme.onSurface
+                    )
+                    if (!isDone) {
+                        Text(
+                            text = subtitle,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                // Edit scheduled time
+                IconButton(
+                    onClick = { showEditTimeDialog = true },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Schedule,
+                        contentDescription = "Set scheduled time",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+
+                // Action area
+                if (isDone) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier
+                            .widthIn(min = 80.dp)
+                            .padding(start = 4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = "Done",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                } else if (habit.type == HabitType.BOOLEAN || habit.type == HabitType.ROUTINE) {
+                    HoldToCompleteButton(onComplete = onComplete)
+                } else {
+                    FilledTonalButton(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onOpen()
+                        },
+                        modifier = Modifier
+                            .heightIn(min = 48.dp)
+                            .widthIn(min = 88.dp)
+                    ) { Text("Open") }
+                }
             }
         }
     }
 }
+
+@Composable
+private fun EditTimeDialog(
+    currentTime: String,
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var timeInput by remember { mutableStateOf(currentTime) }
+    var isError by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Scheduled Execution Time") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Set when this habit is scheduled (24-hour HH:mm). Leave blank to clear.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                OutlinedTextField(
+                    value = timeInput,
+                    onValueChange = { timeInput = it; isError = false },
+                    label = { Text("Time (HH:mm)") },
+                    placeholder = { Text("e.g. 07:30") },
+                    isError = isError,
+                    supportingText = if (isError) {
+                        { Text("Enter a valid time, e.g. 07:30", color = MaterialTheme.colorScheme.error) }
+                    } else null,
+                    singleLine = true
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                val trimmed = timeInput.trim()
+                if (trimmed.isBlank()) {
+                    onConfirm("")
+                } else {
+                    val valid = runCatching { LocalTime.parse(trimmed) }.isSuccess
+                    if (valid) onConfirm(trimmed) else isError = true
+                }
+            }) { Text("Save") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        }
+    )
+}
+
+
 
 @Composable
 private fun HoldToCompleteButton(onComplete: () -> Unit) {
@@ -734,7 +857,7 @@ private fun HoldToCompleteButton(onComplete: () -> Unit) {
 
     Box(
         modifier = Modifier
-            .widthIn(min = 88.dp)
+            .width(104.dp)
             .heightIn(min = 48.dp)
             .graphicsLayer(scaleX = scale, scaleY = scale)
             .border(
@@ -772,6 +895,28 @@ private fun HoldToCompleteButton(onComplete: () -> Unit) {
     }
 }
 
+private fun todayTaskSubtitle(habit: DailyHabitItem): String {
+    val description = habit.description.trim()
+    return when (habit.type) {
+        HabitType.BOOLEAN -> if (description.isNotBlank()) description else "Hold to complete"
+        HabitType.ROUTINE -> if (description.isNotBlank()) description else "Run linked routine"
+        HabitType.POMODORO, HabitType.TIMER -> if (description.isNotBlank()) description else "Open focus session"
+        HabitType.COUNT, HabitType.NUMBER, HabitType.DURATION -> {
+            if (habit.targetValue != null) {
+                val unit = habit.unit?.takeIf { it.isNotBlank() }?.let { " $it" }.orEmpty()
+                "Target ${habit.targetValue}$unit"
+            } else if (description.isNotBlank()) {
+                description
+            } else {
+                "Log progress"
+            }
+        }
+
+        HabitType.TIME -> if (description.isNotBlank()) description else "Log time"
+        HabitType.TEXT -> if (description.isNotBlank()) description else "Add note"
+    }
+}
+
 @Composable
 private fun DashboardKpiAndLifeAreaSection(
     currentStreak: Int,
@@ -780,6 +925,15 @@ private fun DashboardKpiAndLifeAreaSection(
     lifeAreaCompletion: List<LifeAreaCompletion>,
     selectedDate: LocalDate
 ) {
+    var showChartDetailModal by remember { mutableStateOf(false) }
+    
+    if (showChartDetailModal) {
+        ChartDetailModal(
+            data = lifeAreaCompletion,
+            onClose = { showChartDetailModal = false }
+        )
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -833,13 +987,28 @@ private fun DashboardKpiAndLifeAreaSection(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                LifeAreaRoseChart(
-                    data = lifeAreaCompletion,
-                    holeColor = MaterialTheme.colorScheme.surfaceVariant,
-                    modifier = Modifier.size(170.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .size(170.dp)
+                        .clickable { showChartDetailModal = true }
+                ) {
+                    LifeAreaRoseChart(
+                        data = lifeAreaCompletion,
+                        holeColor = MaterialTheme.colorScheme.surfaceVariant,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                    
+                    val activeSegments = lifeAreaCompletion.filter { it.totalCount > 0 }
+                    val isAllComplete = activeSegments.isNotEmpty() && 
+                        activeSegments.all { it.completionPercent >= 100f }
+                    
+                    if (isAllComplete) {
+                        PerfectBalanceAnimation(modifier = Modifier.fillMaxSize())
+                    }
+                }
 
                 val activeSegments = lifeAreaCompletion.filter { it.totalCount > 0 }
+
                 Text(
                     text = if (activeSegments.isEmpty()) {
                         "No assigned life-area habits on this date"
@@ -850,6 +1019,15 @@ private fun DashboardKpiAndLifeAreaSection(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
+                
+                if (activeSegments.isNotEmpty()) {
+                    Text(
+                        text = "Tap chart for details",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                    )
+                }
             }
         }
     }
@@ -862,16 +1040,7 @@ private fun LifeAreaRoseChart(
     modifier: Modifier = Modifier
 ) {
     val segments = data.filter { it.totalCount > 0 }
-    val palette = listOf(
-        Color(0xFF0072B2),
-        Color(0xFFE69F00),
-        Color(0xFF009E73),
-        Color(0xFF56B4E9),
-        Color(0xFFD55E00),
-        Color(0xFFCC79A7),
-        Color(0xFF1A73B8),
-        Color(0xFF4E7A5D)
-    )
+    val palette = lifeAreaChartPalette()
 
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         if (segments.isEmpty()) {
@@ -931,22 +1100,226 @@ private fun LifeAreaRoseChart(
             val completedCount = segments.sumOf { it.completedCount }
             val overallPercent = if (totalCount == 0) 0 else (completedCount * 100 / totalCount)
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(contentAlignment = Alignment.Center) {
                 Text(
-                    text = "$overallPercent%",
-                    style = MaterialTheme.typography.headlineSmall,
+                    text = overallPercent.toString(),
+                    style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = "overall",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
     }
 }
+
+@Composable
+private fun LifeAreaLegend(
+    segments: List<LifeAreaCompletion>,
+    modifier: Modifier = Modifier
+) {
+    val palette = lifeAreaChartPalette()
+    val entries = segments.mapIndexed { index, segment ->
+        segment to palette[index % palette.size]
+    }
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        entries.chunked(2).forEach { rowEntries ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                rowEntries.forEach { (segment, color) ->
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(color = color, shape = CircleShape)
+                        )
+                        Text(
+                            text = "${segment.lifeAreaName} ${segment.completionPercent.toInt()}%",
+                            style = MaterialTheme.typography.labelSmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                if (rowEntries.size == 1) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChartDetailModal(
+    data: List<LifeAreaCompletion>,
+    onClose: () -> Unit
+) {
+    val segments = data.filter { it.totalCount > 0 }
+    val palette = lifeAreaChartPalette()
+
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = {
+            Text(
+                text = "Life Area Completion",
+                style = MaterialTheme.typography.headlineSmall
+            )
+        },
+        text = {
+            if (segments.isEmpty()) {
+                Text("No assigned life-area habits.")
+            } else {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(segments.size) { index ->
+                        val segment = segments[index]
+                        val color = palette[index % palette.size]
+                        val totalCount = segments.sumOf { it.totalCount }
+                        val completedCount = segments.sumOf { it.completedCount }
+                        val overallPercent = if (totalCount == 0) 0 else (completedCount * 100 / totalCount)
+
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(12.dp)
+                                        .background(color = color, shape = CircleShape)
+                                )
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = segment.lifeAreaName,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    Text(
+                                        text = "${segment.completedCount} / ${segment.totalCount}",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Text(
+                                    text = "${segment.completionPercent.toInt()}%",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (segment.completionPercent >= 100f) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    
+                    // Summary footer
+                    item {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(12.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Text(
+                                    text = "Overall Balance",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                                Text(
+                                    text = "${segments.sumOf { it.completedCount }} / ${segments.sumOf { it.totalCount }} completed",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onClose) {
+                Text("Close")
+            }
+        }
+    )
+}
+
+@Composable
+private fun PerfectBalanceAnimation(modifier: Modifier = Modifier) {
+    var isAnimating by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        isAnimating = true
+    }
+
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        // Subtle pulsing glow effect for balance achievement
+        if (isAnimating) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                        shape = CircleShape
+                    )
+            )
+        }
+        
+        // Center checkmark badge
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "✓",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+
+private fun lifeAreaChartPalette(): List<Color> = listOf(
+    Color(0xFF0072B2),
+    Color(0xFFE69F00),
+    Color(0xFF009E73),
+    Color(0xFF56B4E9),
+    Color(0xFFD55E00),
+    Color(0xFFCC79A7),
+    Color(0xFF1A73B8),
+    Color(0xFF4E7A5D)
+)
 
 private fun isCompleted(habit: DailyHabitItem): Boolean {
     return when (habit.type) {
@@ -954,6 +1327,7 @@ private fun isCompleted(habit: DailyHabitItem): Boolean {
         HabitType.NUMBER, HabitType.DURATION, HabitType.COUNT, HabitType.POMODORO, HabitType.TIMER -> habit.entryNumericValue != null
         HabitType.TIME -> habit.entryNumericValue != null
         HabitType.TEXT -> !habit.entryTextValue.isNullOrBlank()
+        HabitType.ROUTINE -> habit.entryBooleanValue == true
     }
 }
 

@@ -57,6 +57,7 @@ interface HabitTrackingDao {
         """
         SELECT
             hd.id AS habitId,
+            hd.routineId AS routineId,
             hd.lifeAreaId AS lifeAreaId,
             hd.name AS name,
             hd.description AS description,
@@ -80,7 +81,9 @@ interface HabitTrackingDao {
             ua.displayOrder AS assignmentDisplayOrder,
             dhe.booleanValue AS entryBooleanValue,
             dhe.numericValue AS entryNumericValue,
-            dhe.textValue AS entryTextValue
+            dhe.textValue AS entryTextValue,
+            hd.commitmentTime AS commitmentTime,
+            hd.commitmentLocation AS commitmentLocation
         FROM user_habit_assignments ua
         INNER JOIN habit_definitions hd ON hd.id = ua.habitId
         LEFT JOIN daily_habit_entries dhe

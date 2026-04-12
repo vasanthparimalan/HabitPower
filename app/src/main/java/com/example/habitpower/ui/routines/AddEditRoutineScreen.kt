@@ -22,6 +22,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,10 +41,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.data.model.Exercise
+import com.example.habitpower.data.model.RoutineType
 import com.example.habitpower.ui.AppViewModelProvider
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.Check
+import com.example.habitpower.ui.theme.LeafSectionItemCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +58,7 @@ fun AddEditRoutineScreen(
     viewModel: AddEditRoutineViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     var showAddExerciseDialog by remember { mutableStateOf(false) }
+    var exerciseSearchQuery by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -105,6 +112,51 @@ fun AddEditRoutineScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // Routine Type Selection
+            Text(
+                text = "Routine Type",
+                style = MaterialTheme.typography.titleSmall
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilterChip(
+                    selected = viewModel.routineType == RoutineType.NORMAL,
+                    onClick = { viewModel.updateRoutineType(RoutineType.NORMAL) },
+                    label = { Text("Normal") },
+                    leadingIcon = {
+                        if (viewModel.routineType == RoutineType.NORMAL) {
+                            Icon(Icons.Default.Check, contentDescription = null)
+                        }
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+                FilterChip(
+                    selected = viewModel.routineType == RoutineType.TIMED,
+                    onClick = { viewModel.updateRoutineType(RoutineType.TIMED) },
+                    label = { Text("Timed") },
+                    leadingIcon = {
+                        if (viewModel.routineType == RoutineType.TIMED) {
+                            Icon(Icons.Default.Check, contentDescription = null)
+                        }
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            // Rest Time - Only show for Timed Routines
+            if (viewModel.routineType == RoutineType.TIMED) {
+                OutlinedTextField(
+                    value = viewModel.restTimeSeconds,
+                    onValueChange = viewModel::updateRestTimeSeconds,
+                    label = { Text("Rest Time Between Exercises (seconds)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    supportingText = { Text("e.g. 30 or 60 seconds") }
+                )
+            }
+
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "Exercises  (${viewModel.addedExercises.size})",
@@ -143,6 +195,12 @@ fun AddEditRoutineScreen(
     if (showAddExerciseDialog) {
         val allExercises by viewModel.allExercises.collectAsState()
         val addedIds = viewModel.addedExercises.map { it.id }.toSet()
+        val filteredExercises = allExercises.filter { exercise ->
+            val query = exerciseSearchQuery.trim()
+            query.isBlank() ||
+                exercise.name.contains(query, ignoreCase = true) ||
+                exercise.tags.contains(query, ignoreCase = true)
+        }
 
         AlertDialog(
             onDismissRequest = { showAddExerciseDialog = false },
@@ -151,8 +209,16 @@ fun AddEditRoutineScreen(
                 if (allExercises.isEmpty()) {
                     Text("No exercises found. Create exercises in the Exercises screen first.")
                 } else {
-                    LazyColumn(modifier = Modifier.height(320.dp)) {
-                        items(allExercises, key = { it.id }) { exercise ->
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedTextField(
+                            value = exerciseSearchQuery,
+                            onValueChange = { exerciseSearchQuery = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("Search by name or tag") },
+                            supportingText = { Text("Examples: yoga, gym, cooldown, stretch") }
+                        )
+                        LazyColumn(modifier = Modifier.height(320.dp)) {
+                            items(filteredExercises, key = { it.id }) { exercise ->
                             val alreadyAdded = exercise.id in addedIds
                             Row(
                                 modifier = Modifier
@@ -173,6 +239,14 @@ fun AddEditRoutineScreen(
                                         MaterialTheme.colorScheme.onSurface
                                     }
                                 )
+                                if (exercise.tags.isNotBlank()) {
+                                    Text(
+                                        text = exercise.tags,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(end = 8.dp)
+                                    )
+                                }
                                 if (alreadyAdded) {
                                     Text(
                                         "Added",
@@ -182,6 +256,7 @@ fun AddEditRoutineScreen(
                                 }
                             }
                             HorizontalDivider()
+                        }
                         }
                     }
                 }
@@ -201,33 +276,18 @@ fun RoutineExerciseItem(
     position: Int,
     onRemove: () -> Unit
 ) {
-    Card(elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "$position.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.width(28.dp)
-            )
-            Column(modifier = Modifier.weight(1f)) {
-                Text(exercise.name, style = MaterialTheme.typography.bodyLarge)
-                if (exercise.description.isNotBlank()) {
-                    Text(
-                        exercise.description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1
-                    )
-                }
-            }
+    LeafSectionItemCard(
+        title = "$position. ${exercise.name}",
+        subtitle = exercise.description.takeIf { it.isNotBlank() },
+        attributes = buildList {
+            exercise.targetSets?.let { add("Sets" to it.toString()) }
+            exercise.targetReps?.let { add("Reps" to it.toString()) }
+            exercise.targetDurationSeconds?.let { add("Duration" to "${it}s") }
+        },
+        trailingActions = {
             IconButton(onClick = onRemove) {
                 Icon(Icons.Default.Clear, contentDescription = "Remove ${exercise.name}")
             }
         }
-    }
+    )
 }
