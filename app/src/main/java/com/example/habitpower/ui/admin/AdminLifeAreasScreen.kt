@@ -3,6 +3,7 @@ package com.example.habitpower.ui.admin
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -13,8 +14,10 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -34,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.data.model.LifeArea
 import com.example.habitpower.ui.AppViewModelProvider
+import com.example.habitpower.ui.theme.SectionHeader
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -67,26 +71,46 @@ fun AdminLifeAreasScreen(
             )
         }
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding).padding(16.dp)) {
-            OutlinedTextField(
-                value = viewModel.newName,
-                onValueChange = { viewModel.updateNewName(it) },
-                label = { Text("Name") },
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-            )
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            item {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        SectionHeader(
+                            title = "Add Life Area",
+                            subtitle = "Create categories to organize habits with cleaner reporting."
+                        )
+                        OutlinedTextField(
+                            value = viewModel.newName,
+                            onValueChange = { viewModel.updateNewName(it) },
+                            label = { Text("Name") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
 
-            OutlinedTextField(
-                value = viewModel.newDescription,
-                onValueChange = { viewModel.updateNewDescription(it) },
-                label = { Text("Description (optional)") },
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-            )
+                        OutlinedTextField(
+                            value = viewModel.newDescription,
+                            onValueChange = { viewModel.updateNewDescription(it) },
+                            label = { Text("Description (optional)") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
 
-            Button(onClick = { viewModel.createLifeArea() }, modifier = Modifier.padding(top = 8.dp)) {
-                Text("Add Life Area")
+                        Button(onClick = { viewModel.createLifeArea() }) {
+                            Text("Add Life Area")
+                        }
+                    }
+                }
             }
 
-            LazyColumn(modifier = Modifier.padding(top = 16.dp)) {
+            if (lifeAreas.isEmpty()) {
+                item {
+                    Text("No life areas yet.", style = MaterialTheme.typography.bodyMedium)
+                }
+            } else {
                 items(lifeAreas) { item ->
                     LifeAreaRow(item, onEdit = { editing.value = it }, onDelete = { viewModel.deleteLifeArea(it) })
                 }
@@ -124,23 +148,29 @@ fun AdminLifeAreasScreen(
 
 @Composable
 private fun LifeAreaRow(item: LifeArea, onEdit: (LifeArea) -> Unit, onDelete: (LifeArea) -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = item.name)
-            item.description?.let {
-                Text(text = it)
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = item.name, style = MaterialTheme.typography.titleMedium)
+                item.description?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
-        }
-        Row {
-            IconButton(onClick = { onEdit(item) }) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
-            }
-            IconButton(onClick = { onDelete(item) }) {
-                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+            Row {
+                IconButton(onClick = { onEdit(item) }) {
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+                }
+                IconButton(onClick = { onDelete(item) }) {
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                }
             }
         }
     }

@@ -2,6 +2,7 @@ package com.example.habitpower.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.time.LocalDate
 
 @Entity(tableName = "habit_definitions")
 data class HabitDefinition(
@@ -13,6 +14,16 @@ data class HabitDefinition(
     val commitmentTime: String? = null,
     val commitmentLocation: String = "",
     val preReminderMinutes: Int? = null,
+    val recurrenceType: HabitRecurrenceType = HabitRecurrenceType.DAILY,
+    val recurrenceInterval: Int = 1,
+    val recurrenceDaysOfWeekMask: Int = 0,
+    val recurrenceDayOfMonth: Int? = null,
+    val recurrenceWeekOfMonth: Int? = null,
+    val recurrenceWeekday: Int? = null,
+    val recurrenceYearlyDates: String = "",
+    val recurrenceAnchorDate: LocalDate? = null,
+    val recurrenceStartDate: LocalDate? = null,
+    val recurrenceEndDate: LocalDate? = null,
     val type: HabitType,
     val unit: String? = null,
     val targetValue: Double? = null,

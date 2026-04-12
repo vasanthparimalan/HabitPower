@@ -85,7 +85,13 @@ object AppViewModelProvider {
             com.example.habitpower.ui.admin.AdminNotificationToneViewModel(
                 habitPowerApplication().container.userPreferencesRepository
             )
- }
+        }
+        initializer {
+            com.example.habitpower.ui.gamification.GamificationViewModel(
+                habitPowerApplication().container.habitPowerRepository,
+                habitPowerApplication().container.gamificationRepository
+            )
+        }
         // Add other ViewModels here as we create them
     }
 }

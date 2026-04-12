@@ -2,14 +2,27 @@ package com.example.habitpower.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val DarkGray = Color(0xFF141414)
-val LightGray = Color(0xFF1F1F1F)
-val SegmentBorder = Color(0xFF2E2E2E)
-val PrimaryAccent = Color(0xFF4CAF50)
-val PrimaryAccentDark = Color(0xFF2E7D32)
-val TextPrimary = Color(0xFFFFFFFF)
-val TextSecondary = Color(0xFFAAAAAA)
-val ErrorColor = Color(0xFFCF6679)
+// A calm, high-legibility palette intended for long daily use.
+// Contrast targets favor readability under color-vision variation and warm night filters.
+val DarkGray = Color(0xFF111417)
+val LightGray = Color(0xFF171C20)
+val SegmentBorder = Color(0xFF2C333A)
+
+val PrimaryAccent = Color(0xFF1A73B8)
+val PrimaryAccentDark = Color(0xFF0E4F81)
+val SuccessAccent = Color(0xFF2E7D5A)
+val FocusAccent = Color(0xFF8A5A00)
+val WarningAccent = Color(0xFF9A3412)
+
+val TextPrimary = Color(0xFFF3F6FA)
+val TextSecondary = Color(0xFFB5BFCA)
+val ErrorColor = Color(0xFFCF5A5A)
+
+val LightBackground = Color(0xFFF6F8FB)
+val LightSurface = Color(0xFFFFFFFF)
+val LightSurfaceVariant = Color(0xFFE8EDF3)
+val LightTextPrimary = Color(0xFF1A222B)
+val LightTextSecondary = Color(0xFF44515E)
 
 // Retained for any legacy use cases
 val Purple80 = Color(0xFFD0BCFF)

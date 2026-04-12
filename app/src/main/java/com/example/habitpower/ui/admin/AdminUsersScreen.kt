@@ -37,6 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.ui.AppViewModelProvider
+import com.example.habitpower.ui.theme.SectionHeader
+import com.example.habitpower.ui.theme.StatusChip
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -128,7 +130,10 @@ fun AdminUsersScreen(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text("Add User", style = MaterialTheme.typography.titleMedium)
+                        SectionHeader(
+                            title = "Add User",
+                            subtitle = "Create profiles for each person using the app."
+                        )
                         OutlinedTextField(
                             value = viewModel.newUserName,
                             onValueChange = viewModel::updateNewUserName,
@@ -171,7 +176,7 @@ fun AdminUsersScreen(
                                     Icon(androidx.compose.material.icons.Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
                                 }
                                 if (activeUser?.id == user.id) {
-                                    Text("Active", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(start = 8.dp))
+                                    StatusChip(text = "Active", modifier = Modifier.padding(start = 8.dp))
                                 } else {
                                     TextButton(onClick = { viewModel.setActiveUser(user.id) }) {
                                         Text("Use")

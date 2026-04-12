@@ -17,6 +17,7 @@ class BootCompletedReceiver : BroadcastReceiver() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 HabitReminderScheduler.createReminderChannel(context)
+                GamificationScheduler.scheduleAll(context)   // reschedule daily gamification alarms
                 val appContext = context.applicationContext
                 val database = HabitPowerDatabase.getDatabase(appContext)
                 val userPrefs = UserPreferencesRepository(appContext)

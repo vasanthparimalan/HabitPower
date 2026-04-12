@@ -13,11 +13,14 @@ import com.example.habitpower.data.model.DailyHabitItem
 import com.example.habitpower.data.model.DailyHealthStat
 import com.example.habitpower.data.model.Exercise
 import com.example.habitpower.data.model.HabitDefinition
+import com.example.habitpower.data.model.HabitRecurrenceType
 import com.example.habitpower.data.model.HabitType
+import com.example.habitpower.data.model.LifeArea
 import com.example.habitpower.data.model.Routine
 import com.example.habitpower.data.model.RoutineExerciseCrossRef
 import com.example.habitpower.data.model.TargetOperator
 import com.example.habitpower.data.model.UserHabitAssignment
+import com.example.habitpower.data.model.UserLifeAreaAssignment
 import com.example.habitpower.data.model.UserProfile
 import com.example.habitpower.data.model.WorkoutSession
 import com.example.habitpower.reminder.HabitReminderScheduler
@@ -33,6 +36,7 @@ import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.LocalTime
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class HabitPowerRepository(
     private val context: Context,
     private val exerciseDao: ExerciseDao,
@@ -201,7 +205,17 @@ class HabitPowerRepository(
         showInDailyCheckIn: Boolean = true,
         commitmentTime: String? = null,
         commitmentLocation: String = "",
-        preReminderMinutes: Int? = null
+        preReminderMinutes: Int? = null,
+        recurrenceType: HabitRecurrenceType = HabitRecurrenceType.DAILY,
+        recurrenceInterval: Int = 1,
+        recurrenceDaysOfWeekMask: Int = 0,
+        recurrenceDayOfMonth: Int? = null,
+        recurrenceWeekOfMonth: Int? = null,
+        recurrenceWeekday: Int? = null,
+        recurrenceYearlyDates: String = "",
+        recurrenceAnchorDate: LocalDate? = null,
+        recurrenceStartDate: LocalDate? = null,
+        recurrenceEndDate: LocalDate? = null
     ): Long {
         val nextOrder = (habitTrackingDao.getAllHabits().first().maxOfOrNull { it.displayOrder } ?: -1) + 1
         val safeName = InputSanitizer.sanitize(name, 120) ?: throw IllegalArgumentException("Habit name required")
@@ -216,6 +230,16 @@ class HabitPowerRepository(
                 commitmentTime = commitmentTime,
                 commitmentLocation = InputSanitizer.sanitize(commitmentLocation, 180) ?: "",
                 preReminderMinutes = preReminderMinutes,
+                recurrenceType = recurrenceType,
+                recurrenceInterval = recurrenceInterval.coerceAtLeast(1),
+                recurrenceDaysOfWeekMask = recurrenceDaysOfWeekMask,
+                recurrenceDayOfMonth = recurrenceDayOfMonth,
+                recurrenceWeekOfMonth = recurrenceWeekOfMonth,
+                recurrenceWeekday = recurrenceWeekday,
+                recurrenceYearlyDates = recurrenceYearlyDates,
+                recurrenceAnchorDate = recurrenceAnchorDate,
+                recurrenceStartDate = recurrenceStartDate,
+                recurrenceEndDate = recurrenceEndDate,
                 type = type,
                 unit = unit?.trim()?.ifBlank { null },
                 targetValue = targetValue,
@@ -252,6 +276,11 @@ class HabitPowerRepository(
     // LifeArea helpers
     fun getAllLifeAreas(): Flow<List<com.example.habitpower.data.model.LifeArea>> = lifeAreaDao.getAllLifeAreas()
     fun getActiveLifeAreas(): Flow<List<com.example.habitpower.data.model.LifeArea>> = lifeAreaDao.getActiveLifeAreas()
+    fun getAssignedLifeAreasForUser(userId: Long): Flow<List<com.example.habitpower.data.model.LifeArea>> =
+        lifeAreaDao.getAssignedLifeAreasForUser(userId)
+
+    fun getAssignedLifeAreaIdsForUser(userId: Long): Flow<List<Long>> = lifeAreaDao.getAssignedLifeAreaIdsForUser(userId)
+
     suspend fun createLifeArea(l: com.example.habitpower.data.model.LifeArea): Long {
         val safeName = InputSanitizer.sanitize(l.name, 120) ?: throw IllegalArgumentException("LifeArea name required")
         val safeDesc = InputSanitizer.sanitize(l.description, 1000)
@@ -280,9 +309,25 @@ class HabitPowerRepository(
         updateWidgetState()
     }
 
+    suspend fun replaceLifeAreaAssignmentsForUser(userId: Long, lifeAreaIds: List<Long>) {
+        lifeAreaDao.clearLifeAreaAssignmentsForUser(userId)
+        lifeAreaIds.forEachIndexed { index, lifeAreaId ->
+            lifeAreaDao.upsertLifeAreaAssignment(
+                UserLifeAreaAssignment(
+                    userId = userId,
+                    lifeAreaId = lifeAreaId,
+                    displayOrder = index
+                )
+            )
+        }
+        triggerRefresh()
+    }
+
     fun getDailyHabitItems(userId: Long, date: LocalDate): Flow<List<DailyHabitItem>> =
         habitTrackingDao.getDailyHabitItems(userId, date).map { items ->
-            items.filter { it.showInDailyCheckIn }.sortedBy { it.effectiveDisplayOrder }
+            items
+                .filter { it.showInDailyCheckIn && it.isScheduledOn(date) }
+                .sortedBy { it.effectiveDisplayOrder }
         }
 
     /**
@@ -291,14 +336,16 @@ class HabitPowerRepository(
      */
     fun getFocusHabitItems(userId: Long, date: LocalDate): Flow<List<DailyHabitItem>> =
         habitTrackingDao.getDailyHabitItems(userId, date).map { items ->
-            items.sortedBy { it.effectiveDisplayOrder }
+            items
+                .filter { it.isScheduledOn(date) }
+                .sortedBy { it.effectiveDisplayOrder }
         }
 
     fun getWidgetHabitItems(userId: Long, date: LocalDate): Flow<List<DailyHabitItem>> =
         observeRefresh().flatMapLatest {
             habitTrackingDao.getDailyHabitItems(userId, date).map { items ->
                 items
-                    .filter { it.showInWidget }
+                    .filter { it.showInWidget && it.isScheduledOn(date) }
                     .sortedBy { it.effectiveDisplayOrder }
             }
         }
@@ -483,29 +530,40 @@ class HabitPowerRepository(
             userPreferencesRepository.saveActiveUserId(defaultUserId)
         }
 
+        // Always ensure starter life areas exist so new users can assign immediately.
+        val lifeAreaIdsByName = ensureStarterLifeAreas()
+        val orderedLifeAreaIds = lifeAreaIdsByName.values.toList()
+        ensureLifeAreaAssignmentsForUser(defaultUserId, orderedLifeAreaIds)
+
         val existingHabits = habitTrackingDao.getAllHabits().first()
         if (existingHabits.isNotEmpty()) return
 
         val createdHabitIds = listOf(
             HabitDefinition(
                 name = "Sleep",
+                goalIdentityStatement = "I protect my energy with quality sleep",
                 description = "Hours slept last night",
                 type = HabitType.DURATION,
                 unit = "hrs",
                 targetValue = 8.0,
+                lifeAreaId = lifeAreaIdsByName["Health"],
                 displayOrder = 0
             ),
             HabitDefinition(
                 name = "Steps",
+                goalIdentityStatement = "I stay active through the day",
                 description = "Total steps walked today",
                 type = HabitType.NUMBER,
                 unit = "steps",
                 targetValue = 6000.0,
+                lifeAreaId = lifeAreaIdsByName["Health"],
                 displayOrder = 1
             ),
             HabitDefinition(
                 name = "Meditation",
+                goalIdentityStatement = "I train calm focus daily",
                 description = "Completed meditation practice",
+                lifeAreaId = lifeAreaIdsByName["Mindset"],
                 type = HabitType.BOOLEAN,
                 displayOrder = 2
             )
@@ -520,6 +578,43 @@ class HabitPowerRepository(
             saveDailyHabitEntry(defaultUserId, stat.date, createdHabitIds[0], HabitType.DURATION, numericValue = stat.sleepHours.toDouble())
             saveDailyHabitEntry(defaultUserId, stat.date, createdHabitIds[1], HabitType.NUMBER, numericValue = stat.stepsCount.toDouble())
             saveDailyHabitEntry(defaultUserId, stat.date, createdHabitIds[2], HabitType.BOOLEAN, booleanValue = stat.meditationCompleted)
+        }
+    }
+
+    private suspend fun ensureStarterLifeAreas(): LinkedHashMap<String, Long> {
+        val starterAreas = listOf(
+            LifeArea(name = "Health", description = "Sleep, movement, nutrition, and recovery", displayOrder = 0),
+            LifeArea(name = "Learning", description = "Reading, study, and skill growth", displayOrder = 1),
+            LifeArea(name = "Mindset", description = "Meditation, journaling, gratitude, and reflection", displayOrder = 2),
+            LifeArea(name = "Work", description = "Deep work, focus blocks, and output", displayOrder = 3),
+            LifeArea(name = "Family", description = "Parenting, partner time, and shared routines", displayOrder = 4)
+        )
+
+        val currentAreas = lifeAreaDao.getAllLifeAreas().first()
+        val byName = LinkedHashMap<String, Long>()
+
+        starterAreas.forEach { starter ->
+            val existing = currentAreas.firstOrNull { it.name.equals(starter.name, ignoreCase = true) }
+            val id = existing?.id ?: lifeAreaDao.insertLifeArea(starter)
+            byName[starter.name] = id
+        }
+
+        return byName
+    }
+
+    private suspend fun ensureLifeAreaAssignmentsForUser(userId: Long, orderedLifeAreaIds: List<Long>) {
+        if (orderedLifeAreaIds.isEmpty()) return
+        val currentAssignments = lifeAreaDao.getAssignedLifeAreaIdsForUser(userId).first()
+        if (currentAssignments.isNotEmpty()) return
+
+        orderedLifeAreaIds.forEachIndexed { index, lifeAreaId ->
+            lifeAreaDao.upsertLifeAreaAssignment(
+                UserLifeAreaAssignment(
+                    userId = userId,
+                    lifeAreaId = lifeAreaId,
+                    displayOrder = index
+                )
+            )
         }
     }
 
@@ -607,5 +702,116 @@ class HabitPowerRepository(
         val sets: Int?,
         val repsOrTime: String,
         val notes: String
+    )
+
+    suspend fun applyStarterHabitStackForUser(userId: Long? = null): Int {
+        val targetUserId = userId ?: getResolvedActiveUser().firstOrNull()?.id ?: return 0
+        val lifeAreaIds = ensureStarterLifeAreas()
+
+        val starterStack = listOf(
+            StarterHabitSpec(
+                name = "Sleep On Time",
+                goalIdentityStatement = "I protect my recovery by respecting sleep timing",
+                description = "Go to bed at or before your planned time",
+                type = HabitType.BOOLEAN,
+                lifeAreaName = "Health"
+            ),
+            StarterHabitSpec(
+                name = "Move 20 Minutes",
+                goalIdentityStatement = "I keep my body active every day",
+                description = "Walk, mobility, or workout for at least 20 minutes",
+                type = HabitType.DURATION,
+                unit = "mins",
+                targetValue = 20.0,
+                lifeAreaName = "Health"
+            ),
+            StarterHabitSpec(
+                name = "Deep Work Block",
+                goalIdentityStatement = "I make focused progress on meaningful work",
+                description = "One distraction-free work or study block",
+                type = HabitType.POMODORO,
+                unit = "sessions",
+                targetValue = 1.0,
+                lifeAreaName = "Work"
+            ),
+            StarterHabitSpec(
+                name = "Read 10 Pages",
+                goalIdentityStatement = "I learn a little every day",
+                description = "Read at least 10 pages",
+                type = HabitType.COUNT,
+                unit = "pages",
+                targetValue = 10.0,
+                lifeAreaName = "Learning"
+            ),
+            StarterHabitSpec(
+                name = "2-Min Reflection",
+                goalIdentityStatement = "I reflect and reset daily",
+                description = "Write one short reflection or gratitude note",
+                type = HabitType.TEXT,
+                lifeAreaName = "Mindset"
+            ),
+            StarterHabitSpec(
+                name = "Family Check-In",
+                goalIdentityStatement = "I stay present for my people",
+                description = "Meaningful 10-minute family conversation",
+                type = HabitType.BOOLEAN,
+                lifeAreaName = "Family"
+            )
+        )
+
+        val existingHabits = habitTrackingDao.getAllHabits().first()
+        val assignedIds = habitTrackingDao.getAssignedHabitIdsForUser(targetUserId).first().toMutableSet()
+        val currentMaxOrder = existingHabits.maxOfOrNull { it.displayOrder } ?: -1
+        var nextOrder = currentMaxOrder + 1
+        var createdCount = 0
+
+        starterStack.forEach { spec ->
+            val existing = existingHabits.firstOrNull { it.name.equals(spec.name, ignoreCase = true) }
+            val habitId = if (existing != null) {
+                existing.id
+            } else {
+                createdCount += 1
+                habitTrackingDao.insertHabit(
+                    HabitDefinition(
+                        name = spec.name,
+                        goalIdentityStatement = spec.goalIdentityStatement,
+                        description = spec.description,
+                        type = spec.type,
+                        unit = spec.unit,
+                        targetValue = spec.targetValue,
+                        lifeAreaId = lifeAreaIds[spec.lifeAreaName],
+                        displayOrder = nextOrder++,
+                        showInDailyCheckIn = true,
+                        operator = TargetOperator.GREATER_THAN_OR_EQUAL
+                    )
+                )
+            }
+
+            if (!assignedIds.contains(habitId)) {
+                assignedIds.add(habitId)
+            }
+        }
+
+        val orderedAssignedIds = habitTrackingDao
+            .getAllHabits()
+            .first()
+            .filter { assignedIds.contains(it.id) }
+            .sortedBy { it.displayOrder }
+            .map { it.id }
+
+        replaceAssignmentsForUser(targetUserId, orderedAssignedIds)
+        ensureLifeAreaAssignmentsForUser(targetUserId, lifeAreaIds.values.toList())
+        triggerRefresh()
+        return createdCount
+    }
+
+    private data class StarterHabitSpec(
+        val name: String,
+        val goalIdentityStatement: String,
+        val description: String,
+        val type: HabitType,
+        val unit: String? = null,
+        val targetValue: Double? = null,
+        val lifeAreaName: String
     )
 }

@@ -26,7 +26,6 @@ object HabitReminderScheduler {
     const val EXTRA_PRE_REMINDER_MINUTES = "extra_pre_reminder_minutes"
 
     fun createReminderChannel(context: Context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channel = NotificationChannel(
             CHANNEL_ID,
@@ -74,9 +73,15 @@ object HabitReminderScheduler {
         }
 
         val now = LocalDateTime.now()
-        var trigger = LocalDateTime.of(now.toLocalDate(), time).minusMinutes(reminderMinutes.toLong())
-        if (!trigger.isAfter(now)) {
-            trigger = trigger.plusDays(1)
+        val trigger = HabitRecurrenceCalculator.nextReminderTrigger(
+            now = now,
+            commitmentTime = time,
+            reminderMinutes = reminderMinutes,
+            habit = habit
+        )
+        if (trigger == null) {
+            cancelForHabit(context, habit.id)
+            return
         }
 
         val triggerMillis = trigger.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()

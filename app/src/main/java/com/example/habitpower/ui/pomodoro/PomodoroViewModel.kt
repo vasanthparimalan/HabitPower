@@ -35,6 +35,7 @@ data class PomodoroState(
     val selectedSoundId: String = NotificationSoundOption.SHORT_BEEP.id
 )
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class PomodoroViewModel(
     savedStateHandle: SavedStateHandle,
     private val repository: HabitPowerRepository,

@@ -5,12 +5,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -23,29 +28,64 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.data.model.HabitType
 import com.example.habitpower.ui.AppViewModelProvider
+import com.example.habitpower.ui.gamification.GamificationViewModel
+import com.example.habitpower.ui.theme.CelebrationOverlay
+import com.example.habitpower.ui.theme.DayCompletionKick
+import com.example.habitpower.ui.theme.SectionHeader
+import com.example.habitpower.ui.theme.StatusChip
+import java.time.LocalDate
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun DailyCheckInScreen(
     navigateBack: () -> Unit,
-    viewModel: DailyCheckInViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    onJumpToToday: (() -> Unit)? = null,
+    viewModel: DailyCheckInViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    gamificationViewModel: GamificationViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val isBackfillDate = uiState.date != LocalDate.now()
+    val pendingCelebration by gamificationViewModel.pendingCelebration.collectAsState()
+
+    // State: track when save is complete so we can trigger gamification + then navigate
+    var saveCompleted by remember { mutableStateOf(false) }
+
+    // After save completes → compute gamification, stay on screen until celebration dismissed
+    LaunchedEffect(saveCompleted) {
+        if (saveCompleted) {
+            gamificationViewModel.onCheckInSaved(uiState.date)
+        }
+    }
+
+    // Show celebration overlay; on dismiss → navigate back
+    if (pendingCelebration != null) {
+        CelebrationOverlay(
+            event = pendingCelebration!!,
+            onDismiss = {
+                gamificationViewModel.clearCelebration()
+                navigateBack()
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -63,6 +103,13 @@ fun DailyCheckInScreen(
                     IconButton(onClick = navigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
+                },
+                actions = {
+                    if (isBackfillDate && onJumpToToday != null) {
+                        TextButton(onClick = onJumpToToday) {
+                            Text("Jump to Today")
+                        }
+                    }
                 }
             )
         },
@@ -70,11 +117,13 @@ fun DailyCheckInScreen(
             ExtendedFloatingActionButton(
                 onClick = {
                     if (uiState.userId != null) {
-                        viewModel.saveDailyCheckIn(navigateBack)
+                        saveCompleted = false
+                        viewModel.saveDailyCheckIn { saveCompleted = true }
                     }
                 }
             ) {
-                Text("Save")
+                Icon(Icons.Default.Check, contentDescription = "Save")
+                Text(" Save Check-In")
             }
         }
     ) { innerPadding ->
@@ -113,9 +162,59 @@ fun DailyCheckInScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     item {
-                        Text(
-                            text = "Completed ${uiState.completedCount} of ${uiState.totalCount} habits",
-                            style = MaterialTheme.typography.titleMedium
+                        Card(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                StatusChip(
+                                    text = if (isBackfillDate) "Backfill Day" else "Today",
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                                Text(
+                                    text = "Complete small wins first, then finish tougher habits.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+
+                    item {
+                        if (isBackfillDate) {
+                            Card(modifier = Modifier.fillMaxWidth()) {
+                                Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    StatusChip(
+                                        text = "Backfill Mode",
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                    Text(
+                                        text = "Backfilling ${uiState.date}. Backfill is intentionally limited to recent days to keep tracking trustworthy.",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        SectionHeader(title = if (isBackfillDate) "Backfill Check-In" else "Today's Check-In")
+                        StatusChip(
+                            text = "Completed ${uiState.completedCount} of ${uiState.totalCount}",
+                            modifier = Modifier.padding(top = 6.dp)
+                        )
+                        DayCompletionKick(
+                            allDone = uiState.totalCount > 0 && uiState.completedCount == uiState.totalCount,
+                            completed = uiState.completedCount,
+                            total = uiState.totalCount,
+                            modifier = Modifier
+                                .padding(top = 10.dp)
+                                .fillMaxWidth()
                         )
                     }
 
@@ -164,15 +263,40 @@ private fun HabitInputCard(
 
             when (habit.type) {
                 HabitType.BOOLEAN -> {
+                    val haptic = LocalHapticFeedback.current
+                    val toggleScale by animateFloatAsState(
+                        targetValue = if (habit.booleanValue) 1.02f else 1f,
+                        animationSpec = tween(150),
+                        label = "booleanToggleScale"
+                    )
+
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 56.dp)
+                            .graphicsLayer(scaleX = toggleScale, scaleY = toggleScale)
+                            .clickable {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                onBooleanChange(!habit.booleanValue)
+                            },
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text("Completed")
                         Switch(
                             checked = habit.booleanValue,
-                            onCheckedChange = onBooleanChange
+                            onCheckedChange = {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                onBooleanChange(it)
+                            }
+                        )
+                    }
+
+                    if (habit.booleanValue) {
+                        StatusChip(
+                            text = "Logged. Nice consistency.",
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                         )
                     }
                 }
@@ -267,7 +391,7 @@ private fun HabitInputCard(
                     text = targetLabel,
                     style = MaterialTheme.typography.bodySmall,
                     color = when (habit.targetMet) {
-                        true -> Color(0xFF2E7D32)
+                        true -> MaterialTheme.colorScheme.tertiary
                         false, null -> MaterialTheme.colorScheme.onSurfaceVariant
                     }
                 )

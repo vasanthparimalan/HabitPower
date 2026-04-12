@@ -1,5 +1,7 @@
 package com.example.habitpower.ui.navigation
 
+import java.time.LocalDate
+
 sealed class Screen(val route: String) {
     object Dashboard : Screen("dashboard")
     object Routines : Screen("routines")
@@ -13,14 +15,16 @@ sealed class Screen(val route: String) {
     object ExecuteRoutine : Screen("routine/execute/{routineId}") {
         fun createRoute(routineId: Long) = "routine/execute/$routineId"
     }
-    object DailyCheckIn : Screen("daily_check_in/{userId}") {
+    object DailyCheckIn : Screen("daily_check_in/{userId}/{date}") {
         const val baseRoute = "daily_check_in"
 
-        fun createRoute(userId: Long? = null): String {
-            return "$baseRoute/${userId ?: -1L}"
+        fun createRoute(userId: Long? = null, date: LocalDate? = null): String {
+            val resolvedDate = date ?: LocalDate.now()
+            return "$baseRoute/${userId ?: -1L}/$resolvedDate"
         }
     }
     object Report : Screen("report")
+    object Help : Screen("help")
     object AdminHome : Screen("admin")
     object AdminUsers : Screen("admin/users")
     object AdminHabits : Screen("admin/habits")

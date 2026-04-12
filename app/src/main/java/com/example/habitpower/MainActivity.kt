@@ -8,11 +8,6 @@ import androidx.activity.compose.setContent
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Insights
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -41,6 +36,7 @@ import com.example.habitpower.ui.navigation.Screen
 import com.example.habitpower.ui.routines.AddEditRoutineScreen
 import com.example.habitpower.ui.routines.RoutinesSection
 import com.example.habitpower.ui.routines.RoutinesScreen
+import com.example.habitpower.ui.theme.AppIconography
 import com.example.habitpower.ui.theme.HabitPowerTheme
 import com.example.habitpower.reminder.HabitReminderScheduler
 import kotlinx.coroutines.launch
@@ -119,10 +115,10 @@ fun HabitPowerAppContent() {
                         NavigationBarItem(
                             icon = {
                                 when (screen) {
-                                    Screen.Dashboard -> Icon(Icons.Default.DateRange, contentDescription = "Dashboard")
-                                    Screen.Routines -> Icon(Icons.AutoMirrored.Filled.List, contentDescription = "Routines")
-                                    Screen.Focus -> Icon(Icons.Default.PlayArrow, contentDescription = "Focus")
-                                    Screen.Report -> Icon(Icons.Default.Insights, contentDescription = "Analytics")
+                                    Screen.Dashboard -> Icon(AppIconography.Dashboard, contentDescription = "Dashboard")
+                                    Screen.Routines -> Icon(AppIconography.Routines, contentDescription = "Routines")
+                                    Screen.Focus -> Icon(AppIconography.Focus, contentDescription = "Focus")
+                                    Screen.Report -> Icon(AppIconography.Analytics, contentDescription = "Analytics")
                                     else -> {}
                                 }
                             },
@@ -186,11 +182,25 @@ fun HabitPowerAppContent() {
             composable(Screen.ExecuteRoutine.route) {
                 WorkoutRunnerScreen(navigateBack = { navController.popBackStack() })
             }
-            composable(Screen.DailyCheckIn.route) {
-                com.example.habitpower.ui.daily.DailyCheckInScreen(navigateBack = { navController.popBackStack() })
+            composable(Screen.DailyCheckIn.route) { backStackEntry ->
+                val userIdArg = backStackEntry.arguments?.getString("userId")?.toLongOrNull()
+                    ?: backStackEntry.arguments?.getLong("userId")
+                com.example.habitpower.ui.daily.DailyCheckInScreen(
+                    navigateBack = { navController.popBackStack() },
+                    onJumpToToday = {
+                        navController.navigate(Screen.DailyCheckIn.createRoute(userIdArg, java.time.LocalDate.now())) {
+                            launchSingleTop = true
+                        }
+                    }
+                )
             }
             composable(Screen.Report.route) {
                 com.example.habitpower.ui.report.ReportScreen()
+            }
+            composable(Screen.Help.route) {
+                com.example.habitpower.ui.help.HelpGuideScreen(
+                    navigateBack = { navController.popBackStack() }
+                )
             }
             composable(Screen.AdminHome.route) {
                 AdminHomeScreen(

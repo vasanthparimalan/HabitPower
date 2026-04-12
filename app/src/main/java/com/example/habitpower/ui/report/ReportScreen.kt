@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.ui.AppViewModelProvider
+import com.example.habitpower.ui.theme.SectionHeader
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -224,10 +225,9 @@ fun ReportScreen(
                 }
 
                 item {
-                    Text(
-                        text = "Life area gauges",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                    SectionHeader(
+                        title = "Life Area Gauges",
+                        subtitle = "Balanced progress across your key domains"
                     )
                 }
 
@@ -257,7 +257,7 @@ fun ReportScreen(
                         EncouragementCard(
                             title = "What is working",
                             message = message,
-                            containerColor = Color(0xFFE8F5E9)
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
                         )
                     }
                 }
@@ -267,7 +267,7 @@ fun ReportScreen(
                         EncouragementCard(
                             title = "Next breakthrough",
                             message = message,
-                            containerColor = Color(0xFFFFF3E0)
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
                         )
                     }
                 }
@@ -324,13 +324,14 @@ private fun TreeTrunkChart(
     rings: List<TreeRingSegment>,
     modifier: Modifier = Modifier
 ) {
+    val centerDotColor = MaterialTheme.colorScheme.onSurfaceVariant
     val palette = listOf(
-        Color(0xFF5D4037),
-        Color(0xFF6D4C41),
-        Color(0xFF795548),
-        Color(0xFF8D6E63),
-        Color(0xFFA1887F),
-        Color(0xFF4CAF50)
+        MaterialTheme.colorScheme.surfaceVariant,
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.45f),
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.75f),
+        MaterialTheme.colorScheme.primary
     )
 
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
@@ -353,7 +354,7 @@ private fun TreeTrunkChart(
             }
 
             drawCircle(
-                color = Color(0xFF3E2723),
+                color = centerDotColor,
                 radius = (ringWidth * 0.9f).coerceAtLeast(6.dp.toPx()),
                 center = center
             )
@@ -415,22 +416,24 @@ private fun GaugeChart(
     progress: Float,
     modifier: Modifier = Modifier
 ) {
+    val baseArcColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+    val progressArcColor = when {
+        progress >= 0.8f -> MaterialTheme.colorScheme.primary
+        progress >= 0.5f -> MaterialTheme.colorScheme.tertiary
+        else -> MaterialTheme.colorScheme.error
+    }
     Box(modifier = modifier, contentAlignment = Alignment.BottomCenter) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             val strokeWidth = 16.dp.toPx()
             drawArc(
-                color = Color.LightGray.copy(alpha = 0.35f),
+                color = baseArcColor,
                 startAngle = 180f,
                 sweepAngle = 180f,
                 useCenter = false,
                 style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
             )
             drawArc(
-                color = when {
-                    progress >= 0.8f -> Color(0xFF43A047)
-                    progress >= 0.5f -> Color(0xFFFB8C00)
-                    else -> Color(0xFFE53935)
-                },
+                color = progressArcColor,
                 startAngle = 180f,
                 sweepAngle = 180f * progress.coerceIn(0f, 1f),
                 useCenter = false,

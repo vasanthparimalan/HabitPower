@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.habitpower.data.HabitPowerRepository
 import com.example.habitpower.data.model.HabitDefinition
+import com.example.habitpower.data.model.HabitRecurrenceType
 import com.example.habitpower.data.model.HabitType
 import com.example.habitpower.data.model.LifeArea
 import com.example.habitpower.data.model.TargetOperator
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewModel() {
     private val _createSuccessTick = MutableStateFlow(0L)
@@ -53,6 +55,24 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
     var selectedOperator by mutableStateOf(TargetOperator.GREATER_THAN_OR_EQUAL)
         private set
     var selectedLifeAreaId by mutableStateOf<Long?>(null)
+        private set
+    var selectedRecurrenceType by mutableStateOf(HabitRecurrenceType.DAILY)
+        private set
+    var selectedWeekdaysMask by mutableStateOf(0)
+        private set
+    var everyNDaysInterval by mutableStateOf("14")
+        private set
+    var monthlyDayOfMonth by mutableStateOf("1")
+        private set
+    var monthlyNthWeek by mutableStateOf("1")
+        private set
+    var monthlyNthWeekday by mutableStateOf("1")
+        private set
+    var yearlyDatesCsv by mutableStateOf("01-01")
+        private set
+    var recurrenceStartDateText by mutableStateOf(LocalDate.now().toString())
+        private set
+    var recurrenceEndDateText by mutableStateOf("")
         private set
 
     val habits: StateFlow<List<HabitDefinition>> = repository.getAllHabits().stateIn(
@@ -104,6 +124,26 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
     }
     fun updateOperator(op: TargetOperator) { selectedOperator = op }
     fun updateSelectedLifeArea(id: Long?) { selectedLifeAreaId = id }
+    fun updateRecurrenceType(type: HabitRecurrenceType) { selectedRecurrenceType = type }
+    fun toggleWeekday(dayOfWeekValue: Int) {
+        val bit = 1 shl dayOfWeekValue
+        selectedWeekdaysMask = if ((selectedWeekdaysMask and bit) != 0) {
+            selectedWeekdaysMask and bit.inv()
+        } else {
+            selectedWeekdaysMask or bit
+        }
+    }
+    fun updateEveryNDaysInterval(value: String) { everyNDaysInterval = value.filter { it.isDigit() } }
+    fun updateMonthlyDayOfMonth(value: String) { monthlyDayOfMonth = value.filter { it.isDigit() } }
+    fun updateMonthlyNthWeek(value: String) { monthlyNthWeek = value.filter { it.isDigit() || it == '-' } }
+    fun updateMonthlyNthWeekday(value: String) { monthlyNthWeekday = value.filter { it.isDigit() } }
+    fun updateYearlyDatesCsv(value: String) {
+        yearlyDatesCsv = value
+            .uppercase()
+            .filter { it.isDigit() || it == '-' || it == ',' || it == ' ' }
+    }
+    fun updateRecurrenceStartDateText(value: String) { recurrenceStartDateText = value.trim() }
+    fun updateRecurrenceEndDateText(value: String) { recurrenceEndDateText = value.trim() }
 
     fun createHabit() {
         val trimmedName = name.trim()
@@ -128,6 +168,50 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
                 null
             }
             if (preReminderEnabled && resolvedReminderMinutes == null) return@launch
+            val startDate = recurrenceStartDateText.toLocalDateOrNull()
+            if (startDate == null) return@launch
+            val endDate = recurrenceEndDateText.toLocalDateOrNull()
+            if (recurrenceEndDateText.isNotBlank() && endDate == null) return@launch
+
+            val recurrenceInterval = when (selectedRecurrenceType) {
+                HabitRecurrenceType.EVERY_N_DAYS -> everyNDaysInterval.toIntOrNull()?.coerceAtLeast(1) ?: return@launch
+                else -> 1
+            }
+            val recurrenceDayOfMonth = when (selectedRecurrenceType) {
+                HabitRecurrenceType.MONTHLY_BY_DATE -> monthlyDayOfMonth.toIntOrNull()?.coerceIn(1, 31) ?: return@launch
+                else -> null
+            }
+            val recurrenceWeekOfMonth = when (selectedRecurrenceType) {
+                HabitRecurrenceType.MONTHLY_BY_NTH_WEEKDAY -> {
+                    val week = monthlyNthWeek.toIntOrNull() ?: return@launch
+                    if (week in 1..5 || week == -1) week else return@launch
+                }
+                else -> null
+            }
+            val recurrenceWeekday = when (selectedRecurrenceType) {
+                HabitRecurrenceType.MONTHLY_BY_NTH_WEEKDAY -> monthlyNthWeekday.toIntOrNull()?.coerceIn(1, 7) ?: return@launch
+                else -> null
+            }
+            val yearlyDates = when (selectedRecurrenceType) {
+                HabitRecurrenceType.YEARLY_BY_DATE,
+                HabitRecurrenceType.YEARLY_MULTI_DATE -> {
+                    val normalized = yearlyDatesCsv
+                        .split(',')
+                        .asSequence()
+                        .map { it.trim() }
+                        .filter { it.matches(Regex("^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$")) }
+                        .distinct()
+                        .toList()
+                    if (normalized.isEmpty()) return@launch
+                    normalized.joinToString(",")
+                }
+                else -> ""
+            }
+            val recurrenceMask = when (selectedRecurrenceType) {
+                HabitRecurrenceType.WEEKLY_SELECTED_DAYS -> if (selectedWeekdaysMask == 0) return@launch else selectedWeekdaysMask
+                else -> 0
+            }
+
             repository.createHabit(
                 name = trimmedName,
                 goalIdentityStatement = trimmedGoalIdentity,
@@ -144,7 +228,17 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
                 showInDailyCheckIn = selectedType != HabitType.TIMER,
                 commitmentTime = "%02d:%02d".format(commitmentHour, commitmentMinute),
                 commitmentLocation = trimmedLocation,
-                preReminderMinutes = resolvedReminderMinutes
+                preReminderMinutes = resolvedReminderMinutes,
+                recurrenceType = selectedRecurrenceType,
+                recurrenceInterval = recurrenceInterval,
+                recurrenceDaysOfWeekMask = recurrenceMask,
+                recurrenceDayOfMonth = recurrenceDayOfMonth,
+                recurrenceWeekOfMonth = recurrenceWeekOfMonth,
+                recurrenceWeekday = recurrenceWeekday,
+                recurrenceYearlyDates = yearlyDates,
+                recurrenceAnchorDate = startDate,
+                recurrenceStartDate = startDate,
+                recurrenceEndDate = endDate
             )
             name = ""
             goalIdentityStatement = ""
@@ -161,6 +255,15 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
             preReminderMinutes = "15"
             selectedOperator = TargetOperator.GREATER_THAN_OR_EQUAL
             selectedLifeAreaId = null
+            selectedRecurrenceType = HabitRecurrenceType.DAILY
+            selectedWeekdaysMask = 0
+            everyNDaysInterval = "14"
+            monthlyDayOfMonth = "1"
+            monthlyNthWeek = "1"
+            monthlyNthWeekday = "1"
+            yearlyDatesCsv = "01-01"
+            recurrenceStartDateText = LocalDate.now().toString()
+            recurrenceEndDateText = ""
             _createSuccessTick.value += 1
         }
     }
@@ -185,6 +288,101 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
         }
     }
 
+    fun updateHabitWithRecurrence(
+        habit: HabitDefinition,
+        newName: String,
+        newDescription: String,
+        newTarget: String?,
+        newOp: TargetOperator,
+        recurrenceType: HabitRecurrenceType,
+        recurrenceDaysOfWeekMask: Int,
+        recurrenceIntervalText: String,
+        recurrenceDayOfMonthText: String,
+        recurrenceWeekOfMonthText: String,
+        recurrenceWeekdayText: String,
+        yearlyDatesCsv: String,
+        startDateText: String,
+        endDateText: String
+    ) {
+        val trimmed = newName.trim()
+        if (trimmed.isBlank()) return
+
+        val resolvedTarget = when (habit.type) {
+            HabitType.BOOLEAN, HabitType.TEXT -> null
+            HabitType.TIME -> newTarget?.toDoubleOrNull()
+            else -> newTarget?.toDoubleOrNull()
+        }
+
+        val startDate = startDateText.trim().toLocalDateOrNull() ?: return
+        val endDate = endDateText.trim().takeIf { it.isNotBlank() }?.toLocalDateOrNull()
+        if (endDateText.isNotBlank() && endDate == null) return
+
+        val recurrenceInterval = when (recurrenceType) {
+            HabitRecurrenceType.EVERY_N_DAYS -> recurrenceIntervalText.toIntOrNull()?.coerceAtLeast(1) ?: return
+            else -> 1
+        }
+
+        val recurrenceDayOfMonth = when (recurrenceType) {
+            HabitRecurrenceType.MONTHLY_BY_DATE -> recurrenceDayOfMonthText.toIntOrNull()?.coerceIn(1, 31) ?: return
+            else -> null
+        }
+
+        val recurrenceWeekOfMonth = when (recurrenceType) {
+            HabitRecurrenceType.MONTHLY_BY_NTH_WEEKDAY -> {
+                val week = recurrenceWeekOfMonthText.toIntOrNull() ?: return
+                if (week in 1..5 || week == -1) week else return
+            }
+            else -> null
+        }
+
+        val recurrenceWeekday = when (recurrenceType) {
+            HabitRecurrenceType.MONTHLY_BY_NTH_WEEKDAY -> recurrenceWeekdayText.toIntOrNull()?.coerceIn(1, 7) ?: return
+            else -> null
+        }
+
+        val normalizedYearlyDates = when (recurrenceType) {
+            HabitRecurrenceType.YEARLY_BY_DATE,
+            HabitRecurrenceType.YEARLY_MULTI_DATE -> {
+                val normalized = yearlyDatesCsv
+                    .split(',')
+                    .asSequence()
+                    .map { it.trim() }
+                    .filter { it.matches(Regex("^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$")) }
+                    .distinct()
+                    .toList()
+                if (normalized.isEmpty()) return
+                normalized.joinToString(",")
+            }
+            else -> ""
+        }
+
+        val normalizedWeekMask = when (recurrenceType) {
+            HabitRecurrenceType.WEEKLY_SELECTED_DAYS -> if (recurrenceDaysOfWeekMask == 0) return else recurrenceDaysOfWeekMask
+            else -> 0
+        }
+
+        viewModelScope.launch {
+            repository.updateHabit(
+                habit.copy(
+                    name = trimmed,
+                    description = newDescription.trim(),
+                    targetValue = resolvedTarget,
+                    operator = newOp,
+                    recurrenceType = recurrenceType,
+                    recurrenceDaysOfWeekMask = normalizedWeekMask,
+                    recurrenceInterval = recurrenceInterval,
+                    recurrenceDayOfMonth = recurrenceDayOfMonth,
+                    recurrenceWeekOfMonth = recurrenceWeekOfMonth,
+                    recurrenceWeekday = recurrenceWeekday,
+                    recurrenceYearlyDates = normalizedYearlyDates,
+                    recurrenceAnchorDate = startDate,
+                    recurrenceStartDate = startDate,
+                    recurrenceEndDate = endDate
+                )
+            )
+        }
+    }
+
     fun deleteHabit(habit: HabitDefinition) {
         viewModelScope.launch {
             repository.deleteHabit(habit)
@@ -200,4 +398,6 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
         val minutesSinceMidnight = hour * 60 + minute
         return ((minutesSinceMidnight - 12 * 60 + 24 * 60) % (24 * 60)).toDouble()
     }
+
+    private fun String.toLocalDateOrNull(): LocalDate? = runCatching { LocalDate.parse(this) }.getOrNull()
 }

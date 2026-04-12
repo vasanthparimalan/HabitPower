@@ -99,9 +99,17 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
 
             val startDate = uiState.startDate
             val endDate = uiState.endDate
-            val assignedHabits = repository.getAssignedHabitsForUser(currentUser.id).first()
+            val assignedLifeAreaIds = repository.getAssignedLifeAreaIdsForUser(currentUser.id).first().toSet()
+            val assignedHabits = filterHabitsByAssignedAreas(
+                habits = repository.getAssignedHabitsForUser(currentUser.id).first(),
+                assignedAreaIds = assignedLifeAreaIds
+            )
             val entries = repository.getEntriesForUserInRange(currentUser.id, startDate, endDate).first()
-            val lifeAreas = repository.getActiveLifeAreas().first()
+            val lifeAreas = if (assignedLifeAreaIds.isEmpty()) {
+                repository.getActiveLifeAreas().first()
+            } else {
+                repository.getAssignedLifeAreasForUser(currentUser.id).first()
+            }
 
             if (assignedHabits.isEmpty()) {
                 uiState = uiState.copy(
@@ -109,7 +117,7 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
                     kpis = emptyList(),
                     treeRings = emptyList(),
                     lifeAreaGauges = emptyList(),
-                    emptyMessage = "Assign habits to ${currentUser.name} to start building a meaningful report."
+                    emptyMessage = "Assign habits and life areas to ${currentUser.name} to start building a meaningful report."
                 )
                 return@launch
             }
@@ -251,6 +259,14 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
 
     private fun percentText(ratio: Float): String = "${(ratio * 100).toInt()}%"
 
+    private fun filterHabitsByAssignedAreas(
+        habits: List<HabitDefinition>,
+        assignedAreaIds: Set<Long>
+    ): List<HabitDefinition> {
+        if (assignedAreaIds.isEmpty()) return habits
+        return habits.filter { habit -> habit.lifeAreaId != null && assignedAreaIds.contains(habit.lifeAreaId) }
+    }
+
     private fun isEntrySuccessful(entry: DailyHabitEntry?, habit: HabitDefinition): Boolean {
         if (entry == null) return false
 
@@ -269,6 +285,7 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
                     }
                 }
             }
+
             HabitType.TIME -> {
                 val value = entry.numericValue ?: return false
                 val target = habit.targetValue

@@ -47,6 +47,18 @@
             android:exported="false" />
 
         <receiver
+            android:name=".reminder.MorningBriefReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".reminder.MidDayNudgeReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".reminder.EveningCheckReceiver"
+            android:exported="false" />
+
+        <receiver
             android:name=".reminder.BootCompletedReceiver"
             android:enabled="true"
             android:exported="true">

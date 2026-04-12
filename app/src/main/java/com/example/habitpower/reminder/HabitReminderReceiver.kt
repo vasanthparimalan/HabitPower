@@ -10,8 +10,10 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.habitpower.MainActivity
 import com.example.habitpower.R
-import com.example.habitpower.data.model.HabitDefinition
-import com.example.habitpower.data.model.HabitType
+import com.example.habitpower.data.HabitPowerDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 class HabitReminderReceiver : BroadcastReceiver() {
@@ -79,17 +81,22 @@ class HabitReminderReceiver : BroadcastReceiver() {
             NotificationManagerCompat.from(context).notify(habitId.toInt(), notification)
         }
 
-        val rescheduleHabit = HabitDefinition(
-            id = habitId,
-            name = habitName,
-            goalIdentityStatement = goalIdentity,
-            description = goalDescription,
-            commitmentTime = commitmentTime,
-            commitmentLocation = commitmentLocation,
-            preReminderMinutes = preReminderMinutes,
-            type = HabitType.BOOLEAN
-        )
-        HabitReminderScheduler.scheduleForHabit(context, rescheduleHabit)
+        val pendingResult = goAsync()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val appContext = context.applicationContext
+                val habit = HabitPowerDatabase.getDatabase(appContext)
+                    .habitTrackingDao()
+                    .getHabitById(habitId)
+                if (habit != null) {
+                    HabitReminderScheduler.scheduleForHabit(appContext, habit)
+                } else {
+                    HabitReminderScheduler.cancelForHabit(appContext, habitId)
+                }
+            } finally {
+                pendingResult.finish()
+            }
+        }
     }
 
     companion object {

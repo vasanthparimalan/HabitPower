@@ -1,23 +1,15 @@
 package com.example.habitpower.data
 
 import android.content.Context
+import com.example.habitpower.gamification.GamificationRepository
 
-/**
- * Simple service locator for app-scoped dependencies.
- *
- * Implementations should provide repository instances used by ViewModels
- * and other UI components. `DefaultAppContainer` wires concrete instances
- * backed by the Room database and simple local repositories.
- */
 interface AppContainer {
     val habitPowerRepository: HabitPowerRepository
     val lifeAreaRepository: com.example.habitpower.data.repository.LifeAreaRepository
     val userPreferencesRepository: UserPreferencesRepository
+    val gamificationRepository: GamificationRepository
 }
 
-/**
- * Default production container that lazily creates the database and repositories.
- */
 class DefaultAppContainer(private val context: Context) : AppContainer {
     private val database by lazy { HabitPowerDatabase.getDatabase(context) }
 
@@ -42,5 +34,13 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val userPreferencesRepository: UserPreferencesRepository by lazy {
         UserPreferencesRepository(context)
+    }
+
+    override val gamificationRepository: GamificationRepository by lazy {
+        GamificationRepository(
+            database.userStatsDao(),
+            database.habitTrackingDao(),
+            database.lifeAreaDao()
+        )
     }
 }

@@ -68,12 +68,17 @@ class DailyCheckInViewModel(
     savedStateHandle: SavedStateHandle,
     private val repository: HabitPowerRepository
 ) : ViewModel() {
+    private val maxBackfillDays = 3L
     private val requestedUserId = (
         savedStateHandle.get<String>("userId")?.toLongOrNull()
             ?: savedStateHandle.get<Long>("userId")
         )
         ?.takeIf { it >= 0L }
-    private val date = LocalDate.now()
+    private val date = (
+        savedStateHandle.get<String>("date")
+            ?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+            ?: LocalDate.now()
+        ).coerceIn(LocalDate.now().minusDays(maxBackfillDays), LocalDate.now())
     private val overrideInputs = MutableStateFlow<Map<Long, DailyCheckInHabitInput>>(emptyMap())
 
     private val selectedUser = if (requestedUserId != null) {

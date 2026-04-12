@@ -13,6 +13,7 @@ import com.example.habitpower.data.dao.LifeAreaDao
 import com.example.habitpower.data.dao.QuoteDao
 import com.example.habitpower.data.dao.RoutineDao
 import com.example.habitpower.data.dao.UserDao
+import com.example.habitpower.data.dao.UserStatsDao
 import com.example.habitpower.data.dao.WorkoutSessionDao
 import com.example.habitpower.data.model.DailyHabitEntry
 import com.example.habitpower.data.model.DailyHealthStat
@@ -23,7 +24,9 @@ import com.example.habitpower.data.model.Quote
 import com.example.habitpower.data.model.Routine
 import com.example.habitpower.data.model.RoutineExerciseCrossRef
 import com.example.habitpower.data.model.UserHabitAssignment
+import com.example.habitpower.data.model.UserLifeAreaAssignment
 import com.example.habitpower.data.model.UserProfile
+import com.example.habitpower.data.model.UserStats
 import com.example.habitpower.data.model.WorkoutSession
 
 /**
@@ -43,10 +46,12 @@ import com.example.habitpower.data.model.WorkoutSession
         HabitDefinition::class,
         LifeArea::class,
         UserHabitAssignment::class,
+        UserLifeAreaAssignment::class,
         DailyHabitEntry::class,
-        Quote::class
+        Quote::class,
+        UserStats::class
     ],
-    version = 11,
+    version = 14,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -59,6 +64,7 @@ abstract class HabitPowerDatabase : RoomDatabase() {
     abstract fun habitTrackingDao(): HabitTrackingDao
     abstract fun lifeAreaDao(): LifeAreaDao
     abstract fun quoteDao(): QuoteDao
+    abstract fun userStatsDao(): UserStatsDao
 
     companion object {
         @Volatile
@@ -94,6 +100,69 @@ abstract class HabitPowerDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_11_12 = object : Migration(11, 12) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE habit_definitions ADD COLUMN recurrenceType TEXT NOT NULL DEFAULT 'DAILY'")
+                db.execSQL("ALTER TABLE habit_definitions ADD COLUMN recurrenceInterval INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE habit_definitions ADD COLUMN recurrenceDaysOfWeekMask INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE habit_definitions ADD COLUMN recurrenceDayOfMonth INTEGER")
+                db.execSQL("ALTER TABLE habit_definitions ADD COLUMN recurrenceWeekOfMonth INTEGER")
+                db.execSQL("ALTER TABLE habit_definitions ADD COLUMN recurrenceWeekday INTEGER")
+                db.execSQL("ALTER TABLE habit_definitions ADD COLUMN recurrenceYearlyDates TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE habit_definitions ADD COLUMN recurrenceAnchorDate INTEGER")
+                db.execSQL("ALTER TABLE habit_definitions ADD COLUMN recurrenceStartDate INTEGER")
+                db.execSQL("ALTER TABLE habit_definitions ADD COLUMN recurrenceEndDate INTEGER")
+            }
+        }
+
+        val MIGRATION_12_13 = object : Migration(12, 13) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS `user_stats` (
+                        `userId` INTEGER NOT NULL PRIMARY KEY,
+                        `currentStreak` INTEGER NOT NULL DEFAULT 0,
+                        `longestStreak` INTEGER NOT NULL DEFAULT 0,
+                        `totalXp` INTEGER NOT NULL DEFAULT 0,
+                        `level` INTEGER NOT NULL DEFAULT 1,
+                        `totalHabitsCompleted` INTEGER NOT NULL DEFAULT 0,
+                        `totalDaysPerfect` INTEGER NOT NULL DEFAULT 0,
+                        `lastPerfectDate` INTEGER,
+                        `earnedBadgesMask` INTEGER NOT NULL DEFAULT 0
+                    )"""
+                )
+            }
+        }
+
+        val MIGRATION_13_14 = object : Migration(13, 14) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS `user_life_area_assignments` (
+                        `userId` INTEGER NOT NULL,
+                        `lifeAreaId` INTEGER NOT NULL,
+                        `displayOrder` INTEGER NOT NULL DEFAULT 0,
+                        `isActive` INTEGER NOT NULL DEFAULT 1,
+                        PRIMARY KEY(`userId`, `lifeAreaId`),
+                        FOREIGN KEY(`userId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE,
+                        FOREIGN KEY(`lifeAreaId`) REFERENCES `life_areas`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE
+                    )"""
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_user_life_area_assignments_lifeAreaId` ON `user_life_area_assignments` (`lifeAreaId`)")
+
+                // Backfill from existing habit assignments so current analytics keep behavior after upgrade.
+                db.execSQL(
+                    """
+                    INSERT OR IGNORE INTO user_life_area_assignments(userId, lifeAreaId, displayOrder, isActive)
+                    SELECT DISTINCT ua.userId, hd.lifeAreaId, 0, 1
+                    FROM user_habit_assignments ua
+                    INNER JOIN habit_definitions hd ON hd.id = ua.habitId
+                    WHERE ua.isActive = 1
+                        AND hd.isActive = 1
+                        AND hd.lifeAreaId IS NOT NULL
+                    """.trimIndent()
+                )
+            }
+        }
+
         /**
          * Obtain the singleton database instance.
          *
@@ -107,7 +176,15 @@ abstract class HabitPowerDatabase : RoomDatabase() {
                     HabitPowerDatabase::class.java,
                     "habit_power_database"
                 )
-                    .addMigrations(MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
+                    .addMigrations(
+                        MIGRATION_7_8,
+                        MIGRATION_8_9,
+                        MIGRATION_9_10,
+                        MIGRATION_10_11,
+                        MIGRATION_11_12,
+                        MIGRATION_12_13,
+                        MIGRATION_13_14
+                    )
                     .build()
                 INSTANCE = instance
                 instance

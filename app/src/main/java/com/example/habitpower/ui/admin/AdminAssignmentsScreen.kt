@@ -38,8 +38,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.data.model.HabitDefinition
+import com.example.habitpower.data.model.LifeArea
 import com.example.habitpower.data.model.UserProfile
 import com.example.habitpower.ui.AppViewModelProvider
+import com.example.habitpower.ui.theme.SectionHeader
+import com.example.habitpower.ui.theme.StatusChip
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -49,14 +52,16 @@ fun AdminAssignmentsScreen(
 ) {
     val users by viewModel.users.collectAsState()
     val habits by viewModel.habits.collectAsState()
+    val lifeAreas by viewModel.lifeAreas.collectAsState()
     val selectedUserId by viewModel.selectedUserId.collectAsState()
     val selectedHabitIds by viewModel.selectedHabitIds.collectAsState()
+    val selectedLifeAreaIds by viewModel.selectedLifeAreaIds.collectAsState()
     val saveSuccessTick by viewModel.saveSuccessTick.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(saveSuccessTick) {
         if (saveSuccessTick > 0L) {
-            snackbarHostState.showSnackbar("Habit assignments saved")
+            snackbarHostState.showSnackbar("Assignments saved")
         }
     }
 
@@ -88,7 +93,10 @@ fun AdminAssignmentsScreen(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text("Select User", style = MaterialTheme.typography.titleMedium)
+                        SectionHeader(
+                            title = "Select User",
+                            subtitle = "Pick a user and choose which habits appear in their daily check-in."
+                        )
                         UserSelectionMenu(
                             users = users,
                             selectedUserId = selectedUserId,
@@ -99,6 +107,39 @@ fun AdminAssignmentsScreen(
                             enabled = selectedUserId != null
                         ) {
                             Text("Save Assignments")
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            StatusChip(text = "${selectedHabitIds.size} habits selected")
+                            StatusChip(text = "${selectedLifeAreaIds.size} life areas selected")
+                        }
+                    }
+                }
+            }
+
+            if (selectedUserId != null) {
+                item {
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            SectionHeader(
+                                title = "Assign Life Areas",
+                                subtitle = "These assignments scope life-area KPI and chart calculations for this user."
+                            )
+                            if (lifeAreas.isEmpty()) {
+                                Text("Create life areas first before assigning them.")
+                            } else {
+                                lifeAreas.forEach { area ->
+                                    LifeAreaAssignmentRow(
+                                        lifeArea = area,
+                                        checked = selectedLifeAreaIds.contains(area.id),
+                                        onCheckedChange = { viewModel.toggleLifeArea(area.id, it) }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -122,6 +163,32 @@ fun AdminAssignmentsScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun LifeAreaAssignmentRow(
+    lifeArea: LifeArea,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(lifeArea.name, style = MaterialTheme.typography.titleSmall)
+            lifeArea.description?.takeIf { it.isNotBlank() }?.let {
+                Text(it, style = MaterialTheme.typography.bodySmall)
+            }
+        }
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange
+        )
     }
 }
 

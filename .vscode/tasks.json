@@ -1,0 +1,348 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run app unit tests",
+			"type": "shell",
+			"command": "gradlew.bat",
+			"args": [
+				":app:testDebugUnitTest",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"isBackground": false,
+			"group": "test"
+		},
+		{
+			"label": "Run app unit tests",
+			"type": "shell",
+			"command": ".\\gradlew.bat",
+			"args": [
+				":app:testDebugUnitTest",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"isBackground": false,
+			"group": "test"
+		},
+		{
+			"label": "Run app unit tests cmd",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:testDebugUnitTest",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"isBackground": false,
+			"group": "test"
+		},
+		{
+			"label": "Verify unit tests",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:testDebugUnitTest",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "Verify lint",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:lintDebug",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Recheck lint",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:lintDebug",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Step1 verify unit tests",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:testDebugUnitTest",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "Step1 verify lint",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:lintDebug",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Validate UI corrections compile",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:compileDebugKotlin",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Passes compile verify",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:compileDebugKotlin",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Passes lint verify",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:lintDebug",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "UX polish compile check",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:compileDebugKotlin",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "UX polish compile recheck",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:compileDebugKotlin",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "UX polish lint recheck",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:lintDebug",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Final warning cleanup compile",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:compileDebugKotlin",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Final warning cleanup lint",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:lintDebug",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "No-warning compile verify",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:compileDebugKotlin",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "No-warning lint verify",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:lintDebug",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Habit form UX compile check",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:compileDebugKotlin",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Final verify compile",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:compileDebugKotlin",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Final verify lint",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:lintDebug",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Final verify compile after lint fix",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:compileDebugKotlin",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Final verify lint after api fix",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				".\\gradlew.bat",
+				":app:lintDebug",
+				"--console=plain",
+				"--no-daemon"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

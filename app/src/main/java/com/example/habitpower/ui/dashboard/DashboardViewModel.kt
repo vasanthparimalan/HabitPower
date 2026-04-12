@@ -4,6 +4,7 @@ import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.habitpower.data.HabitPowerRepository
+import com.example.habitpower.data.model.HabitDefinition
 import com.example.habitpower.data.model.DailyHabitItem
 import com.example.habitpower.data.model.HabitType
 import com.example.habitpower.data.model.LifeArea
@@ -62,17 +63,27 @@ class DashboardViewModel(
         initialValue = emptyList()
     )
 
-    val activeLifeAreas: StateFlow<List<LifeArea>> = repository.getActiveLifeAreas().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = emptyList()
-    )
-
     val activeUser: StateFlow<UserProfile?> = repository.getResolvedActiveUser().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = null
     )
+
+    private val assignedLifeAreas: StateFlow<List<LifeArea>> = activeUser.flatMapLatest { user ->
+        if (user == null) flowOf(emptyList()) else repository.getAssignedLifeAreasForUser(user.id)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = emptyList()
+    )
+
+    private val assignedLifeAreaIds: StateFlow<Set<Long>> = assignedLifeAreas
+        .map { areas -> areas.map { it.id }.toSet() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptySet()
+        )
 
     fun setActiveUser(userId: Long) {
         viewModelScope.launch {
@@ -94,43 +105,41 @@ class DashboardViewModel(
 
         combine(
             repository.getAssignedHabitsForUser(user.id),
+            repository.getAssignedLifeAreaIdsForUser(user.id),
             repository.getEntriesForUserInRange(user.id, start, end)
-        ) { assignedHabits, entries ->
-            val entriesByDate = entries.groupBy { it.date }
-            val maxPoints = assignedHabits.size
-            val hasHabits = assignedHabits.isNotEmpty()
-
-            val heatmap = mutableMapOf<LocalDate, Pair<Float, Boolean>>()
-            var date = start
-            while (!date.isAfter(end)) {
-                val dayEntries = entriesByDate[date] ?: emptyList()
-
-                val points = dayEntries.size.toFloat()
-                val ratio = if (maxPoints > 0) (points / maxPoints).coerceIn(0f, 1f) else 0f
-
-                heatmap[date] = Pair(ratio, hasHabits)
-                date = date.plusDays(1)
-            }
-            heatmap
+        ) { assignedHabits, assignedAreaIds, entries ->
+            val scopedHabits = filterHabitsByAssignedAreas(assignedHabits, assignedAreaIds.toSet())
+            DashboardMetrics.buildHeatmap(scopedHabits, entries.groupBy { it.date }, start, end)
         }
     }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = emptyMap())
 
-    // Today's Habits
+    // Habits for selected date (supports backfilling)
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    val todayHabits: StateFlow<List<DailyHabitItem>> = activeUser.flatMapLatest { user ->
-        if (user == null) flowOf(emptyList()) else repository.getFocusHabitItems(user.id, LocalDate.now())
-    }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = emptyList())
+    val selectedDateHabits: StateFlow<List<DailyHabitItem>> =
+        combine(activeUser, selectedDate) { user, date -> user to date }
+            .flatMapLatest { (user, date) ->
+                if (user == null) flowOf(emptyList()) else repository.getFocusHabitItems(user.id, date)
+            }
+            .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = emptyList())
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val todayHabits: StateFlow<List<DailyHabitItem>> = activeUser
+        .flatMapLatest { user ->
+            if (user == null) flowOf(emptyList()) else repository.getFocusHabitItems(user.id, LocalDate.now())
+        }
+        .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = emptyList())
 
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     val lifeAreaCompletionForSelectedDate: StateFlow<List<LifeAreaCompletion>> =
-        combine(activeUser, selectedDate, activeLifeAreas) { user, date, areas ->
-            Triple(user, date, areas)
-        }.flatMapLatest { (user, date, areas) ->
+        combine(activeUser, selectedDate, assignedLifeAreas, assignedLifeAreaIds) { user, date, areas, assignedAreaIds ->
+            Quad(user, date, areas, assignedAreaIds)
+        }.flatMapLatest { (user, date, areas, assignedAreaIds) ->
             if (user == null) {
                 flowOf(emptyList())
             } else {
                 repository.getDailyHabitItems(user.id, date).map { habits ->
-                    computeLifeAreaCompletion(areas = areas, habits = habits)
+                    val scopedHabits = filterDailyItemsByAssignedAreas(habits, assignedAreaIds)
+                    computeLifeAreaCompletion(areas = areas, habits = scopedHabits)
                 }
             }
         }.stateIn(
@@ -151,109 +160,66 @@ class DashboardViewModel(
 
     // KPI: Current Streak
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    val currentStreak: StateFlow<Int> = activeUser.flatMapLatest { user ->
-        if (user == null) return@flatMapLatest flowOf(0)
+    val currentStreak: StateFlow<Int> = activeUser.flatMapLatest activeUserFlow@{ user ->
+        if (user == null) return@activeUserFlow flowOf(0)
 
-        repository.getAssignedHabitsForUser(user.id).flatMapLatest { habits ->
-            val habitIds = habits.map { it.id }
-            if (habitIds.isEmpty()) return@flatMapLatest flowOf(0)
+        combine(
+            repository.getAssignedHabitsForUser(user.id),
+            repository.getAssignedLifeAreaIdsForUser(user.id)
+        ) { habits, assignedAreaIds ->
+            filterHabitsByAssignedAreas(habits, assignedAreaIds.toSet())
+        }.flatMapLatest habitsFlow@{ habits ->
+            if (habits.isEmpty()) return@habitsFlow flowOf(0)
 
             val start = LocalDate.now().minusDays(89)
             val end = LocalDate.now()
 
             repository.getEntriesForUserInRange(user.id, start, end).map { entries ->
-                val entriesByDate = entries.groupBy { it.date }
-                var streak = 0
-                var date = LocalDate.now()
-
-                while (true) {
-                    val dayEntries = entriesByDate[date] ?: emptyList()
-                    val completedHabits = dayEntries.map { it.habitId }.distinct()
-                    val allCompleted = habitIds.all { it in completedHabits }
-
-                    if (allCompleted) {
-                        streak++
-                        date = date.minusDays(1)
-                    } else {
-                        break
-                    }
-                }
-                streak
+                DashboardMetrics.currentStreak(habits, entries.groupBy { it.date }, LocalDate.now())
             }
         }
     }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = 0)
 
     // KPI: This Week Consistency %
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    val thisWeekConsistency: StateFlow<Int> = activeUser.flatMapLatest { user ->
-        if (user == null) return@flatMapLatest flowOf(0)
+    val thisWeekConsistency: StateFlow<Int> = activeUser.flatMapLatest activeUserFlow@{ user ->
+        if (user == null) return@activeUserFlow flowOf(0)
 
-        repository.getAssignedHabitsForUser(user.id).flatMapLatest { habits ->
-            val habitIds = habits.map { it.id }
-            if (habitIds.isEmpty()) return@flatMapLatest flowOf(0)
+        combine(
+            repository.getAssignedHabitsForUser(user.id),
+            repository.getAssignedLifeAreaIdsForUser(user.id)
+        ) { habits, assignedAreaIds ->
+            filterHabitsByAssignedAreas(habits, assignedAreaIds.toSet())
+        }.flatMapLatest habitsFlow@{ habits ->
+            if (habits.isEmpty()) return@habitsFlow flowOf(0)
 
             val today = LocalDate.now()
             val startOfWeek = today.minusDays((today.dayOfWeek.value - 1).toLong())
 
             repository.getEntriesForUserInRange(user.id, startOfWeek, today).map { entries ->
-                val entriesByDate = entries.groupBy { it.date }
-                var completedCount = 0
-                var totalCount = 0
-
-                var date = startOfWeek
-                while (!date.isAfter(today)) {
-                    val dayEntries = entriesByDate[date] ?: emptyList()
-                    val completedHabits = dayEntries.map { it.habitId }.distinct()
-                    completedCount += completedHabits.count { it in habitIds }
-                    totalCount += habitIds.size
-                    date = date.plusDays(1)
-                }
-
-                if (totalCount == 0) 0 else ((completedCount * 100) / totalCount)
+                DashboardMetrics.consistencyPercentage(habits, entries.groupBy { it.date }, startOfWeek, today)
             }
         }
     }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = 0)
 
     // KPI: Best Personal Record %
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    val bestPersonalRecord: StateFlow<Int> = activeUser.flatMapLatest { user ->
-        if (user == null) return@flatMapLatest flowOf(0)
+    val bestPersonalRecord: StateFlow<Int> = activeUser.flatMapLatest activeUserFlow@{ user ->
+        if (user == null) return@activeUserFlow flowOf(0)
 
-        repository.getAssignedHabitsForUser(user.id).flatMapLatest { habits ->
-            val habitIds = habits.map { it.id }
-            if (habitIds.isEmpty()) return@flatMapLatest flowOf(0)
+        combine(
+            repository.getAssignedHabitsForUser(user.id),
+            repository.getAssignedLifeAreaIdsForUser(user.id)
+        ) { habits, assignedAreaIds ->
+            filterHabitsByAssignedAreas(habits, assignedAreaIds.toSet())
+        }.flatMapLatest habitsFlow@{ habits ->
+            if (habits.isEmpty()) return@habitsFlow flowOf(0)
 
             val start = LocalDate.now().minusDays(89)
             val end = LocalDate.now()
 
             repository.getEntriesForUserInRange(user.id, start, end).map { entries ->
-                val entriesByDate = entries.groupBy { it.date }
-                var bestWeekPercentage = 0
-
-                var weekStart = start
-                while (!weekStart.isAfter(end)) {
-                    val weekEnd = weekStart.plusDays(6).let { if (it.isAfter(end)) end else it }
-                    var weekCompleted = 0
-                    var weekTotal = 0
-
-                    var date = weekStart
-                    while (!date.isAfter(weekEnd)) {
-                        val dayEntries = entriesByDate[date] ?: emptyList()
-                        val completedHabits = dayEntries.map { it.habitId }.distinct()
-                        weekCompleted += completedHabits.count { it in habitIds }
-                        weekTotal += habitIds.size
-                        date = date.plusDays(1)
-                    }
-
-                    if (weekTotal > 0) {
-                        val weekPercentage = (weekCompleted * 100) / weekTotal
-                        if (weekPercentage > bestWeekPercentage) {
-                            bestWeekPercentage = weekPercentage
-                        }
-                    }
-                    weekStart = weekStart.plusDays(7)
-                }
-                bestWeekPercentage
+                DashboardMetrics.bestWeeklyPercentage(habits, entries.groupBy { it.date }, start, end)
             }
         }
     }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = 0)
@@ -268,19 +234,19 @@ class DashboardViewModel(
         viewModelScope.launch { repository.deleteWorkoutSession(sessionId) }
     }
 
-    fun toggleHabit(habitId: Long) {
+    fun toggleHabit(habitId: Long, date: LocalDate = selectedDate.value) {
         val user = activeUser.value ?: return
         viewModelScope.launch {
-            repository.toggleBooleanHabit(user.id, habitId, LocalDate.now())
+            repository.toggleBooleanHabit(user.id, habitId, date)
         }
     }
 
-    fun logTwoMinutes(habit: DailyHabitItem) {
+    fun logTwoMinutes(habit: DailyHabitItem, date: LocalDate = selectedDate.value) {
         val user = activeUser.value ?: return
         viewModelScope.launch {
             repository.saveDailyHabitEntry(
                 userId = user.id,
-                date = LocalDate.now(),
+                date = date,
                 habitId = habit.habitId,
                 type = habit.type,
                 numericValue = 1.0,
@@ -319,4 +285,27 @@ class DashboardViewModel(
             )
         }
     }
+
+    private fun filterHabitsByAssignedAreas(
+        habits: List<HabitDefinition>,
+        assignedAreaIds: Set<Long>
+    ): List<HabitDefinition> {
+        if (assignedAreaIds.isEmpty()) return habits
+        return habits.filter { habit -> habit.lifeAreaId != null && assignedAreaIds.contains(habit.lifeAreaId) }
+    }
+
+    private fun filterDailyItemsByAssignedAreas(
+        items: List<DailyHabitItem>,
+        assignedAreaIds: Set<Long>
+    ): List<DailyHabitItem> {
+        if (assignedAreaIds.isEmpty()) return items
+        return items.filter { item -> item.lifeAreaId != null && assignedAreaIds.contains(item.lifeAreaId) }
+    }
+
+    private data class Quad<A, B, C, D>(
+        val first: A,
+        val second: B,
+        val third: C,
+        val fourth: D
+    )
 }
