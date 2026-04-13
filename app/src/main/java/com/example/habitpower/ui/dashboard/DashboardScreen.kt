@@ -99,12 +99,14 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.util.Locale
 
 private const val HOLD_TO_COMPLETE_MS = 760
+private const val DEFAULT_TASK_TIME_TEXT = "06:00"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -359,15 +361,12 @@ fun DashboardScreen(
             item {
                 SectionHeader(
                     title = "Today Tasks",
-                    subtitle = "Sorted by scheduled time — tap \uD83D\uDD52 to set a time, hold to complete"
+                    subtitle = "Sorted by time so your day is visible at a glance"
                 )
                 Spacer(modifier = Modifier.height(AppSpacing.sm))
 
                 fun sortByTime(list: List<DailyHabitItem>): List<DailyHabitItem> =
-                    list.sortedWith(compareBy(nullsLast()) { habit ->
-                        habit.commitmentTime?.takeIf { it.isNotBlank() }
-                            ?.let { runCatching { LocalTime.parse(it) }.getOrNull() }
-                    })
+                    list.sortedBy { habitScheduledTime(it) }
 
                 val sortedPending = sortByTime(todayHabits.filter { !isCompleted(it) })
                 val sortedDone = sortByTime(todayHabits.filter { isCompleted(it) })
@@ -598,11 +597,14 @@ private fun TodayTaskRow(
     val haptic = LocalHapticFeedback.current
     val title = habit.name.ifBlank { "Untitled habit" }
     val subtitle = todayTaskSubtitle(habit)
+    val displayTimeText = habitScheduledTime(habit).format(DateTimeFormatter.ofPattern("HH:mm"))
+    val motivation = habit.goalIdentityStatement.ifBlank { "I keep promises to myself." }
+    val hasPlace = habit.commitmentLocation.isNotBlank()
     var showEditTimeDialog by remember { mutableStateOf(false) }
 
     if (showEditTimeDialog) {
         EditTimeDialog(
-            currentTime = habit.commitmentTime.orEmpty(),
+            currentTime = displayTimeText,
             onConfirm = { newTime ->
                 onEditTime(newTime.ifBlank { null })
                 showEditTimeDialog = false
@@ -621,61 +623,6 @@ private fun TodayTaskRow(
 
     Card(modifier = Modifier.fillMaxWidth(), colors = cardColors) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            // ── Time / location strip ──────────────────────────────────────
-            val hasTime = !habit.commitmentTime.isNullOrBlank()
-            val hasPlace = habit.commitmentLocation.isNotBlank()
-            if (hasTime || hasPlace) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f))
-                        .padding(horizontal = 12.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (hasTime) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Schedule,
-                                contentDescription = "Time",
-                                modifier = Modifier.size(12.dp),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Text(
-                                text = habit.commitmentTime!!,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    }
-                    if (hasPlace) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.LocationOn,
-                                contentDescription = "Location",
-                                modifier = Modifier.size(12.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                text = habit.commitmentLocation,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-                }
-            }
-
-            // ── Main row ──────────────────────────────────────────────────
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -684,6 +631,18 @@ private fun TodayTaskRow(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                TextButton(
+                    onClick = { showEditTimeDialog = true },
+                    modifier = Modifier.widthIn(min = 72.dp)
+                ) {
+                    Text(
+                        text = displayTimeText,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
                 // Completed badge (only for done tasks)
                 if (isDone) {
                     Box(
@@ -711,28 +670,31 @@ private fun TodayTaskRow(
                         color = if (isDone) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
                         else MaterialTheme.colorScheme.onSurface
                     )
+                    Text(
+                        text = "Type of person: $motivation",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                     if (!isDone) {
                         Text(
                             text = subtitle,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 2,
+                            maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                     }
-                }
-
-                // Edit scheduled time
-                IconButton(
-                    onClick = { showEditTimeDialog = true },
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Schedule,
-                        contentDescription = "Set scheduled time",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                        modifier = Modifier.size(16.dp)
-                    )
+                    if (hasPlace) {
+                        Text(
+                            text = "Where: ${habit.commitmentLocation}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
 
                 // Action area
@@ -911,10 +873,16 @@ private fun todayTaskSubtitle(habit: DailyHabitItem): String {
                 "Log progress"
             }
         }
-
         HabitType.TIME -> if (description.isNotBlank()) description else "Log time"
         HabitType.TEXT -> if (description.isNotBlank()) description else "Add note"
     }
+}
+
+private fun habitScheduledTime(habit: DailyHabitItem): LocalTime {
+    val parsed = habit.commitmentTime
+        ?.takeIf { it.isNotBlank() }
+        ?.let { runCatching { LocalTime.parse(it) }.getOrNull() }
+    return parsed ?: LocalTime.parse(DEFAULT_TASK_TIME_TEXT)
 }
 
 @Composable

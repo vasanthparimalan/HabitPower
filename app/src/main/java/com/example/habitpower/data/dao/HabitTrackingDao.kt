@@ -60,6 +60,7 @@ interface HabitTrackingDao {
             hd.routineId AS routineId,
             hd.lifeAreaId AS lifeAreaId,
             hd.name AS name,
+            hd.goalIdentityStatement AS goalIdentityStatement,
             hd.description AS description,
             hd.type AS type,
             hd.unit AS unit,

@@ -13,6 +13,8 @@ data class DailyHabitItem(
     @ColumnInfo(name = "lifeAreaId")
     val lifeAreaId: Long?,
     val name: String,
+    @ColumnInfo(name = "goalIdentityStatement")
+    val goalIdentityStatement: String = "",
     val description: String,
     val type: HabitType,
     val unit: String?,
