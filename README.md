@@ -14,7 +14,7 @@ A comprehensive habit tracking Android application built with Kotlin and Jetpack
 
 ## Screenshots
 
-<img width="1080" height="2424" alt="Focus for Pomodoro and Timer" src="https://github.com/user-attachments/assets/cd884d4b-f1a8-4325-ae6e-273f0a1ef701" />
+<img width="300" alt="Focus for Pomodoro and Timer" src="https://github.com/user-attachments/assets/cd884d4b-f1a8-4325-ae6e-273f0a1ef701" />
 <img width="1080" height="2424" alt="DailyTasks Dashboard" src="https://github.com/user-attachments/assets/8908a53b-1f7b-4fc1-8360-5f09f6dfe4a7" />
 ![Uploading Focus for Pomodoro and Timer.png…]()<img width="1080" height="2424" alt="Routines and Exercises" src="https://github.com/user-attachments/assets/3de5d456-383a-4dae-9bc4-9c6fe6fd2a3b" />
 <img width="1080" height="2424" alt="Reports" src="https://github.com/user-attachments/assets/20e017ec-a31d-4639-afe9-9f81fbdff659" />
