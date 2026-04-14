@@ -15,8 +15,15 @@ import com.example.habitpower.data.model.UserProfile
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import kotlin.math.ceil
+
+enum class ReportPeriod(val label: String, val days: Int) {
+    DAYS_7("7 days", 7),
+    DAYS_30("30 days", 30),
+    DAYS_90("90 days", 90),
+    CUSTOM("Custom", -1)
+}
 
 data class ReportKpi(
     val label: String,
@@ -24,9 +31,16 @@ data class ReportKpi(
     val supportingText: String
 )
 
-data class TreeRingSegment(
-    val label: String,
+data class WeekTrend(
+    val weekLabel: String,
     val completionRatio: Float
+)
+
+data class HabitConsistency(
+    val habitName: String,
+    val completedCount: Int,
+    val totalDays: Int,
+    val consistencyRatio: Float
 )
 
 data class LifeAreaGauge(
@@ -40,13 +54,15 @@ data class LifeAreaGauge(
 data class ReportUiState(
     val isLoading: Boolean = false,
     val activeUser: UserProfile? = null,
+    val selectedPeriod: ReportPeriod = ReportPeriod.DAYS_30,
     val startDate: LocalDate = LocalDate.now().minusDays(29),
     val endDate: LocalDate = LocalDate.now(),
     val headline: String = "Stay on the path",
     val subheadline: String = "Your long-term identity is built one completed day at a time.",
     val kpis: List<ReportKpi> = emptyList(),
-    val treeRings: List<TreeRingSegment> = emptyList(),
+    val weeklyTrend: List<WeekTrend> = emptyList(),
     val lifeAreaGauges: List<LifeAreaGauge> = emptyList(),
+    val habitConsistency: List<HabitConsistency> = emptyList(),
     val weakestAreaMessage: String? = null,
     val strongestAreaMessage: String? = null,
     val emptyMessage: String? = null
@@ -60,15 +76,26 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
         observeActiveUser()
     }
 
+    fun selectPeriod(period: ReportPeriod) {
+        if (period == ReportPeriod.CUSTOM) {
+            uiState = uiState.copy(selectedPeriod = period)
+            return
+        }
+        val endDate = LocalDate.now()
+        val startDate = endDate.minusDays((period.days - 1).toLong())
+        uiState = uiState.copy(selectedPeriod = period, startDate = startDate, endDate = endDate)
+        refreshReport()
+    }
+
     fun updateStartDate(date: LocalDate) {
         val adjustedEnd = if (date.isAfter(uiState.endDate)) date else uiState.endDate
-        uiState = uiState.copy(startDate = date, endDate = adjustedEnd)
+        uiState = uiState.copy(selectedPeriod = ReportPeriod.CUSTOM, startDate = date, endDate = adjustedEnd)
         refreshReport()
     }
 
     fun updateEndDate(date: LocalDate) {
         val adjustedStart = if (date.isBefore(uiState.startDate)) date else uiState.startDate
-        uiState = uiState.copy(startDate = adjustedStart, endDate = date)
+        uiState = uiState.copy(selectedPeriod = ReportPeriod.CUSTOM, startDate = adjustedStart, endDate = date)
         refreshReport()
     }
 
@@ -88,8 +115,9 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
                 uiState = uiState.copy(
                     isLoading = false,
                     kpis = emptyList(),
-                    treeRings = emptyList(),
+                    weeklyTrend = emptyList(),
                     lifeAreaGauges = emptyList(),
+                    habitConsistency = emptyList(),
                     emptyMessage = "No active user selected yet. Pick a user to unlock analytics."
                 )
                 return@launch
@@ -115,8 +143,9 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
                 uiState = uiState.copy(
                     isLoading = false,
                     kpis = emptyList(),
-                    treeRings = emptyList(),
+                    weeklyTrend = emptyList(),
                     lifeAreaGauges = emptyList(),
+                    habitConsistency = emptyList(),
                     emptyMessage = "Assign habits and life areas to ${currentUser.name} to start building a meaningful report."
                 )
                 return@launch
@@ -131,7 +160,13 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
                 lifeAreas = lifeAreas
             )
 
-            uiState = report.copy(isLoading = false, activeUser = currentUser, startDate = startDate, endDate = endDate)
+            uiState = report.copy(
+                isLoading = false,
+                activeUser = currentUser,
+                startDate = startDate,
+                endDate = endDate,
+                selectedPeriod = uiState.selectedPeriod
+            )
         }
     }
 
@@ -147,9 +182,7 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
         val entriesByKey = entries.associateBy { it.date to it.habitId }
 
         val dayRatios = dates.map { date ->
-            val completed = habits.count { habit ->
-                isEntrySuccessful(entriesByKey[date to habit.id], habit)
-            }
+            val completed = habits.count { habit -> isEntrySuccessful(entriesByKey[date to habit.id], habit) }
             if (habits.isEmpty()) 0f else completed.toFloat() / habits.size.toFloat()
         }
 
@@ -158,13 +191,17 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
             habits.count { habit -> isEntrySuccessful(entriesByKey[date to habit.id], habit) }
         }
         val overallRatio = if (totalTasks == 0) 0f else totalCompletedTasks.toFloat() / totalTasks.toFloat()
-        val currentStreak = dates.asReversed().takeWhile { date ->
-            habits.all { habit -> isEntrySuccessful(entriesByKey[date to habit.id], habit) }
-        }.count()
+
+        val showUpDays = dates.count { date ->
+            habits.any { habit -> isEntrySuccessful(entriesByKey[date to habit.id], habit) }
+        }
+        val showUpRate = if (dates.isEmpty()) 0f else showUpDays.toFloat() / dates.size.toFloat()
+
         val bestDayRatio = dayRatios.maxOrNull() ?: 0f
 
-        val trunkSegments = buildTreeRingSegments(dates, dayRatios)
+        val weeklyTrend = buildWeeklyTrend(dates, habits, entriesByKey)
         val lifeAreaGauges = buildLifeAreaGauges(dates, habits, entriesByKey, lifeAreas)
+        val habitConsistency = buildHabitConsistency(dates, habits, entriesByKey)
         val weakestArea = lifeAreaGauges.minByOrNull { it.completionRatio }
         val strongestArea = lifeAreaGauges.maxByOrNull { it.completionRatio }
 
@@ -176,8 +213,8 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
         }
 
         val subheadline = when {
-            currentStreak >= 14 -> "${user.name}, your systems are becoming part of your identity. Keep protecting the streak."
-            overallRatio >= 0.60f -> "Your consistency is real. Tighten the weakest area and the next level opens up."
+            showUpRate >= 0.9f -> "${user.name}, showing up every single day is the whole game. You're winning it."
+            overallRatio >= 0.60f -> "Your consistency is real. Tighten the weakest habit and the next level opens up."
             else -> "This report is not judgment. It is a map. Use it to choose your next small win."
         }
 
@@ -185,12 +222,13 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
             headline = headline,
             subheadline = subheadline,
             kpis = listOf(
-                ReportKpi("Streak", currentStreak.toString(), "fully completed days ending ${endDate}"),
-                ReportKpi("Consistency", percentText(overallRatio), "completed tasks across the selected range"),
-                ReportKpi("Best Day", percentText(bestDayRatio), "highest single-day completion rate")
+                ReportKpi("Show-Up Rate", percentText(showUpRate), "$showUpDays of ${dates.size} days active"),
+                ReportKpi("Consistency", percentText(overallRatio), "of all habit-days honored"),
+                ReportKpi("Best Day", percentText(bestDayRatio), "highest single-day completion")
             ),
-            treeRings = trunkSegments,
+            weeklyTrend = weeklyTrend,
             lifeAreaGauges = lifeAreaGauges,
+            habitConsistency = habitConsistency,
             weakestAreaMessage = weakestArea?.let {
                 "Most attention needed: ${it.name} is at ${percentText(it.completionRatio)}. A few repeated wins here will change the whole story."
             },
@@ -201,24 +239,41 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
         )
     }
 
-    private fun buildTreeRingSegments(
+    private fun buildWeeklyTrend(
         dates: List<LocalDate>,
-        dayRatios: List<Float>
-    ): List<TreeRingSegment> {
-        if (dates.isEmpty()) return emptyList()
+        habits: List<HabitDefinition>,
+        entriesByKey: Map<Pair<LocalDate, Long>, DailyHabitEntry>
+    ): List<WeekTrend> {
+        if (dates.isEmpty() || habits.isEmpty()) return emptyList()
+        // Short periods: one bar per day; longer: one bar per week
+        val chunkSize = if (dates.size <= 14) 1 else 7
+        val fmtWeek = DateTimeFormatter.ofPattern("MMM d")
+        return dates.chunked(chunkSize).map { chunk ->
+            val avg = chunk.map { date ->
+                val completed = habits.count { habit -> isEntrySuccessful(entriesByKey[date to habit.id], habit) }
+                completed.toFloat() / habits.size.toFloat()
+            }.average().toFloat()
+            val label = if (chunkSize == 1) chunk.first().dayOfMonth.toString()
+                        else chunk.first().format(fmtWeek)
+            WeekTrend(weekLabel = label, completionRatio = avg)
+        }
+    }
 
-        val bucketCount = minOf(dates.size, 48)
-        val bucketSize = ceil(dates.size / bucketCount.toFloat()).toInt().coerceAtLeast(1)
-
-        return dates.zip(dayRatios)
-            .chunked(bucketSize)
-            .map { bucket ->
-                val start = bucket.first().first
-                val end = bucket.last().first
-                val averageRatio = bucket.map { it.second }.average().toFloat()
-                val label = if (start == end) start.toString() else "$start → $end"
-                TreeRingSegment(label = label, completionRatio = averageRatio)
-            }
+    private fun buildHabitConsistency(
+        dates: List<LocalDate>,
+        habits: List<HabitDefinition>,
+        entriesByKey: Map<Pair<LocalDate, Long>, DailyHabitEntry>
+    ): List<HabitConsistency> {
+        return habits.map { habit ->
+            val completed = dates.count { date -> isEntrySuccessful(entriesByKey[date to habit.id], habit) }
+            val ratio = if (dates.isEmpty()) 0f else completed.toFloat() / dates.size.toFloat()
+            HabitConsistency(
+                habitName = habit.name,
+                completedCount = completed,
+                totalDays = dates.size,
+                consistencyRatio = ratio
+            )
+        }.sortedBy { it.consistencyRatio } // worst first — most attention needed at top
     }
 
     private fun buildLifeAreaGauges(
@@ -269,38 +324,28 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
 
     private fun isEntrySuccessful(entry: DailyHabitEntry?, habit: HabitDefinition): Boolean {
         if (entry == null) return false
-
         return when (habit.type) {
             HabitType.BOOLEAN -> entry.booleanValue == true
             HabitType.NUMBER, HabitType.DURATION, HabitType.COUNT, HabitType.POMODORO, HabitType.TIMER -> {
                 val value = entry.numericValue ?: return false
-                val target = habit.targetValue
-                if (target == null) {
-                    true
-                } else {
-                    when (habit.operator) {
-                        TargetOperator.LESS_THAN_OR_EQUAL -> value <= target
-                        TargetOperator.GREATER_THAN_OR_EQUAL -> value >= target
-                        TargetOperator.EQUAL -> value == target
-                    }
+                val target = habit.targetValue ?: return true
+                when (habit.operator) {
+                    TargetOperator.LESS_THAN_OR_EQUAL -> value <= target
+                    TargetOperator.GREATER_THAN_OR_EQUAL -> value >= target
+                    TargetOperator.EQUAL -> value == target
                 }
             }
-
             HabitType.TIME -> {
                 val value = entry.numericValue ?: return false
-                val target = habit.targetValue
-                if (target == null) {
-                    true
-                } else {
-                    when (habit.operator) {
-                        TargetOperator.LESS_THAN_OR_EQUAL -> value <= target
-                        TargetOperator.GREATER_THAN_OR_EQUAL -> value >= target
-                        TargetOperator.EQUAL -> value == target
-                    }
+                val target = habit.targetValue ?: return true
+                when (habit.operator) {
+                    TargetOperator.LESS_THAN_OR_EQUAL -> value <= target
+                    TargetOperator.GREATER_THAN_OR_EQUAL -> value >= target
+                    TargetOperator.EQUAL -> value == target
                 }
             }
-                HabitType.TEXT -> !entry.textValue.isNullOrBlank()
-                HabitType.ROUTINE -> entry.booleanValue == true
+            HabitType.TEXT -> !entry.textValue.isNullOrBlank()
+            HabitType.ROUTINE -> entry.booleanValue == true
         }
     }
 }

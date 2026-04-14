@@ -60,14 +60,14 @@ object AppViewModelProvider {
         }
         initializer {
             DashboardViewModel(
-                habitPowerApplication().container.habitPowerRepository,
-                habitPowerApplication()
+                habitPowerApplication().container.habitPowerRepository
             )
         }
         initializer {
             DailyCheckInViewModel(
                 this.createSavedStateHandle(),
-                habitPowerApplication().container.habitPowerRepository
+                habitPowerApplication().container.habitPowerRepository,
+                habitPowerApplication().container.gamificationRepository
             )
         }
         initializer {
@@ -102,6 +102,19 @@ object AppViewModelProvider {
         }
         initializer {
             com.example.habitpower.ui.gamification.GamificationViewModel(
+                habitPowerApplication().container.habitPowerRepository,
+                habitPowerApplication().container.gamificationRepository
+            )
+        }
+        initializer {
+            com.example.habitpower.ui.admin.ExportViewModel(
+                habitPowerApplication().container.habitPowerRepository,
+                habitPowerApplication().container.gamificationRepository,
+                habitPowerApplication()
+            )
+        }
+        initializer {
+            com.example.habitpower.ui.report.YearInReviewViewModel(
                 habitPowerApplication().container.habitPowerRepository,
                 habitPowerApplication().container.gamificationRepository
             )

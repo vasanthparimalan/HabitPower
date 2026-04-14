@@ -46,7 +46,8 @@ fun HelpGuideScreen(
                 "Open Admin > Habits to create habit definitions once, then reuse for all users.",
                 "Open Admin > Assignments to pick habits and life areas for each user.",
                 "Use Dashboard to switch user, review KPIs, and open Daily Check-In.",
-                "Use Focus for timer/pomodoro habits that need deep-work sessions."
+                "Use Focus for timer/pomodoro habits that need deep-work sessions.",
+                "Your data is backed up automatically via Google Backup — no setup needed. See 'Your Data & Backup' below for what to do when switching phones."
             )
         ),
         GuideSection(
@@ -97,6 +98,18 @@ fun HelpGuideScreen(
                 "Coach weaker life areas with focused assignments and review loops.",
                 "Build accountability without nagging by combining reminders and game progress.",
                 "Turn daily check-ins into a motivating, repeatable ritual."
+            )
+        ),
+        GuideSection(
+            title = "Your Data & Backup",
+            points = listOf(
+                "HabitPower is fully offline. Your data never leaves your device to any external server.",
+                "Your habit history, streaks, and stats are automatically backed up via Android's built-in Google Backup — this uses your existing Google account at no extra cost.",
+                "To verify backups are active: go to your phone's Settings > Google > Backup and confirm 'Back up to Google Drive' is turned on.",
+                "Switching to a new phone: sign into the same Google account during setup, then install HabitPower again. Your data will restore automatically on first launch.",
+                "HabitPower is not on the Play Store, so the app itself will not auto-reinstall — but your data is safely waiting. Install the APK first, then open it.",
+                "If you want a manual backup: go to Admin > Export Data to save a CSV or full JSON backup to any location you choose.",
+                "Backup data is retained for 60 days after uninstalling the app. Reinstall within that window to recover everything."
             )
         )
     )

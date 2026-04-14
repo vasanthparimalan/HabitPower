@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -21,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,8 +45,6 @@ fun AdminHomeScreen(
     val context = LocalContext.current
     val repository = (context.applicationContext as HabitPowerApp).container.habitPowerRepository
     val coroutineScope = rememberCoroutineScope()
-    val streakBaseDays by repository.streakBaseDays.collectAsState(initial = 7)
-    var showStreakDialog by remember { mutableStateOf(false) }
     var starterStackStatus by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
@@ -105,12 +101,15 @@ fun AdminHomeScreen(
                 description = "Choose the tone for Focus and Pomodoro completion alerts.",
                 buttonLabel = "Open",
                 onClick = { onNavigate(Screen.AdminNotificationTone.route) }
-            ),
+            )
+        )
+
+        val dataActions = listOf(
             AdminActionItem(
-                title = "Streak Milestones",
-                description = "Set the base number of consecutive days for widget streak milestone emojis. Currently: $streakBaseDays days.",
-                buttonLabel = "Edit",
-                onClick = { showStreakDialog = true }
+                title = "Export Data",
+                description = "Save your habit history as CSV for analysis or JSON as a full backup. You choose the file name and location.",
+                buttonLabel = "Open",
+                onClick = { onNavigate(Screen.AdminExport.route) }
             )
         )
 
@@ -135,26 +134,6 @@ fun AdminHomeScreen(
             }
 
             item {
-                QuickStartCard(
-                    onOpenUsers = { onNavigate(Screen.AdminUsers.route) },
-                    onOpenHabits = { onNavigate(Screen.AdminHabits.route) },
-                    onOpenAssignments = { onNavigate(Screen.AdminAssignments.route) },
-                    onOpenGuide = { onNavigate(Screen.Help.route) },
-                    onApplyStarterStack = {
-                        coroutineScope.launch {
-                            val createdCount = repository.applyStarterHabitStackForUser()
-                            starterStackStatus = if (createdCount > 0) {
-                                "Starter stack applied. Added $createdCount new habits."
-                            } else {
-                                "Starter stack already available for this user."
-                            }
-                        }
-                    },
-                    statusMessage = starterStackStatus
-                )
-            }
-
-            item {
                 SectionHeader(
                     title = "Setup",
                     subtitle = "Create people, habits, and life-area structure."
@@ -168,6 +147,51 @@ fun AdminHomeScreen(
                     containerColor = MaterialTheme.colorScheme.surface,
                     onClick = action.onClick
                 )
+            }
+
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            "80/20 Starter Stack",
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        Text(
+                            "Instantly populate habits based on high-impact defaults. Safe to run — skips habits that already exist.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Row(
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            TextButton(onClick = {
+                                coroutineScope.launch {
+                                    val createdCount = repository.applyStarterHabitStackForUser()
+                                    starterStackStatus = if (createdCount > 0) {
+                                        "Added $createdCount new habits."
+                                    } else {
+                                        "Already up to date — no new habits added."
+                                    }
+                                }
+                            }) {
+                                Text("Apply Starter Stack")
+                            }
+                            val status = starterStackStatus
+                            if (status != null) {
+                                StatusChip(text = status)
+                            }
+                        }
+                    }
+                }
             }
 
             item {
@@ -189,7 +213,7 @@ fun AdminHomeScreen(
             item {
                 SectionHeader(
                     title = "System",
-                    subtitle = "Tune app-level sounds and streak behavior."
+                    subtitle = "Tune app-level notification sounds."
                 )
             }
             items(systemActions) { action ->
@@ -201,47 +225,24 @@ fun AdminHomeScreen(
                     onClick = action.onClick
                 )
             }
+
+            item {
+                SectionHeader(
+                    title = "Data",
+                    subtitle = "Export your history for analysis or backup."
+                )
+            }
+            items(dataActions) { action ->
+                AdminActionCard(
+                    title = action.title,
+                    description = action.description,
+                    buttonLabel = action.buttonLabel,
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    onClick = action.onClick
+                )
+            }
         }
 
-        if (showStreakDialog) {
-            var inputText by remember { mutableStateOf(streakBaseDays.toString()) }
-
-            androidx.compose.material3.AlertDialog(
-                onDismissRequest = { showStreakDialog = false },
-                title = { Text("Streak Milestone Base") },
-                text = {
-                    Column {
-                        Text("Enter the number of days for the base streak length (e.g. 7). Your widgets progress in milestones of 1x, 2x, and 3x of this base.")
-                        androidx.compose.material3.OutlinedTextField(
-                            value = inputText,
-                            onValueChange = { newValue -> inputText = newValue.filter { char -> char.isDigit() } },
-                            label = { Text("Days") },
-                            singleLine = true,
-                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
-                        )
-                    }
-                },
-                confirmButton = {
-                    androidx.compose.material3.TextButton(
-                        onClick = {
-                            val value = inputText.toIntOrNull()?.takeIf { it > 0 } ?: 7
-                            coroutineScope.launch {
-                                repository.saveStreakBaseDays(value)
-                            }
-                            showStreakDialog = false
-                        }
-                    ) {
-                        Text("Save")
-                    }
-                },
-                dismissButton = {
-                    androidx.compose.material3.TextButton(onClick = { showStreakDialog = false }) {
-                        Text("Cancel")
-                    }
-                }
-            )
-        }
     }
 }
 
@@ -251,60 +252,6 @@ private data class AdminActionItem(
     val buttonLabel: String,
     val onClick: () -> Unit
 )
-
-@Composable
-private fun QuickStartCard(
-    onOpenUsers: () -> Unit,
-    onOpenHabits: () -> Unit,
-    onOpenAssignments: () -> Unit,
-    onOpenGuide: () -> Unit,
-    onApplyStarterStack: () -> Unit,
-    statusMessage: String?
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(AppSpacing.md)
-        ) {
-            SectionHeader(
-                title = "Quick Start",
-                subtitle = "If this is your first time, follow this order."
-            )
-
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                StatusChip(text = "1. Users")
-                StatusChip(text = "2. Habits")
-                StatusChip(text = "3. Assign")
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Button(onClick = onOpenUsers, modifier = Modifier.weight(1f)) { Text("Users") }
-                Button(onClick = onOpenHabits, modifier = Modifier.weight(1f)) { Text("Habits") }
-                Button(onClick = onOpenAssignments, modifier = Modifier.weight(1f)) { Text("Assign") }
-            }
-
-            TextButton(onClick = onOpenGuide) {
-                Text("Open Guide & Help")
-            }
-
-            TextButton(onClick = onApplyStarterStack) {
-                Text("Apply 80/20 Starter Stack")
-            }
-
-            statusMessage?.let {
-                StatusChip(text = it)
-            }
-        }
-    }
-}
 
 @Composable
 private fun AdminActionCard(

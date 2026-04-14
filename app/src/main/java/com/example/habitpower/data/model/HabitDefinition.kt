@@ -33,5 +33,6 @@ data class HabitDefinition(
     val isActive: Boolean = true,
     val operator: TargetOperator = TargetOperator.GREATER_THAN_OR_EQUAL,
     val lifeAreaId: Long? = null,
-    val routineId: Long? = null // For ROUTINE type habits, reference the routine
+    val routineId: Long? = null, // For ROUTINE type habits, reference the routine
+    val lifecycleStatus: HabitLifecycleStatus = HabitLifecycleStatus.ACTIVE
 )

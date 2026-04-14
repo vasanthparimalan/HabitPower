@@ -175,7 +175,7 @@ fun DailyCheckInScreen(
                                     contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                                 Text(
-                                    text = "Complete small wins first, then finish tougher habits.",
+                                    text = "Honor your commitments first. Everything beyond is a bonus.",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -205,7 +205,7 @@ fun DailyCheckInScreen(
                     item {
                         SectionHeader(title = if (isBackfillDate) "Backfill Check-In" else "Today's Check-In")
                         StatusChip(
-                            text = "Completed ${uiState.completedCount} of ${uiState.totalCount}",
+                            text = "Honored ${uiState.completedCount} of ${uiState.totalCount}",
                             modifier = Modifier.padding(top = 6.dp)
                         )
                         DayCompletionKick(
@@ -257,7 +257,14 @@ private fun HabitInputCard(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(habit.name, style = MaterialTheme.typography.titleMedium)
-            if (habit.description.isNotBlank()) {
+            if (habit.goalIdentityStatement.isNotBlank()) {
+                Text(
+                    text = "\u201c${habit.goalIdentityStatement}\u201d",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                )
+            } else if (habit.description.isNotBlank()) {
                 Text(habit.description, style = MaterialTheme.typography.bodyMedium)
             }
 
@@ -294,7 +301,7 @@ private fun HabitInputCard(
 
                     if (habit.booleanValue) {
                         StatusChip(
-                            text = "Logged. Nice consistency.",
+                            text = "Commitment honored. Keep showing up.",
                             containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                             contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                         )
@@ -375,8 +382,8 @@ private fun HabitInputCard(
             }
 
             habit.targetValue?.let { target ->
-                val targetLabel = buildString {
-                    append("Target: ")
+                val commitmentLabel = buildString {
+                    append("Commitment: ")
                     if (habit.type == HabitType.COUNT) {
                         append(target.toInt())
                     } else {
@@ -386,9 +393,10 @@ private fun HabitInputCard(
                         append(" ")
                         append(it)
                     }
+                    if (habit.targetMet == true) append(" ✓")
                 }
                 Text(
-                    text = targetLabel,
+                    text = commitmentLabel,
                     style = MaterialTheme.typography.bodySmall,
                     color = when (habit.targetMet) {
                         true -> MaterialTheme.colorScheme.tertiary

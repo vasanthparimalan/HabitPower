@@ -57,6 +57,9 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -77,6 +80,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -95,6 +99,13 @@ import com.example.habitpower.ui.theme.AppSpacing
 import com.example.habitpower.ui.theme.GamificationSummaryCard
 import com.example.habitpower.ui.theme.SectionHeader
 import com.example.habitpower.ui.theme.StatusChip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
+import com.example.habitpower.util.SoundPlayer
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -105,8 +116,43 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.util.Locale
 
+private val DAILY_CUE_PHRASES = listOf(
+    "Honor your commitment. The amount doesn't matter today.",
+    "Show up. That's the whole game.",
+    "The streak survives showing up — not showing off.",
+    "A small action today keeps the habit alive tomorrow.",
+    "Small and consistent beats large and occasional.",
+    "Your commitment is your floor, not your ceiling.",
+    "Done imperfectly is infinitely better than not done.",
+    "Every rep is a vote for the person you're becoming.",
+    "You don't need motivation. You need a commitment small enough to always keep.",
+    "Identity first, outcomes second. Who are you becoming today?",
+    "One percent better. Every single day.",
+    "The best time to build a habit was yesterday. The second best time is right now."
+)
+
 private const val HOLD_TO_COMPLETE_MS = 760
 private const val DEFAULT_TASK_TIME_TEXT = "06:00"
+
+private val COMPLETION_PHRASES = listOf(
+    "Done! That's a vote for your best self. 🗳️",
+    "Habit honored. Identity reinforced. ✅",
+    "One more rep for the person you're becoming. 💪",
+    "Showing up is the whole game. You showed up. 🔥",
+    "Small win. Real compound interest. 📈",
+    "That's the chain staying unbroken. 🔗",
+    "Proof over promises — you delivered. ⚡"
+)
+
+private fun completionMessage(habitName: String, done: Int, total: Int): String {
+    val base = COMPLETION_PHRASES[(done + habitName.length) % COMPLETION_PHRASES.size]
+    return when {
+        done == total -> "All $total done today! 🎉 Perfect day."
+        done == total - 1 -> "$habitName done! One more to go. Almost there 🏁"
+        done == 1 -> "$habitName done! First one is always the hardest. $done/$total 🚀"
+        else -> "$habitName done! $done of $total today · $base"
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -127,22 +173,90 @@ fun DashboardScreen(
     val bestPersonalRecord by viewModel.bestPersonalRecord.collectAsState()
     val lifeAreaCompletion by viewModel.lifeAreaCompletionForSelectedDate.collectAsState()
     val gamificationState by gamificationViewModel.uiState.collectAsState()
+    val graduatedHabits by viewModel.graduatedHabits.collectAsState()
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    val completionSoundPrefs by viewModel.completionSoundPrefs.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.completionEvents.collect { feedback ->
+            val msg = completionMessage(feedback.habitName, feedback.completedCount, feedback.totalCount)
+            // Play sound
+            if (completionSoundPrefs.soundEnabled) {
+                SoundPlayer.playById(completionSoundPrefs.soundId)
+            }
+            // Mild haptic vibration
+            if (completionSoundPrefs.vibrationEnabled) {
+                try {
+                    val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        (context.getSystemService(VibratorManager::class.java))?.defaultVibrator
+                    } else {
+                        @Suppress("DEPRECATION")
+                        context.getSystemService(Vibrator::class.java)
+                    }
+                    vibrator?.let {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            it.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK))
+                        } else {
+                            @Suppress("DEPRECATION")
+                            it.vibrate(VibrationEffect.createOneShot(60L, VibrationEffect.DEFAULT_AMPLITUDE))
+                        }
+                    }
+                } catch (_: Exception) {}
+            }
+            snackbarHostState.showSnackbar(msg)
+        }
+    }
 
     var showQuotesDialog by remember { mutableStateOf(false) }
     var showGamificationInfoDialog by remember { mutableStateOf(false) }
 
     if (showQuotesDialog) {
+        val uriHandler = LocalUriHandler.current
         AlertDialog(
             onDismissRequest = { showQuotesDialog = false },
-            title = { Text("Atomic Principles") },
+            title = { Text("Habit Science") },
             text = {
-                LazyColumn {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(atomicQuotes.size) { i ->
-                        Text(
-                            text = "• ${atomicQuotes[i].text}",
-                            modifier = Modifier.padding(vertical = 8.dp),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        val quote = atomicQuotes[i]
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(
+                                text = "\u201c${quote.text}\u201d",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                            )
+                            if (quote.source.isNotBlank()) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    Text(
+                                        text = "— ${quote.source}",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    if (quote.sourceUrl.isNotBlank()) {
+                                        TextButton(
+                                            onClick = {
+                                                runCatching { uriHandler.openUri(quote.sourceUrl) }
+                                            },
+                                            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.AutoMirrored.Filled.MenuBook,
+                                                contentDescription = "Open on Audible",
+                                                modifier = Modifier.size(14.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text("Audible", style = MaterialTheme.typography.labelSmall)
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -166,9 +280,9 @@ fun DashboardScreen(
             title = { Text("How Gamification Works") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("• Complete habits to earn XP and build consistency.")
-                    Text("• Perfect daily check-ins keep your streak alive.")
-                    Text("• Levels increase as XP grows, unlocking stronger momentum.")
+                    Text("• Honor your daily commitments to earn XP and build consistency.")
+                    Text("• Showing up every day keeps your streak alive — the amount doesn't matter.")
+                    Text("• Levels increase as XP grows, reflecting who you are becoming.")
                     Text("• Track streak, level progress, and achievements from this Dashboard.")
                     Text("• For full family workflow guidance, open Guide & Help.")
                 }
@@ -190,6 +304,16 @@ fun DashboardScreen(
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    shape = MaterialTheme.shapes.medium
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 title = {
@@ -219,7 +343,7 @@ fun DashboardScreen(
                         Icon(Icons.Default.Info, contentDescription = "Help")
                     }
                     IconButton(onClick = { showQuotesDialog = true }) {
-                        Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = "Atomic principles")
+                        Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = "Habit science")
                     }
                 }
             )
@@ -250,23 +374,28 @@ fun DashboardScreen(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        val cuePhrase = remember {
+                            DAILY_CUE_PHRASES[LocalDate.now().dayOfYear % DAILY_CUE_PHRASES.size]
+                        }
                         StatusChip(
                             text = "Daily Cue",
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                         Text(
-                            text = "Becoming 1% better every day.",
+                            text = cuePhrase,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
-                        Text(
-                            text = "\"$dailyQuote\"",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.9f)
-                        )
+                        if (dailyQuote.isNotBlank()) {
+                            Text(
+                                text = "\u201c$dailyQuote\u201d",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.85f)
+                            )
+                        }
                     }
                 }
             }
@@ -289,6 +418,7 @@ fun DashboardScreen(
                     }
                     GamificationSummaryCard(
                         streak = gamificationState.streak,
+                        longestStreak = gamificationState.longestStreak,
                         level = gamificationState.level,
                         levelName = gamificationState.levelName,
                         levelProgress = gamificationState.levelProgress,
@@ -386,7 +516,7 @@ fun DashboardScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        StatusChip(text = "${sortedDone.size}/${todayHabits.size} done")
+                        StatusChip(text = "${sortedDone.size}/${todayHabits.size} honored")
                         if (sortedDone.size == todayHabits.size && todayHabits.isNotEmpty()) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -399,7 +529,7 @@ fun DashboardScreen(
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Text(
-                                    text = "All done!",
+                                    text = "All commitments honored!",
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.SemiBold
@@ -421,10 +551,17 @@ fun DashboardScreen(
                                 }
                             },
                             onOpen = {
-                                if (habit.type == HabitType.POMODORO || habit.type == HabitType.TIMER) {
-                                    onNavigate(Screen.Focus.createRoute(habit.habitId))
-                                } else {
-                                    onNavigate(Screen.DailyCheckIn.createRoute(activeUser?.id, LocalDate.now()))
+                                when (habit.type) {
+                                    HabitType.POMODORO, HabitType.TIMER ->
+                                        onNavigate(Screen.Focus.createRoute(habit.habitId))
+                                    HabitType.ROUTINE ->
+                                        if (habit.routineId != null) {
+                                            onNavigate(Screen.ExecuteRoutine.createRoute(habit.routineId))
+                                        } else {
+                                            onNavigate(Screen.Routines.route)
+                                        }
+                                    else ->
+                                        onNavigate(Screen.DailyCheckIn.createRoute(activeUser?.id, LocalDate.now()))
                                 }
                             },
                             onEditTime = { newTime -> viewModel.updateHabitTime(habit.habitId, newTime) }
@@ -435,7 +572,7 @@ fun DashboardScreen(
                     if (sortedDone.isNotEmpty()) {
                         if (sortedPending.isNotEmpty()) {
                             Text(
-                                text = "Completed",
+                                text = "Honored",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(vertical = 6.dp)
@@ -459,7 +596,7 @@ fun DashboardScreen(
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                         ) {
                             Text(
-                                text = "Life areas complete for today. Keep this rhythm tomorrow as well.",
+                                text = "All commitments honored today. This is exactly who you are becoming.",
                                 modifier = Modifier.padding(14.dp),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -470,7 +607,94 @@ fun DashboardScreen(
                 }
             }
 
+            if (graduatedHabits.isNotEmpty()) {
+                item {
+                    IdentityWallCard(habits = graduatedHabits)
+                }
+            }
+
             item { Spacer(modifier = Modifier.height(24.dp)) }
+        }
+    }
+}
+
+@Composable
+private fun IdentityWallCard(habits: List<com.example.habitpower.data.model.HabitDefinition>) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        "Identity Wall",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                    Text(
+                        "${habits.size} habit${if (habits.size == 1) "" else "s"} internalized",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.75f)
+                    )
+                }
+                TextButton(onClick = { expanded = !expanded }) {
+                    Text(if (expanded) "Hide" else "Show")
+                }
+            }
+
+            if (!expanded) {
+                Text(
+                    "These behaviors are now part of who you are. They no longer need tracking.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.75f)
+                )
+            }
+
+            if (expanded) {
+                habits.forEach { habit ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 10.dp),
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            Text(
+                                habit.name,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                            if (habit.goalIdentityStatement.isNotBlank()) {
+                                Text(
+                                    habit.goalIdentityStatement,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontStyle = FontStyle.Italic,
+                                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.75f)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -598,7 +822,6 @@ private fun TodayTaskRow(
     val title = habit.name.ifBlank { "Untitled habit" }
     val subtitle = todayTaskSubtitle(habit)
     val displayTimeText = habitScheduledTime(habit).format(DateTimeFormatter.ofPattern("HH:mm"))
-    val motivation = habit.goalIdentityStatement.ifBlank { "I keep promises to myself." }
     val hasPlace = habit.commitmentLocation.isNotBlank()
     var showEditTimeDialog by remember { mutableStateOf(false) }
 
@@ -670,14 +893,7 @@ private fun TodayTaskRow(
                         color = if (isDone) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
                         else MaterialTheme.colorScheme.onSurface
                     )
-                    Text(
-                        text = "Type of person: $motivation",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    if (!isDone) {
+                    if (!isDone && subtitle.isNotBlank()) {
                         Text(
                             text = subtitle,
                             style = MaterialTheme.typography.bodySmall,
@@ -687,13 +903,24 @@ private fun TodayTaskRow(
                         )
                     }
                     if (hasPlace) {
-                        Text(
-                            text = "Where: ${habit.commitmentLocation}",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(3.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.LocationOn,
+                                contentDescription = null,
+                                modifier = Modifier.size(10.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = habit.commitmentLocation,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 }
 
@@ -713,13 +940,13 @@ private fun TodayTaskRow(
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
-                            text = "Done",
+                            text = "Honored",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
                         )
                     }
-                } else if (habit.type == HabitType.BOOLEAN || habit.type == HabitType.ROUTINE) {
+                } else if (habit.type == HabitType.BOOLEAN) {
                     HoldToCompleteButton(onComplete = onComplete)
                 } else {
                     FilledTonalButton(
@@ -730,7 +957,7 @@ private fun TodayTaskRow(
                         modifier = Modifier
                             .heightIn(min = 48.dp)
                             .widthIn(min = 88.dp)
-                    ) { Text("Open") }
+                    ) { Text(if (habit.type == HabitType.ROUTINE) "Run" else "Open") }
                 }
             }
         }
@@ -860,21 +1087,15 @@ private fun HoldToCompleteButton(onComplete: () -> Unit) {
 private fun todayTaskSubtitle(habit: DailyHabitItem): String {
     val description = habit.description.trim()
     return when (habit.type) {
-        HabitType.BOOLEAN -> if (description.isNotBlank()) description else "Hold to complete"
-        HabitType.ROUTINE -> if (description.isNotBlank()) description else "Run linked routine"
-        HabitType.POMODORO, HabitType.TIMER -> if (description.isNotBlank()) description else "Open focus session"
         HabitType.COUNT, HabitType.NUMBER, HabitType.DURATION -> {
             if (habit.targetValue != null) {
                 val unit = habit.unit?.takeIf { it.isNotBlank() }?.let { " $it" }.orEmpty()
-                "Target ${habit.targetValue}$unit"
-            } else if (description.isNotBlank()) {
-                description
+                "Commitment: ${habit.targetValue}$unit"
             } else {
-                "Log progress"
+                description
             }
         }
-        HabitType.TIME -> if (description.isNotBlank()) description else "Log time"
-        HabitType.TEXT -> if (description.isNotBlank()) description else "Add note"
+        else -> description
     }
 }
 

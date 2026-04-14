@@ -42,6 +42,7 @@ class UserPreferencesRepository(private val context: Context) {
 
     private val SOUND_ENABLED_KEY = booleanPreferencesKey("notification_sound_enabled")
     private val SOUND_ID_KEY = stringPreferencesKey("notification_sound_id")
+    private val VIBRATION_ENABLED_KEY = booleanPreferencesKey("completion_vibration_enabled")
     private val ROUTINE_START_SOUND_ENABLED_KEY = booleanPreferencesKey("routine_start_sound_enabled")
     private val ROUTINE_START_SOUND_ID_KEY = stringPreferencesKey("routine_start_sound_id")
     private val ROUTINE_END_SOUND_ENABLED_KEY = booleanPreferencesKey("routine_end_sound_enabled")
@@ -55,6 +56,11 @@ class UserPreferencesRepository(private val context: Context) {
     /** The ID of the selected notification tone (see [NotificationSoundOption]). */
     val notificationSoundId: Flow<String> = context.dataStore.data.map { preferences ->
         preferences[SOUND_ID_KEY] ?: NotificationSoundOption.entries.first().id
+    }
+
+    /** Whether the completion haptic vibration is enabled (default: true). */
+    val completionVibrationEnabled: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[VIBRATION_ENABLED_KEY] ?: true
     }
 
     val routineStartSoundEnabled: Flow<Boolean> = context.dataStore.data.map { preferences ->
@@ -79,6 +85,10 @@ class UserPreferencesRepository(private val context: Context) {
 
     suspend fun saveNotificationSoundId(id: String) {
         context.dataStore.edit { it[SOUND_ID_KEY] = id }
+    }
+
+    suspend fun saveCompletionVibrationEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[VIBRATION_ENABLED_KEY] = enabled }
     }
 
     suspend fun saveRoutineStartSoundEnabled(enabled: Boolean) {

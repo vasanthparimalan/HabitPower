@@ -135,5 +135,7 @@ object HabitReminderScheduler {
         )
     }
 
-    private fun requestCodeFor(habitId: Long): Int = (habitId % Int.MAX_VALUE).toInt()
+    // Use lower 31 bits to guarantee a non-negative Int; avoids the edge-case where
+    // habitId == Int.MAX_VALUE would produce the same code as habitId == 0.
+    private fun requestCodeFor(habitId: Long): Int = (habitId and 0x7FFFFFFF).toInt()
 }

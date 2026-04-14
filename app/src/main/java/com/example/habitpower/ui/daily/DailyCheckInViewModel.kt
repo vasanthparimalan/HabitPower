@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.habitpower.data.HabitPowerRepository
 import com.example.habitpower.data.model.DailyHabitItem
 import com.example.habitpower.data.model.HabitType
+import com.example.habitpower.gamification.GamificationRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,6 +22,7 @@ data class DailyCheckInHabitInput(
     val habitId: Long,
     val name: String,
     val description: String,
+    val goalIdentityStatement: String = "",
     val type: HabitType,
     val unit: String?,
     val targetValue: Double?,
@@ -68,7 +70,8 @@ data class DailyCheckInUiState(
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class DailyCheckInViewModel(
     savedStateHandle: SavedStateHandle,
-    private val repository: HabitPowerRepository
+    private val repository: HabitPowerRepository,
+    private val gamificationRepository: GamificationRepository
 ) : ViewModel() {
     private val maxBackfillDays = 3L
     private val requestedUserId = (
@@ -183,6 +186,8 @@ class DailyCheckInViewModel(
                 }
             }
             overrideInputs.value = emptyMap()
+            // Award XP, update streak and badges based on what was just saved
+            try { gamificationRepository.onDayCheckedIn(userId, date) } catch (_: Exception) {}
             onSaved()
         }
     }
@@ -192,6 +197,7 @@ class DailyCheckInViewModel(
             habitId = habitId,
             name = name,
             description = description,
+            goalIdentityStatement = goalIdentityStatement,
             type = type,
             unit = unit,
             targetValue = targetValue,

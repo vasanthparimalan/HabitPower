@@ -70,7 +70,7 @@ fun AdminAssignmentsScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Assign Habits") },
+                title = { Text("Assign Habits & Life Areas") },
                 navigationIcon = {
                     IconButton(onClick = navigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -96,7 +96,7 @@ fun AdminAssignmentsScreen(
                     ) {
                         SectionHeader(
                             title = "Select User",
-                            subtitle = "Pick a user and choose which habits appear in their daily check-in."
+                            subtitle = "Pick a user, then assign which habits and life areas belong to them."
                         )
                         UserSelectionMenu(
                             users = users,
@@ -143,6 +143,15 @@ fun AdminAssignmentsScreen(
                             }
                         }
                     }
+                }
+            }
+
+            if (selectedUserId != null) {
+                item {
+                    SectionHeader(
+                        title = "Assign Habits",
+                        subtitle = "These habits will appear in this user's daily check-in."
+                    )
                 }
             }
 
@@ -230,7 +239,7 @@ private fun HabitAssignmentCard(
     val attributes = buildList {
         add("Type" to habit.type.name)
         habit.unit?.takeIf { it.isNotBlank() }?.let { add("Unit" to it) }
-        habit.targetValue?.let { add("Target" to it.toString()) }
+        habit.targetValue?.let { add("Commitment" to it.toString()) }
     }
 
     LeafSectionItemCard(

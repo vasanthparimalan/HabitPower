@@ -1,16 +1,19 @@
 package com.example.habitpower.ui.dashboard
 
-import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.habitpower.data.HabitPowerRepository
 import com.example.habitpower.data.model.HabitDefinition
 import com.example.habitpower.data.model.DailyHabitItem
+import com.example.habitpower.data.model.HabitLifecycleStatus
 import com.example.habitpower.data.model.HabitType
 import com.example.habitpower.data.model.LifeArea
 import com.example.habitpower.data.model.UserProfile
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -22,6 +25,13 @@ import kotlinx.coroutines.launch
 import kotlin.random.Random
 import java.time.LocalDate
 
+// Exposed so DashboardScreen can play sound/vibrate without knowing the pref keys
+data class CompletionSoundPrefs(
+    val soundEnabled: Boolean = true,
+    val soundId: String = "positive",
+    val vibrationEnabled: Boolean = true
+)
+
 data class LifeAreaCompletion(
     val lifeAreaId: Long,
     val lifeAreaName: String,
@@ -30,13 +40,21 @@ data class LifeAreaCompletion(
     val completionPercent: Float
 )
 
+data class CompletionFeedback(
+    val habitName: String,
+    val completedCount: Int,
+    val totalCount: Int
+)
+
 class DashboardViewModel(
-    private val repository: HabitPowerRepository,
-    private val application: android.app.Application
+    private val repository: HabitPowerRepository
 ) : ViewModel() {
 
     private val _selectedDate = MutableStateFlow(LocalDate.now())
     val selectedDate: StateFlow<LocalDate> = _selectedDate.asStateFlow()
+
+    private val _completionEvents = MutableSharedFlow<CompletionFeedback>(extraBufferCapacity = 1)
+    val completionEvents: SharedFlow<CompletionFeedback> = _completionEvents.asSharedFlow()
 
     fun selectDate(date: LocalDate) {
         _selectedDate.value = date
@@ -93,11 +111,8 @@ class DashboardViewModel(
 
     fun setActiveUser(userId: Long) {
         viewModelScope.launch {
+            // saveActiveUserId already calls updateWidgetState() → DataStore emits → widget recomposes reactively
             repository.saveActiveUserId(userId)
-            try {
-                com.example.habitpower.ui.widget.HabitPowerWidget().updateAll(application)
-            } catch (e: Exception) { // Ignore if update fails
-            }
         }
     }
 
@@ -153,6 +168,13 @@ class DashboardViewModel(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList()
         )
+
+    // Identity Wall — habits the user has graduated (internalized)
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val graduatedHabits: StateFlow<List<HabitDefinition>> = activeUser.flatMapLatest { user ->
+        if (user == null) flowOf(emptyList())
+        else repository.getGraduatedHabitsForUser(user.id)
+    }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = emptyList())
 
     // Missed Yesterday
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
@@ -230,6 +252,19 @@ class DashboardViewModel(
         }
     }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = 0)
 
+    // Completion sound + vibration prefs (for DashboardScreen to react to)
+    val completionSoundPrefs: StateFlow<CompletionSoundPrefs> = combine(
+        repository.getCompletionSoundEnabled(),
+        repository.getCompletionSoundId(),
+        repository.getCompletionVibrationEnabled()
+    ) { soundEnabled, soundId, vibrationEnabled ->
+        CompletionSoundPrefs(soundEnabled, soundId, vibrationEnabled)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = CompletionSoundPrefs()
+    )
+
     // Selected Date Routines
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     val sessionsForSelectedDate: StateFlow<List<com.example.habitpower.data.model.WorkoutSession>> = _selectedDate
@@ -242,8 +277,25 @@ class DashboardViewModel(
 
     fun toggleHabit(habitId: Long, date: LocalDate = selectedDate.value) {
         val user = activeUser.value ?: return
+        val snapshot = todayHabits.value
+        val habit = snapshot.firstOrNull { it.habitId == habitId }
+        val wasCompleted = habit?.isCompleted() ?: true  // treat unknown as done → no feedback
+
         viewModelScope.launch {
             repository.toggleBooleanHabit(user.id, habitId, date)
+
+            // Only fire feedback when going incomplete → complete, never for un-marking
+            if (!wasCompleted && habit != null) {
+                val doneNow = snapshot.count { it.isCompleted() } + 1
+                val total = snapshot.size
+                _completionEvents.tryEmit(
+                    CompletionFeedback(
+                        habitName = habit.name,
+                        completedCount = doneNow,
+                        totalCount = total
+                    )
+                )
+            }
         }
     }
 

@@ -89,10 +89,7 @@ fun ExecuteTimedRoutineScreen(
                         if (isRunning) viewModel.pauseRoutine() else viewModel.resumeRoutine()
                     },
                     onSkip = { viewModel.skipToNextExercise() },
-                    onFinish = {
-                        viewModel.finishRoutine()
-                        onRoutineComplete()
-                    }
+                    onFinish = { viewModel.finishRoutine() }
                 )
             }
             phase is ExecutionPhase.RestPhase -> {

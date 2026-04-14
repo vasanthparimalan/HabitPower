@@ -10,21 +10,28 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -36,143 +43,166 @@ fun WorkoutRunnerScreen(
     navigateBack: () -> Unit,
     viewModel: WorkoutRunnerViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    // Completion screen
     if (viewModel.isWorkoutComplete) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().padding(32.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Workout Complete!", style = MaterialTheme.typography.displayMedium)
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = navigateBack) {
-                Text("Back to Routines")
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.height(16.dp))
+            Text("Routine Complete!", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(8.dp))
+            Text("All exercises done. Great work.", style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(32.dp))
+            Button(onClick = navigateBack, modifier = Modifier.fillMaxWidth()) {
+                Text("Done")
             }
         }
         return
     }
 
-    val exercise = viewModel.currentExercise ?: return
+    val exercise = viewModel.currentExercise
 
     Scaffold(
         topBar = {
-            // Hiding TopBar to give more space as requested or keeping it?
-            // User said "Exercise name on top left". System TopBar might duplicate this or waste space.
-            // Let's keep system top bar for "Back" navigation but maybe make it small or transparent?
-            // Actually, the user requirement "Exercise name on top left" suggests it replaces the title or is just below it.
-            // Let's keep standard TopBar for consistency but put the specifc details in the content.
-            TopAppBar(title = { Text("Workout") })
+            TopAppBar(
+                title = {
+                    val total = viewModel.totalExercises
+                    val current = viewModel.currentExerciseIndex + 1
+                    Text(if (total > 0) "Exercise $current of $total" else "Routine")
+                },
+                navigationIcon = {
+                    IconButton(onClick = navigateBack) {
+                        Icon(Icons.Default.Close, contentDescription = "Back")
+                    }
+                }
+            )
         }
     ) { innerPadding ->
+
+        if (exercise == null) {
+            // Exercises still loading
+            Box(
+                modifier = Modifier.fillMaxSize().padding(innerPadding),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+            return@Scaffold
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // Header Row: Name and Timer
+            // Exercise name
+            Text(
+                text = exercise.name,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+            )
+
+            // Sets / Reps / Duration target
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = exercise.name,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.weight(1f)
-                )
-
-                Text(
-                    text = formatTime(viewModel.timerSeconds),
-                    style = MaterialTheme.typography.displaySmall
-                )
-            }
-
-            // Subheader: Sets and Targets
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                    .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (exercise.targetSets != null) {
-                    Text(
-                        text = "Sets: ${exercise.targetSets}",
-                        style = MaterialTheme.typography.titleLarge
-                    )
+                exercise.targetSets?.let {
+                    Text("Sets: $it", style = MaterialTheme.typography.titleMedium)
                 }
-
-                // Show Target Reps or Duration here as well
-                if (exercise.targetReps != null) {
+                exercise.targetReps?.let {
+                    Text("Reps: $it", style = MaterialTheme.typography.titleMedium)
+                }
+                exercise.targetDurationSeconds?.let {
+                    Text("Target: ${formatTime(it)}", style = MaterialTheme.typography.titleMedium)
+                }
+                // Elapsed timer
+                if (viewModel.isTimerRunning || viewModel.timerSeconds > 0) {
+                    Spacer(Modifier.weight(1f))
                     Text(
-                        text = "Reps: ${exercise.targetReps}",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                } else if (exercise.targetDurationSeconds != null) {
-                    Text(
-                        text = "Target: ${formatTime(exercise.targetDurationSeconds)}",
-                        style = MaterialTheme.typography.titleMedium
+                        text = formatTime(viewModel.timerSeconds),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
 
-            // Image Area - Takes remaining space (approx 75% visually if buttons are small)
+            // Image / placeholder
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
                     .padding(16.dp)
                     .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
-                    .padding(4.dp) // border effect
             ) {
-                if (exercise.imageUri != null) {
+                if (!exercise.imageUri.isNullOrBlank()) {
                     AsyncImage(
                         model = exercise.imageUri,
-                        contentDescription = null,
+                        contentDescription = exercise.name,
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit // "fit the screen" usually means see the whole image
+                        contentScale = ContentScale.Fit
                     )
                 } else {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No Image")
+                        Text(
+                            text = exercise.name.take(1).uppercase(),
+                            style = MaterialTheme.typography.displayLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                        )
                     }
                 }
             }
 
-            // Note if present
-            if (!exercise.notes.isNullOrBlank()) {
+            // Instructions or notes
+            val detail = exercise.instructions?.takeIf { it.isNotBlank() }
+                ?: exercise.notes?.takeIf { it.isNotBlank() }
+            if (detail != null) {
                 Text(
-                    text = "Note: ${exercise.notes}",
+                    text = detail,
                     style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                 )
             }
 
-            // Bottom Controls
+            // Controls
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Button(
+                FilledTonalButton(
                     onClick = { viewModel.toggleTimer() },
-                    modifier = Modifier.weight(1f).padding(end = 8.dp)
+                    modifier = Modifier.weight(1f)
                 ) {
                     Icon(
-                        if (viewModel.isTimerRunning) Icons.Default.Check else Icons.Default.PlayArrow,
-                        contentDescription = "Toggle Timer"
+                        imageVector = if (viewModel.isTimerRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
+                        contentDescription = null
                     )
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(6.dp))
                     Text(if (viewModel.isTimerRunning) "Pause" else "Start Timer")
                 }
 
                 Button(
                     onClick = { viewModel.nextExercise() },
-                    modifier = Modifier.weight(1f).padding(start = 8.dp)
+                    modifier = Modifier.weight(1f)
                 ) {
-                    Text("Next / Done")
+                    Text(if (viewModel.isLastExercise) "Finish" else "Next")
                 }
             }
         }

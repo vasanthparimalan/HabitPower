@@ -70,7 +70,11 @@ object MotivationContent {
             9  -> "💫 LEVEL 9 — $name!\nOne step from double digits. You're basically a habit legend."
             10 -> "🏆 LEVEL 10 — $name! 🎉\nDOUBLE DIGITS! You've joined an incredibly rare group. LEGEND status earned."
             15 -> "🔮 LEVEL 15 — $name!\nTop 1% territory. Your commitment is extraordinary."
-            20 -> "👑 LEVEL 20 — ENLIGHTENED! 🎉🎉🎉\nYou have reached the pinnacle. You ARE your habits. Truly Enlightened."
+            20 -> "👑 LEVEL 20 — ENLIGHTENED! 🎉🎉🎉\nYou ARE your habits. This is the first pinnacle — and it's not the end."
+            25 -> "💠 LEVEL 25 — $name! 🎉\nA quarter-century of levels. Your consistency is beyond ordinary. This is mastery."
+            30 -> "🌌 LEVEL 30 — $name! 🎉🎉\nThirty levels deep. Most people quit apps. You built an identity. ETERNAL."
+            40 -> "⚜️ LEVEL 40 — $name! 🎉🎉🎉\nLevel 40. You have become the person you set out to be. MYTHIC is earned — not given."
+            50 -> "🏵️ LEVEL 50 — $name! 🎉🎉🎉🎉\nFifty. This number represents years of showing up. You are UNDYING. Truly extraordinary."
             else -> "⭐ LEVEL $newLevel — $name!\nAnother level unlocked. The climb continues."
         }
     }
@@ -88,6 +92,10 @@ object MotivationContent {
         GamificationEngine.Badge.LEVEL_10     -> "🌟 Badge Earned: Decade Legend"
         GamificationEngine.Badge.LEVEL_MAX    -> "🔮 Badge Earned: Enlightened"
         GamificationEngine.Badge.PERFECT_WEEK -> "🎯 Badge Earned: Perfect Week"
+        GamificationEngine.Badge.LEVEL_25     -> "💠 Badge Earned: Mastermind"
+        GamificationEngine.Badge.LEVEL_30     -> "🌌 Badge Earned: Eternal"
+        GamificationEngine.Badge.LEVEL_40     -> "⚜️ Badge Earned: Mythic"
+        GamificationEngine.Badge.LEVEL_50     -> "🏵️ Badge Earned: Undying"
         else -> "🏅 Badge Earned!"
     }
 

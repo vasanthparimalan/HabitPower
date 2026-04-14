@@ -67,26 +67,41 @@ class HabitPowerRepository(
     suspend fun updateWidgetState() {
         val user = getResolvedActiveUser().firstOrNull() ?: return
         val today = LocalDate.now()
-        val habits = habitTrackingDao.getDailyHabitItems(user.id, today).firstOrNull() ?: emptyList()
+        // getWidgetHabitItems applies showInWidget + isScheduledOn(today) — correct filtering
+        val allTodayHabits = getWidgetHabitItems(user.id, today).first()
 
-        val widgetHabits = habits.map { habit ->
-            val isCompleted = when (habit.type) {
-                HabitType.BOOLEAN -> habit.entryBooleanValue == true
-                HabitType.NUMBER, HabitType.DURATION, HabitType.COUNT, HabitType.POMODORO, HabitType.TIMER -> habit.entryNumericValue != null
-                HabitType.TIME -> habit.entryNumericValue != null
-                HabitType.ROUTINE -> habit.entryBooleanValue == true
-                HabitType.TEXT -> !habit.entryTextValue.isNullOrBlank()
+        fun isDailyHabitCompleted(h: com.example.habitpower.data.model.DailyHabitItem): Boolean =
+            when (h.type) {
+                HabitType.BOOLEAN, HabitType.ROUTINE -> h.entryBooleanValue == true
+                HabitType.NUMBER, HabitType.DURATION, HabitType.COUNT,
+                HabitType.POMODORO, HabitType.TIMER, HabitType.TIME -> h.entryNumericValue != null
+                HabitType.TEXT -> !h.entryTextValue.isNullOrBlank()
             }
-            WidgetHabit(
-                name = habit.name,
-                isCompleted = isCompleted,
-                streak = getHabitStreak(user.id, habit.habitId, habit.type, habit.targetValue, habit.operator)
-            )
-        }
+
+        val completedCount = allTodayHabits.count { isDailyHabitCompleted(it) }
+        val totalCount = allTodayHabits.size
+
+        // Widget list shows only what still needs action; counts give the progress context
+        val pendingWidgetHabits = allTodayHabits
+            .filter { !isDailyHabitCompleted(it) }
+            .map { habit ->
+                val navigateTo = when (habit.type) {
+                    HabitType.TIMER, HabitType.POMODORO -> "focus"
+                    HabitType.ROUTINE -> "routines"
+                    else -> "daily_check_in"
+                }
+                WidgetHabit(
+                    name = habit.name,
+                    streak = getHabitStreak(user.id, habit.habitId, habit.type, habit.targetValue, habit.operator),
+                    navigateTo = navigateTo
+                )
+            }
 
         val state = WidgetState(
             userName = user.name,
-            habits = widgetHabits
+            habits = pendingWidgetHabits,
+            completedCount = completedCount,
+            totalCount = totalCount
         )
 
         context.saveWidgetState(state)
@@ -98,24 +113,54 @@ class HabitPowerRepository(
     suspend fun insertQuote(quote: com.example.habitpower.data.model.Quote) = quoteDao.insertQuote(quote)
     suspend fun deleteQuote(quote: com.example.habitpower.data.model.Quote) = quoteDao.deleteQuote(quote)
     suspend fun seedQuotesIfNeeded() {
+        data class SeedQuote(val text: String, val source: String, val sourceUrl: String)
+
+        val atomicHabitsUrl = "https://www.audible.com/search?keywords=Atomic+Habits+James+Clear"
+        val gritUrl = "https://www.audible.com/search?keywords=Grit+Angela+Duckworth"
+        val powerOfHabitUrl = "https://www.audible.com/search?keywords=The+Power+of+Habit+Charles+Duhigg"
+        val tinyHabitsUrl = "https://www.audible.com/search?keywords=Tiny+Habits+BJ+Fogg"
+
         val defaults = listOf(
-            "Make the cue obvious: redesign your environment so the next right action is easy to see. (Atomic Habits)",
-            "Make it attractive: pair a difficult habit with something you already enjoy. (Atomic Habits)",
-            "Make it easy: shrink today's version until starting feels effortless. (Atomic Habits)",
-            "Make it satisfying: close your day with a visible win, however small. (Atomic Habits)",
-            "Small daily gains compound into major change over time. (Atomic Habits)",
-            "Focus on systems and processes, not only goals and outcomes. (Atomic Habits)",
-            "A habit loop has cue, routine, and reward - improve one loop at a time. (The Power of Habit)",
-            "When a cue appears, decide your routine before the moment arrives. (The Power of Habit)",
-            "Cravings drive habits; attach your routine to a meaningful identity. (The Power of Habit)",
-            "Keystone habits trigger progress in other areas - protect your keystone first. (The Power of Habit)",
-            "Tiny actions done consistently beat intense actions done occasionally. (Tiny Habits)",
-            "Reduce friction for good habits and add friction for distracting ones. (Behavior Design)"
+            // ── Atomic Habits — James Clear ──────────────────────────────────
+            SeedQuote("Make the cue obvious: redesign your environment so the right action is the easy action.", "Atomic Habits — James Clear", atomicHabitsUrl),
+            SeedQuote("Make it attractive: pair a hard habit with something you already enjoy — temptation bundling works.", "Atomic Habits — James Clear", atomicHabitsUrl),
+            SeedQuote("Make it easy: shrink the habit until starting takes less than two minutes. The act of starting is the habit.", "Atomic Habits — James Clear", atomicHabitsUrl),
+            SeedQuote("Make it satisfying: immediate reward after a habit trains your brain to want it again tomorrow.", "Atomic Habits — James Clear", atomicHabitsUrl),
+            SeedQuote("Every action is a vote for the person you are becoming. Enough votes change the identity.", "Atomic Habits — James Clear", atomicHabitsUrl),
+            SeedQuote("You do not rise to the level of your goals. You fall to the level of your systems.", "Atomic Habits — James Clear", atomicHabitsUrl),
+            SeedQuote("Never miss twice. One missed day is an accident. Two missed days is the start of a new habit.", "Atomic Habits — James Clear", atomicHabitsUrl),
+            SeedQuote("The plateau of latent potential: results feel slow — until the day they suddenly are not.", "Atomic Habits — James Clear", atomicHabitsUrl),
+            SeedQuote("Habit stacking: after I do X, I will do Y. Anchor new habits to existing ones.", "Atomic Habits — James Clear", atomicHabitsUrl),
+            SeedQuote("The environment is the invisible hand that shapes behaviour. Design it deliberately.", "Atomic Habits — James Clear", atomicHabitsUrl),
+
+            // ── Grit — Angela Duckworth ───────────────────────────────────────
+            SeedQuote("Talent × effort = skill. Skill × effort = achievement. Effort counts twice.", "Grit — Angela Duckworth", gritUrl),
+            SeedQuote("Passion and perseverance for long-term goals outweigh raw talent nearly every time.", "Grit — Angela Duckworth", gritUrl),
+            SeedQuote("Grit grows when work is interesting, practice is deliberate, and effort connects to purpose.", "Grit — Angela Duckworth", gritUrl),
+            SeedQuote("A growth mindset — believing abilities can be developed — is the foundation that grit is built on.", "Grit — Angela Duckworth", gritUrl),
+            SeedQuote("Enthusiasm is common. Endurance is rare. The long game is where character is built.", "Grit — Angela Duckworth", gritUrl),
+            SeedQuote("Deliberate practice is not fun. It is focused, purposeful repetition with immediate feedback.", "Grit — Angela Duckworth", gritUrl),
+
+            // ── The Power of Habit — Charles Duhigg ──────────────────────────
+            SeedQuote("Habits follow a loop: cue triggers routine, routine delivers reward. Change the routine; keep the loop.", "The Power of Habit — Charles Duhigg", powerOfHabitUrl),
+            SeedQuote("Keystone habits — a few routines that trigger progress in many areas — are worth protecting first.", "The Power of Habit — Charles Duhigg", powerOfHabitUrl),
+            SeedQuote("Believing change is possible is itself what makes change possible.", "The Power of Habit — Charles Duhigg", powerOfHabitUrl),
+            SeedQuote("When a craving appears, decide your routine before the moment arrives. Plans survive pressure.", "The Power of Habit — Charles Duhigg", powerOfHabitUrl),
+            SeedQuote("The brain cannot distinguish between a good habit and a bad one. Only you can make that call.", "The Power of Habit — Charles Duhigg", powerOfHabitUrl),
+
+            // ── Tiny Habits — BJ Fogg ─────────────────────────────────────────
+            SeedQuote("Anchor a tiny habit to something you already do, then celebrate immediately after. Emotion creates habit.", "Tiny Habits — BJ Fogg", tinyHabitsUrl),
+            SeedQuote("Tiny actions done consistently beat intense actions done occasionally — every time.", "Tiny Habits — BJ Fogg", tinyHabitsUrl),
+            SeedQuote("Motivation is unreliable. Design for the version of yourself who is tired and busy.", "Tiny Habits — BJ Fogg", tinyHabitsUrl),
+            SeedQuote("Reduce friction for habits you want. Add friction for habits you don't. Environment is leverage.", "Tiny Habits — BJ Fogg", tinyHabitsUrl)
         )
 
         val existing = quoteDao.getAllQuotesSync().map { it.text.trim() }.toSet()
-        defaults.filterNot { it in existing }
-            .forEach { text -> quoteDao.insertQuote(com.example.habitpower.data.model.Quote(text = text)) }
+        defaults.filterNot { it.text in existing }.forEach { q ->
+            quoteDao.insertQuote(
+                com.example.habitpower.data.model.Quote(text = q.text, source = q.source, sourceUrl = q.sourceUrl)
+            )
+        }
     }
     fun getAllExercises(): Flow<List<Exercise>> = exerciseDao.getAllExercises()
     suspend fun getExerciseById(id: Long): Exercise? = exerciseDao.getExerciseById(id)
@@ -145,6 +190,10 @@ class HabitPowerRepository(
 
     suspend fun updateRoutineNotificationSettings(settings: RoutineNotificationSettings) =
         routineNotificationSettingsDao.updateSettings(settings)
+
+    fun getCompletionSoundEnabled(): Flow<Boolean> = userPreferencesRepository.soundEnabled
+    fun getCompletionSoundId(): Flow<String> = userPreferencesRepository.notificationSoundId
+    fun getCompletionVibrationEnabled(): Flow<Boolean> = userPreferencesRepository.completionVibrationEnabled
 
     fun getRoutineStartSoundEnabled(): Flow<Boolean> = userPreferencesRepository.routineStartSoundEnabled
     fun getRoutineStartSoundId(): Flow<String> = userPreferencesRepository.routineStartSoundId
@@ -203,9 +252,26 @@ class HabitPowerRepository(
     fun getAllHabits(): Flow<List<HabitDefinition>> = habitTrackingDao.getAllHabits()
     fun getAssignedHabitsForUser(userId: Long): Flow<List<HabitDefinition>> = habitTrackingDao.getAssignedHabitsForUser(userId)
     fun getAssignedHabitIdsForUser(userId: Long): Flow<List<Long>> = habitTrackingDao.getAssignedHabitIdsForUser(userId)
+    fun getGraduatedHabitsForUser(userId: Long): Flow<List<HabitDefinition>> = habitTrackingDao.getGraduatedHabitsForUser(userId)
 
     suspend fun updateHabit(habit: HabitDefinition) {
         habitTrackingDao.updateHabit(habit)
+        syncHabitReminders()
+        updateWidgetState()
+    }
+
+    /**
+     * Changes a habit's lifecycle status. Also keeps [HabitDefinition.isActive] in sync
+     * so all existing DAO queries that filter `isActive = 1` continue to work correctly.
+     * PAUSED / RETIRED / GRADUATED habits are excluded from daily tracking, reminders,
+     * and streak calculations — but their full history is preserved.
+     */
+    suspend fun setHabitLifecycle(habit: HabitDefinition, status: com.example.habitpower.data.model.HabitLifecycleStatus) {
+        val updated = habit.copy(
+            lifecycleStatus = status,
+            isActive = status.isTracked
+        )
+        habitTrackingDao.updateHabit(updated)
         syncHabitReminders()
         updateWidgetState()
     }
@@ -296,7 +362,7 @@ class HabitPowerRepository(
 
         val assignedHabitIds = habitTrackingDao.getAssignedHabitIdsForUser(activeUser.id).first().toSet()
         allHabits.forEach { habit ->
-            if (habit.id in assignedHabitIds) {
+            if (habit.id in assignedHabitIds && habit.lifecycleStatus.isTracked) {
                 HabitReminderScheduler.scheduleForHabit(context, habit)
             } else {
                 HabitReminderScheduler.cancelForHabit(context, habit.id)
@@ -400,6 +466,11 @@ class HabitPowerRepository(
         return habitTrackingDao.getEntriesForUserInRange(userId, from, to)
     }
 
+    suspend fun getAllEntriesForUser(userId: Long): List<DailyHabitEntry> =
+        habitTrackingDao.getAllEntriesForUser(userId)
+
+    fun getAllHealthStats(): Flow<List<DailyHealthStat>> = dailyHealthStatDao.getAllStats()
+
     suspend fun saveDailyHabitEntry(
         userId: Long,
         date: LocalDate,
@@ -475,7 +546,7 @@ class HabitPowerRepository(
 
     suspend fun toggleBooleanHabit(userId: Long, habitId: Long, date: LocalDate) {
         val habit = habitTrackingDao.getHabitById(habitId) ?: return
-        if (habit.type != HabitType.BOOLEAN) return
+        if (habit.type != HabitType.BOOLEAN && habit.type != HabitType.ROUTINE) return
 
         val currentItem = habitTrackingDao.getDailyHabitItems(userId, date).first().firstOrNull { it.habitId == habitId }
         val nextValue = currentItem?.entryBooleanValue != true
@@ -483,7 +554,7 @@ class HabitPowerRepository(
             userId = userId,
             date = date,
             habitId = habitId,
-            type = HabitType.BOOLEAN,
+            type = habit.type,
             booleanValue = nextValue
         )
     }

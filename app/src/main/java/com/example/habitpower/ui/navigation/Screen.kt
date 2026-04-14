@@ -39,4 +39,6 @@ sealed class Screen(val route: String) {
         }
     }
     object AdminQuotes : Screen("admin/quotes")
+    object AdminExport : Screen("admin/export")
+    object YearInReview : Screen("report/year-in-review")
 }

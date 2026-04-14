@@ -54,7 +54,7 @@ import com.example.habitpower.data.model.WorkoutSession
         UserStats::class,
         RoutineNotificationSettings::class
     ],
-    version = 17,
+    version = 20,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -208,6 +208,53 @@ abstract class HabitPowerDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_18_19 = object : Migration(18, 19) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // ROUTINE habits were incorrectly created with showInDailyCheckIn = 0.
+                // They should appear in daily check-in so users can confirm completion manually.
+                db.execSQL("UPDATE habit_definitions SET showInDailyCheckIn = 1 WHERE type = 'ROUTINE'")
+            }
+        }
+
+        val MIGRATION_19_20 = object : Migration(19, 20) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Add lifecycle status column. Default ACTIVE keeps all existing habits unchanged.
+                // isActive remains the canonical "include in daily tracking" boolean and stays in
+                // sync whenever lifecycleStatus changes (ACTIVE → isActive=1, others → isActive=0).
+                db.execSQL(
+                    "ALTER TABLE habit_definitions ADD COLUMN lifecycleStatus TEXT NOT NULL DEFAULT 'ACTIVE'"
+                )
+            }
+        }
+
+        val MIGRATION_17_18 = object : Migration(17, 18) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE quotes ADD COLUMN source TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE quotes ADD COLUMN sourceUrl TEXT NOT NULL DEFAULT ''")
+                // Backfill attribution on existing default Atomic Habits quotes
+                db.execSQL(
+                    "UPDATE quotes SET source = 'Atomic Habits — James Clear', " +
+                    "sourceUrl = 'https://www.audible.com/search?keywords=Atomic+Habits+James+Clear' " +
+                    "WHERE text LIKE '%(Atomic Habits)%'"
+                )
+                db.execSQL(
+                    "UPDATE quotes SET source = 'The Power of Habit — Charles Duhigg', " +
+                    "sourceUrl = 'https://www.audible.com/search?keywords=The+Power+of+Habit+Charles+Duhigg' " +
+                    "WHERE text LIKE '%(The Power of Habit)%'"
+                )
+                db.execSQL(
+                    "UPDATE quotes SET source = 'Tiny Habits — BJ Fogg', " +
+                    "sourceUrl = 'https://www.audible.com/search?keywords=Tiny+Habits+BJ+Fogg' " +
+                    "WHERE text LIKE '%(Tiny Habits)%'"
+                )
+                db.execSQL(
+                    "UPDATE quotes SET source = 'Behavior Design — BJ Fogg', " +
+                    "sourceUrl = 'https://www.audible.com/search?keywords=Tiny+Habits+BJ+Fogg' " +
+                    "WHERE text LIKE '%(Behavior Design)%'"
+                )
+            }
+        }
+
         /**
          * Obtain the singleton database instance.
          *
@@ -231,7 +278,10 @@ abstract class HabitPowerDatabase : RoomDatabase() {
                         MIGRATION_13_14,
                         MIGRATION_14_15,
                         MIGRATION_15_16,
-                        MIGRATION_16_17
+                        MIGRATION_16_17,
+                        MIGRATION_17_18,
+                        MIGRATION_18_19,
+                        MIGRATION_19_20
                     )
                     .build()
                 INSTANCE = instance

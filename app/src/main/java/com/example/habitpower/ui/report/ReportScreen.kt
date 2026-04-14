@@ -2,12 +2,14 @@ package com.example.habitpower.ui.report
 
 import android.app.DatePickerDialog
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,32 +17,37 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Insights
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.ui.AppViewModelProvider
@@ -51,6 +58,7 @@ import java.time.LocalDate
 @Composable
 fun ReportScreen(
     navigateBack: (() -> Unit)? = null,
+    onNavigateToYearInReview: (() -> Unit)? = null,
     viewModel: ReportViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val context = LocalContext.current
@@ -89,6 +97,7 @@ fun ReportScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // ── Headline card ──────────────────────────────────────────────────
             item {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
@@ -119,7 +128,6 @@ fun ReportScreen(
                                 modifier = Modifier.padding(start = 12.dp)
                             )
                         }
-
                         Text(
                             text = "User: ${state.activeUser?.name ?: "No active user"}",
                             style = MaterialTheme.typography.labelLarge,
@@ -129,34 +137,27 @@ fun ReportScreen(
                 }
             }
 
-            item {
-                Card {
-                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text("Select period", style = MaterialTheme.typography.titleMedium)
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Button(
-                                modifier = Modifier.weight(1f),
-                                onClick = {
-                                    showDatePicker(state.startDate, viewModel::updateStartDate)
-                                }
-                            ) {
-                                Icon(Icons.Default.DateRange, contentDescription = null)
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(state.startDate.toString())
-                            }
-                            Button(
-                                modifier = Modifier.weight(1f),
-                                onClick = {
-                                    showDatePicker(state.endDate, viewModel::updateEndDate)
-                                }
-                            ) {
-                                Icon(Icons.Default.DateRange, contentDescription = null)
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(state.endDate.toString())
-                            }
-                        }
-                    }
+            // ── Year in Review entry point ─────────────────────────────────────
+            if (onNavigateToYearInReview != null) {
+                item {
+                    YearInReviewBanner(
+                        year = java.time.LocalDate.now().year,
+                        onClick = onNavigateToYearInReview
+                    )
                 }
+            }
+
+            // ── Period selector ────────────────────────────────────────────────
+            item {
+                PeriodSelector(
+                    selectedPeriod = state.selectedPeriod,
+                    startDate = state.startDate,
+                    endDate = state.endDate,
+                    onSelectPeriod = viewModel::selectPeriod,
+                    onUpdateStartDate = viewModel::updateStartDate,
+                    onUpdateEndDate = viewModel::updateEndDate,
+                    showDatePicker = ::showDatePicker
+                )
             }
 
             if (state.isLoading) {
@@ -182,6 +183,7 @@ fun ReportScreen(
                     }
                 }
             } else {
+                // ── KPIs ───────────────────────────────────────────────────────
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -198,60 +200,75 @@ fun ReportScreen(
                     }
                 }
 
-                item {
-                    Card {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = "Growth Rings",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = "Each ring reflects a slice of your selected period. Stronger completion creates brighter, healthier growth.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                textAlign = TextAlign.Center
-                            )
-                            TreeTrunkChart(
-                                rings = state.treeRings,
-                                modifier = Modifier.size(260.dp)
+                // ── Trend chart ────────────────────────────────────────────────
+                if (state.weeklyTrend.isNotEmpty()) {
+                    item {
+                        val isDaily = state.weeklyTrend.size <= 14
+                        SectionHeader(
+                            title = if (isDaily) "Daily Completion" else "Week-by-Week Trend",
+                            subtitle = if (isDaily) "Each bar = one day" else "Each bar = one week's average completion"
+                        )
+                    }
+                    item {
+                        Card {
+                            TrendBarChart(
+                                trends = state.weeklyTrend,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
                             )
                         }
                     }
                 }
 
-                item {
-                    SectionHeader(
-                        title = "Life Area Gauges",
-                        subtitle = "Balanced progress across your key domains"
-                    )
-                }
-
-                item {
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        state.lifeAreaGauges.chunked(2).forEach { rowItems ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                // ── Habit breakdown ────────────────────────────────────────────
+                if (state.habitConsistency.isNotEmpty()) {
+                    item {
+                        SectionHeader(
+                            title = "Habit Breakdown",
+                            subtitle = "Lowest consistency first — your next focus is at the top"
+                        )
+                    }
+                    item {
+                        Card {
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(14.dp)
                             ) {
-                                rowItems.forEach { gauge ->
-                                    LifeAreaGaugeCard(
-                                        gauge = gauge,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                }
-                                if (rowItems.size == 1) {
-                                    Spacer(modifier = Modifier.weight(1f))
+                                state.habitConsistency.forEach { habit ->
+                                    HabitConsistencyRow(habit = habit)
                                 }
                             }
                         }
                     }
                 }
 
+                // ── Life area gauges ───────────────────────────────────────────
+                if (state.lifeAreaGauges.isNotEmpty()) {
+                    item {
+                        SectionHeader(
+                            title = "Life Area Gauges",
+                            subtitle = "Balanced progress across your key domains"
+                        )
+                    }
+                    item {
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            state.lifeAreaGauges.chunked(2).forEach { rowItems ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    rowItems.forEach { gauge ->
+                                        LifeAreaGaugeCard(gauge = gauge, modifier = Modifier.weight(1f))
+                                    }
+                                    if (rowItems.size == 1) Spacer(modifier = Modifier.weight(1f))
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ── Encouragement cards ────────────────────────────────────────
                 state.strongestAreaMessage?.let { message ->
                     item {
                         EncouragementCard(
@@ -272,6 +289,7 @@ fun ReportScreen(
                     }
                 }
 
+                // ── Footer ─────────────────────────────────────────────────────
                 item {
                     Card(
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
@@ -286,6 +304,188 @@ fun ReportScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun PeriodSelector(
+    selectedPeriod: ReportPeriod,
+    startDate: LocalDate,
+    endDate: LocalDate,
+    onSelectPeriod: (ReportPeriod) -> Unit,
+    onUpdateStartDate: (LocalDate) -> Unit,
+    onUpdateEndDate: (LocalDate) -> Unit,
+    showDatePicker: (LocalDate, (LocalDate) -> Unit) -> Unit
+) {
+    Card {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text("Period", style = MaterialTheme.typography.titleMedium)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                listOf(ReportPeriod.DAYS_7, ReportPeriod.DAYS_30, ReportPeriod.DAYS_90, ReportPeriod.CUSTOM)
+                    .forEach { period ->
+                        FilterChip(
+                            selected = selectedPeriod == period,
+                            onClick = { onSelectPeriod(period) },
+                            label = { Text(period.label, style = MaterialTheme.typography.labelSmall) },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+            }
+            if (selectedPeriod == ReportPeriod.CUSTOM) {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    OutlinedButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = { showDatePicker(startDate, onUpdateStartDate) }
+                    ) {
+                        Icon(Icons.Default.DateRange, contentDescription = null, modifier = Modifier.size(14.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(startDate.toString(), style = MaterialTheme.typography.bodySmall)
+                    }
+                    OutlinedButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = { showDatePicker(endDate, onUpdateEndDate) }
+                    ) {
+                        Icon(Icons.Default.DateRange, contentDescription = null, modifier = Modifier.size(14.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(endDate.toString(), style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrendBarChart(
+    trends: List<WeekTrend>,
+    modifier: Modifier = Modifier
+) {
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val tertiaryColor = MaterialTheme.colorScheme.tertiary
+    val errorColor = MaterialTheme.colorScheme.error
+    val trackColor = MaterialTheme.colorScheme.surfaceVariant
+
+    Column(modifier = modifier) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp)
+        ) {
+            if (trends.isEmpty()) return@Canvas
+            val count = trends.size
+            val gap = 4.dp.toPx()
+            val totalGaps = gap * (count - 1)
+            val barWidth = (size.width - totalGaps) / count
+            val maxBarHeight = size.height - 2.dp.toPx()
+
+            trends.forEachIndexed { index, trend ->
+                val ratio = trend.completionRatio.coerceIn(0f, 1f)
+                val barHeight = (ratio * maxBarHeight).coerceAtLeast(4.dp.toPx())
+                val left = index * (barWidth + gap)
+                val barColor = when {
+                    ratio >= 0.8f -> primaryColor
+                    ratio >= 0.5f -> tertiaryColor
+                    else -> errorColor
+                }
+                // Background track
+                drawRoundRect(
+                    color = trackColor,
+                    topLeft = Offset(left, 0f),
+                    size = Size(barWidth, size.height),
+                    cornerRadius = CornerRadius(4.dp.toPx())
+                )
+                // Filled bar
+                drawRoundRect(
+                    color = barColor,
+                    topLeft = Offset(left, size.height - barHeight),
+                    size = Size(barWidth, barHeight),
+                    cornerRadius = CornerRadius(4.dp.toPx())
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        // X-axis labels — thin out if too many bars
+        val labelIndices: Set<Int> = when {
+            trends.size <= 7 -> trends.indices.toSet()
+            trends.size <= 12 -> trends.indices.filter { it % 2 == 0 }.toSet()
+            else -> setOf(0, trends.size / 2, trends.size - 1)
+        }
+        Row(modifier = Modifier.fillMaxWidth()) {
+            trends.forEachIndexed { index, trend ->
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    if (index in labelIndices) {
+                        Text(
+                            text = trend.weekLabel,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HabitConsistencyRow(habit: HabitConsistency) {
+    val barColor = when {
+        habit.consistencyRatio >= 0.8f -> MaterialTheme.colorScheme.primary
+        habit.consistencyRatio >= 0.5f -> MaterialTheme.colorScheme.tertiary
+        else -> MaterialTheme.colorScheme.error
+    }
+    val trackColor = MaterialTheme.colorScheme.surfaceVariant
+    val pct = "${(habit.consistencyRatio * 100).toInt()}%"
+
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = habit.habitName,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = pct,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                color = barColor
+            )
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp)
+                .background(trackColor, RoundedCornerShape(3.dp))
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(habit.consistencyRatio.coerceIn(0f, 1f))
+                    .fillMaxHeight()
+                    .background(barColor, RoundedCornerShape(3.dp))
+            )
+        }
+        Text(
+            text = "${habit.completedCount} of ${habit.totalDays} days",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
@@ -315,54 +515,6 @@ private fun AnalyticsKpiCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
-        }
-    }
-}
-
-@Composable
-private fun TreeTrunkChart(
-    rings: List<TreeRingSegment>,
-    modifier: Modifier = Modifier
-) {
-    val centerDotColor = MaterialTheme.colorScheme.onSurfaceVariant
-    val palette = listOf(
-        MaterialTheme.colorScheme.surfaceVariant,
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.45f),
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.75f),
-        MaterialTheme.colorScheme.primary
-    )
-
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            if (rings.isEmpty()) return@Canvas
-
-            val center = Offset(size.width / 2f, size.height / 2f)
-            val maxRadius = size.minDimension / 2f - 6.dp.toPx()
-            val ringWidth = (maxRadius / rings.size.coerceAtLeast(1)).coerceAtLeast(4.dp.toPx())
-
-            rings.forEachIndexed { index, ring ->
-                val radius = maxRadius - index * ringWidth
-                val colorIndex = ((ring.completionRatio.coerceIn(0f, 1f)) * (palette.lastIndex)).toInt()
-                drawCircle(
-                    color = palette[colorIndex],
-                    radius = radius,
-                    center = center,
-                    style = Stroke(width = ringWidth * 0.82f, cap = StrokeCap.Round)
-                )
-            }
-
-            drawCircle(
-                color = centerDotColor,
-                radius = (ringWidth * 0.9f).coerceAtLeast(6.dp.toPx()),
-                center = center
-            )
-        }
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Tree", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text("trunk", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -453,6 +605,42 @@ private fun EncouragementCard(
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Text(message, style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+}
+
+@Composable
+private fun YearInReviewBanner(year: Int, onClick: () -> Unit) {
+    Card(
+        onClick = onClick,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "$year — Year in Review",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                )
+                Text(
+                    text = "See your full-year stats, best streak, and personal headline.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
+                )
+            }
+            Icon(
+                Icons.Default.Star,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                modifier = Modifier.padding(start = 12.dp)
+            )
         }
     }
 }

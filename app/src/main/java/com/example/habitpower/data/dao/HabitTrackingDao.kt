@@ -118,4 +118,18 @@ interface HabitTrackingDao {
 
     @Query("SELECT * FROM daily_habit_entries WHERE userId = :userId AND date >= :from AND date <= :to ORDER BY date DESC")
     fun getEntriesForUserInRange(userId: Long, from: LocalDate, to: LocalDate): Flow<List<DailyHabitEntry>>
+
+    @Query("SELECT * FROM daily_habit_entries WHERE userId = :userId ORDER BY date DESC")
+    suspend fun getAllEntriesForUser(userId: Long): List<DailyHabitEntry>
+
+    @Query(
+        """
+        SELECT hd.*
+        FROM habit_definitions hd
+        INNER JOIN user_habit_assignments ua ON ua.habitId = hd.id
+        WHERE ua.userId = :userId AND ua.isActive = 1 AND hd.lifecycleStatus = 'GRADUATED'
+        ORDER BY hd.name ASC
+        """
+    )
+    fun getGraduatedHabitsForUser(userId: Long): Flow<List<HabitDefinition>>
 }

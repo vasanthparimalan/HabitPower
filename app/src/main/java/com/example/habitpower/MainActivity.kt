@@ -29,6 +29,7 @@ import com.example.habitpower.ui.admin.AdminHabitsScreen
 import com.example.habitpower.ui.admin.AdminHomeScreen
 import com.example.habitpower.ui.admin.AdminLifeAreasScreen
 import com.example.habitpower.ui.admin.AdminUsersScreen
+import com.example.habitpower.ui.admin.ExportScreen
 import com.example.habitpower.ui.dashboard.DashboardScreen
 import com.example.habitpower.ui.execution.WorkoutRunnerScreen
 import com.example.habitpower.ui.exercises.AddEditExerciseScreen
@@ -199,7 +200,9 @@ fun HabitPowerAppContent() {
                 )
             }
             composable(Screen.Report.route) {
-                com.example.habitpower.ui.report.ReportScreen()
+                com.example.habitpower.ui.report.ReportScreen(
+                    onNavigateToYearInReview = { navController.navigate(Screen.YearInReview.route) }
+                )
             }
             composable(Screen.Help.route) {
                 com.example.habitpower.ui.help.HelpGuideScreen(
@@ -231,6 +234,14 @@ fun HabitPowerAppContent() {
             }
             composable(Screen.AdminQuotes.route) {
                 com.example.habitpower.ui.admin.AdminQuotesScreen(navigateBack = { navController.popBackStack() })
+            }
+            composable(Screen.AdminExport.route) {
+                ExportScreen(navigateBack = { navController.popBackStack() })
+            }
+            composable(Screen.YearInReview.route) {
+                com.example.habitpower.ui.report.YearInReviewScreen(
+                    navigateBack = { navController.popBackStack() }
+                )
             }
         }
     }

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.habitpower.data.HabitPowerRepository
 import com.example.habitpower.data.model.HabitDefinition
+import com.example.habitpower.data.model.HabitLifecycleStatus
 import com.example.habitpower.data.model.HabitRecurrenceType
 import com.example.habitpower.data.model.HabitType
 import com.example.habitpower.data.model.LifeArea
@@ -239,7 +240,7 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
                 targetValue = resolvedTarget,
                 operator = selectedOperator,
                 lifeAreaId = selectedLifeAreaId,
-                showInDailyCheckIn = selectedType != HabitType.TIMER && selectedType != HabitType.ROUTINE,
+                showInDailyCheckIn = selectedType != HabitType.TIMER,
                 commitmentTime = "%02d:%02d".format(commitmentHour, commitmentMinute),
                 commitmentLocation = trimmedLocation,
                 preReminderMinutes = resolvedReminderMinutes,
@@ -395,6 +396,12 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
                     recurrenceEndDate = endDate
                 )
             )
+        }
+    }
+
+    fun setHabitLifecycle(habit: HabitDefinition, status: HabitLifecycleStatus) {
+        viewModelScope.launch {
+            repository.setHabitLifecycle(habit, status)
         }
     }
 

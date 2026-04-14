@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 data class NotificationToneState(
     val soundEnabled: Boolean = true,
     val selectedSoundId: String = NotificationSoundOption.SHORT_BEEP.id,
+    val vibrationEnabled: Boolean = true,
     val routineStartSoundEnabled: Boolean = true,
     val routineStartSoundId: String = NotificationSoundOption.SHORT_BEEP.id,
     val routineEndSoundEnabled: Boolean = true,
@@ -40,8 +41,9 @@ class AdminNotificationToneViewModel(
             combine(
                 combine(
                     prefsRepository.soundEnabled,
-                    prefsRepository.notificationSoundId
-                ) { enabled, soundId -> enabled to soundId },
+                    prefsRepository.notificationSoundId,
+                    prefsRepository.completionVibrationEnabled
+                ) { enabled, soundId, vibration -> Triple(enabled, soundId, vibration) },
                 combine(
                     prefsRepository.routineStartSoundEnabled,
                     prefsRepository.routineStartSoundId,
@@ -59,6 +61,7 @@ class AdminNotificationToneViewModel(
                 NotificationToneState(
                     soundEnabled = completionSound.first,
                     selectedSoundId = completionSound.second,
+                    vibrationEnabled = completionSound.third,
                     routineStartSoundEnabled = routineSounds.startEnabled,
                     routineStartSoundId = routineSounds.startSoundId,
                     routineEndSoundEnabled = routineSounds.endEnabled,
@@ -80,6 +83,12 @@ class AdminNotificationToneViewModel(
     fun selectSound(option: NotificationSoundOption) {
         _state.update { it.copy(selectedSoundId = option.id) }
         viewModelScope.launch { prefsRepository.saveNotificationSoundId(option.id) }
+    }
+
+    fun toggleVibration() {
+        val new = !_state.value.vibrationEnabled
+        _state.update { it.copy(vibrationEnabled = new) }
+        viewModelScope.launch { prefsRepository.saveCompletionVibrationEnabled(new) }
     }
 
     fun toggleRoutineStartSound() {

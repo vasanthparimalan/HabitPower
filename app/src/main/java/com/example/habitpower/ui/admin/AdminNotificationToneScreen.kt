@@ -75,6 +75,15 @@ fun AdminNotificationToneScreen(
             }
 
             item {
+                ToneToggleCard(
+                    title = "Completion Vibration",
+                    subtitle = if (state.vibrationEnabled) "Mild haptic on task completion" else "Vibration is off",
+                    enabled = state.vibrationEnabled,
+                    onToggle = { viewModel.toggleVibration() }
+                )
+            }
+
+            item {
                 Text(
                     text = "Choose Tone",
                     style = MaterialTheme.typography.titleMedium,

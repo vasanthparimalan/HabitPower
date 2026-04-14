@@ -17,7 +17,7 @@ object GamificationEngine {
     private const val XP_STREAK_BONUS_PER_DAY = 6
     private const val XP_STREAK_BONUS_CAP = 90
 
-    // ── Level thresholds (index = level - 1) ─────────────────────────────────
+    // ── Level thresholds (index = level - 1, covers levels 1–20) ────────────
     private val LEVEL_XP_THRESHOLDS = intArrayOf(
         0,       // Level 1
         100,     // Level 2
@@ -38,10 +38,15 @@ object GamificationEngine {
         17_500,  // Level 17
         21_000,  // Level 18
         25_000,  // Level 19
-        30_000   // Level 20 (max)
+        30_000   // Level 20 — Enlightened
     )
 
-    val MAX_LEVEL = LEVEL_XP_THRESHOLDS.size
+    // Levels 21+ use a linear formula: each level needs XP_PER_POST_LEVEL more XP than the last.
+    private const val LEGACY_MAX_LEVEL = 20
+    private const val XP_PER_POST_LEVEL = 8_000
+
+    // No hard cap — levels extend indefinitely for users who stay for years.
+    val MAX_LEVEL = Int.MAX_VALUE
 
     private val LEVEL_NAMES = arrayOf(
         "Seeker",        // 1
@@ -66,6 +71,40 @@ object GamificationEngine {
         "Enlightened"    // 20
     )
 
+    // Distinct titles for levels 21–50. After 50, levelName() returns "Level N".
+    private val POST_LEVEL_NAMES = arrayOf(
+        "Philosopher",   // 21
+        "Virtuoso",      // 22
+        "Pathfinder",    // 23
+        "Alchemist",     // 24
+        "Mastermind",    // 25 — mastery milestone
+        "Sentinel",      // 26
+        "Crusader",      // 27
+        "Harbinger",     // 28
+        "Archon",        // 29
+        "Eternal",       // 30 — mastery milestone
+        "Oracle",        // 31
+        "Warlord",       // 32
+        "Artisan",       // 33
+        "Exemplar",      // 34
+        "Apex",          // 35
+        "Pinnacle",      // 36
+        "Celestial",     // 37
+        "Immutable",     // 38
+        "Boundless",     // 39
+        "Mythic",        // 40 — mastery milestone
+        "Infinite",      // 41
+        "Timeless",      // 42
+        "Cosmic",        // 43
+        "Absolute",      // 44
+        "Invincible",    // 45
+        "Immortal",      // 46
+        "Undaunted",     // 47
+        "Omnipotent",    // 48
+        "Supreme",       // 49
+        "Undying"        // 50 — mastery milestone
+    )
+
     // ── Badge bitmask constants ───────────────────────────────────────────────
     object Badge {
         const val FIRST_STEP: Long      = 1L shl 0  // first habit ever checked
@@ -77,54 +116,70 @@ object GamificationEngine {
         const val CENTURY: Long         = 1L shl 6  // 100 total habits done
         const val LEVEL_5: Long         = 1L shl 7
         const val LEVEL_10: Long        = 1L shl 8
-        const val LEVEL_MAX: Long       = 1L shl 9  // reached level 20
+        const val LEVEL_MAX: Long       = 1L shl 9  // reached level 20 — Enlightened
         const val PERFECT_WEEK: Long    = 1L shl 10 // 7 consecutive perfect days
+        // Mastery milestones — earned once, never lost
+        const val LEVEL_25: Long        = 1L shl 11 // Mastermind
+        const val LEVEL_30: Long        = 1L shl 12 // Eternal
+        const val LEVEL_40: Long        = 1L shl 13 // Mythic
+        const val LEVEL_50: Long        = 1L shl 14 // Undying
 
         data class Metadata(val id: Long, val emoji: String, val name: String, val description: String)
 
         val ALL: List<Metadata> = listOf(
-            Metadata(FIRST_STEP,   "🌱", "First Step",      "Completed your first habit check-in."),
-            Metadata(STREAK_3,     "🔥", "On Fire",         "3-day streak — the momentum has started!"),
-            Metadata(STREAK_7,     "⚡", "Weekly Warrior",  "7 consecutive perfect days!"),
-            Metadata(STREAK_14,    "💪", "Fortnight Force", "14 days strong — you're a force of nature."),
-            Metadata(STREAK_30,    "🏆", "Monthly Master",  "30 days straight. Pure discipline."),
-            Metadata(STREAK_100,   "👑", "Century King",    "100-day streak. Legendary."),
-            Metadata(CENTURY,      "💯", "Centurion",       "Checked off 100 individual habits total."),
-            Metadata(LEVEL_5,      "⭐", "Rising Star",     "Reached Level 5 — Warrior!"),
-            Metadata(LEVEL_10,     "🌟", "Decade Legend",   "Reached Level 10 — Legend!"),
-            Metadata(LEVEL_MAX,    "🔮", "Enlightened",     "Maximum level reached. Truly enlightened."),
-            Metadata(PERFECT_WEEK, "🎯", "Perfect Week",    "7 consecutive days of completing every habit.")
+            Metadata(FIRST_STEP,   "🌱", "First Step",        "Completed your first habit check-in."),
+            Metadata(STREAK_3,     "🔥", "On Fire",           "3-day streak — the momentum has started!"),
+            Metadata(STREAK_7,     "⚡", "Weekly Warrior",    "7 consecutive perfect days!"),
+            Metadata(STREAK_14,    "💪", "Fortnight Force",   "14 days strong — you're a force of nature."),
+            Metadata(STREAK_30,    "🏆", "Monthly Master",    "30 days straight. Pure discipline."),
+            Metadata(STREAK_100,   "👑", "Century King",      "100-day streak. Legendary."),
+            Metadata(CENTURY,      "💯", "Centurion",         "Checked off 100 individual habits total."),
+            Metadata(LEVEL_5,      "⭐", "Rising Star",       "Reached Level 5 — Warrior!"),
+            Metadata(LEVEL_10,     "🌟", "Decade Legend",     "Reached Level 10 — Legend!"),
+            Metadata(LEVEL_MAX,    "🔮", "Enlightened",       "Reached Level 20. The first pinnacle of mastery."),
+            Metadata(PERFECT_WEEK, "🎯", "Perfect Week",      "7 consecutive days of completing every habit."),
+            Metadata(LEVEL_25,     "💠", "Mastermind",        "Reached Level 25. Your habits are part of who you are."),
+            Metadata(LEVEL_30,     "🌌", "Eternal",           "Reached Level 30. Discipline without end."),
+            Metadata(LEVEL_40,     "⚜️", "Mythic",            "Reached Level 40. You are a living legend."),
+            Metadata(LEVEL_50,     "🏵️", "Undying",           "Reached Level 50. Commitment beyond measure.")
         )
     }
 
     // ── Public API ────────────────────────────────────────────────────────────
 
     fun levelForXp(xp: Int): Int {
+        if (xp >= LEVEL_XP_THRESHOLDS.last()) {
+            return LEGACY_MAX_LEVEL + (xp - LEVEL_XP_THRESHOLDS.last()) / XP_PER_POST_LEVEL
+        }
         for (i in LEVEL_XP_THRESHOLDS.indices.reversed()) {
             if (xp >= LEVEL_XP_THRESHOLDS[i]) return i + 1
         }
         return 1
     }
 
-    fun levelName(level: Int): String =
-        LEVEL_NAMES.getOrElse(level - 1) { LEVEL_NAMES.last() }
+    fun levelName(level: Int): String = when {
+        level <= LEGACY_MAX_LEVEL -> LEVEL_NAMES.getOrElse(level - 1) { LEVEL_NAMES.last() }
+        level <= LEGACY_MAX_LEVEL + POST_LEVEL_NAMES.size ->
+            POST_LEVEL_NAMES[level - LEGACY_MAX_LEVEL - 1]
+        else -> "Level $level"
+    }
 
-    /** XP required to reach [level] (0-based start of that level). */
-    fun xpForLevel(level: Int): Int =
-        LEVEL_XP_THRESHOLDS.getOrElse(level - 1) { LEVEL_XP_THRESHOLDS.last() }
+    /** XP required to reach [level] (start threshold of that level). */
+    fun xpForLevel(level: Int): Int = when {
+        level <= LEGACY_MAX_LEVEL -> LEVEL_XP_THRESHOLDS.getOrElse(level - 1) { LEVEL_XP_THRESHOLDS.last() }
+        else -> LEVEL_XP_THRESHOLDS.last() + (level - LEGACY_MAX_LEVEL) * XP_PER_POST_LEVEL
+    }
 
-    /** XP required to reach the next level after [level]. Returns null at max level. */
-    fun xpForNextLevel(level: Int): Int? =
-        if (level >= MAX_LEVEL) null else LEVEL_XP_THRESHOLDS.getOrNull(level)
+    /** XP required to reach the next level after [level]. Never returns null — levels have no cap. */
+    fun xpForNextLevel(level: Int): Int = xpForLevel(level + 1)
 
     /**
      * Fraction (0f–1f) of progress within the current level band.
      */
     fun levelProgress(xp: Int): Float {
         val level = levelForXp(xp)
-        if (level >= MAX_LEVEL) return 1f
         val current = xpForLevel(level)
-        val next = xpForNextLevel(level) ?: return 1f
+        val next = xpForNextLevel(level)
         return ((xp - current).toFloat() / (next - current).toFloat()).coerceIn(0f, 1f)
     }
 
@@ -169,8 +224,12 @@ object GamificationEngine {
         check(Badge.CENTURY,      stats.totalHabitsCompleted >= 100)
         check(Badge.LEVEL_5,      stats.level >= 5)
         check(Badge.LEVEL_10,     stats.level >= 10)
-        check(Badge.LEVEL_MAX,    stats.level >= MAX_LEVEL)
+        check(Badge.LEVEL_MAX,    stats.level >= LEGACY_MAX_LEVEL)
         check(Badge.PERFECT_WEEK, stats.currentStreak >= 7)
+        check(Badge.LEVEL_25,     stats.level >= 25)
+        check(Badge.LEVEL_30,     stats.level >= 30)
+        check(Badge.LEVEL_40,     stats.level >= 40)
+        check(Badge.LEVEL_50,     stats.level >= 50)
         return newMask
     }
 
@@ -215,6 +274,18 @@ object GamificationEngine {
         return Pair(finalStats, newBadges)
     }
 
+    /**
+     * Returns the next streak milestone the user is working towards.
+     * Milestones: 3, 7, 14, 21, 30, 50, 60, 90, 100, then every 100.
+     */
+    fun nextStreakMilestone(streak: Int): Int {
+        val fixed = intArrayOf(3, 7, 14, 21, 30, 50, 60, 90, 100)
+        for (m in fixed) {
+            if (streak < m) return m
+        }
+        return ((streak / 100) + 1) * 100
+    }
+
     /** Human-readable summary line for a streak, e.g. "🔥 12-day streak". */
     fun streakLabel(streak: Int): String = when {
         streak <= 0 -> "No streak yet"
@@ -230,6 +301,6 @@ object GamificationEngine {
     fun xpLabel(xp: Int): String {
         val level = levelForXp(xp)
         val next = xpForNextLevel(level)
-        return if (next == null) "$xp XP (MAX)" else "$xp / $next XP"
+        return "$xp / $next XP"
     }
 }

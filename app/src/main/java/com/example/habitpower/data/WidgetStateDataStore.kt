@@ -16,14 +16,13 @@ private val WIDGET_STATE_KEY = stringPreferencesKey("widget_state")
 
 suspend fun Context.saveWidgetState(state: WidgetState) {
     widgetStateDataStore.edit { preferences ->
-        // sanitize user-visible strings before storing
         val safe = state.copy(
             userName = InputSanitizer.sanitize(state.userName, 100) ?: "",
             habits = state.habits.map { h ->
                 WidgetHabit(
                     name = InputSanitizer.sanitize(h.name, 120) ?: "",
-                    isCompleted = h.isCompleted,
-                    streak = h.streak
+                    streak = h.streak,
+                    navigateTo = h.navigateTo
                 )
             }
         )
@@ -39,13 +38,15 @@ fun Context.getWidgetState(): Flow<WidgetState> = widgetStateDataStore.data.map 
 private fun WidgetState.toJson(): String {
     val json = JSONObject().apply {
         put("userName", userName)
+        put("completedCount", completedCount)
+        put("totalCount", totalCount)
         val habitsArray = JSONArray()
         habits.forEach { habit ->
             habitsArray.put(
                 JSONObject().apply {
                     put("name", habit.name)
-                    put("isCompleted", habit.isCompleted)
                     put("streak", habit.streak)
+                    put("navigateTo", habit.navigateTo)
                 }
             )
         }
@@ -58,15 +59,27 @@ private fun String.toWidgetState(): WidgetState {
     return try {
         val json = JSONObject(this)
         val userName = InputSanitizer.sanitize(json.optString("userName", ""), 100) ?: ""
+        val completedCount = json.optInt("completedCount", 0)
+        val totalCount = json.optInt("totalCount", 0)
         val habitsArray = json.optJSONArray("habits") ?: JSONArray()
         val habits = mutableListOf<WidgetHabit>()
         for (i in 0 until habitsArray.length()) {
-            val habitObject = habitsArray.optJSONObject(i) ?: continue
-            val rawName = habitObject.optString("name", "")
-            val safeName = InputSanitizer.sanitize(rawName, 120) ?: ""
-            habits.add(WidgetHabit(name = safeName, isCompleted = habitObject.optBoolean("isCompleted", false), streak = habitObject.optInt("streak", 0)))
+            val obj = habitsArray.optJSONObject(i) ?: continue
+            val safeName = InputSanitizer.sanitize(obj.optString("name", ""), 120) ?: ""
+            habits.add(
+                WidgetHabit(
+                    name = safeName,
+                    streak = obj.optInt("streak", 0),
+                    navigateTo = obj.optString("navigateTo", "daily_check_in")
+                )
+            )
         }
-        WidgetState(userName = userName, habits = habits)
+        WidgetState(
+            userName = userName,
+            habits = habits,
+            completedCount = completedCount,
+            totalCount = totalCount
+        )
     } catch (e: Exception) {
         WidgetState()
     }

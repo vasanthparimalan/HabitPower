@@ -255,12 +255,16 @@ fun XpProgressBar(
 @Composable
 fun GamificationSummaryCard(
     streak: Int,
+    longestStreak: Int,
     level: Int,
     levelName: String,
     levelProgress: Float,
     xpLabel: String,
     modifier: Modifier = Modifier
 ) {
+    val nextMilestone = GamificationEngine.nextStreakMilestone(streak)
+    val daysToNext = nextMilestone - streak
+
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -275,6 +279,19 @@ fun GamificationSummaryCard(
                         contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                     )
                 }
+            }
+            // Milestone progress or recovery nudge
+            when {
+                streak == 0 && longestStreak >= 3 -> StatusChip(
+                    text = "Rebuild your streak — you had a $longestStreak-day run",
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                )
+                streak > 0 -> StatusChip(
+                    text = "🎯 $daysToNext more days → $nextMilestone-day milestone",
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                )
             }
             XpProgressBar(
                 level = level,

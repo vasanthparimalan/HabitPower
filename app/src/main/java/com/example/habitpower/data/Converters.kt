@@ -2,6 +2,7 @@ package com.example.habitpower.data
 
 import androidx.room.TypeConverter
 import com.example.habitpower.data.model.ExerciseTag
+import com.example.habitpower.data.model.HabitLifecycleStatus
 import com.example.habitpower.data.model.HabitRecurrenceType
 import com.example.habitpower.data.model.HabitType
 import com.example.habitpower.data.model.RoutineType
@@ -63,5 +64,17 @@ class Converters {
     @TypeConverter
     fun routineTypeToString(type: RoutineType?): String? {
         return type?.name
+    }
+
+    @TypeConverter
+    fun fromHabitLifecycleStatus(value: String?): HabitLifecycleStatus? {
+        return value?.let {
+            runCatching { HabitLifecycleStatus.valueOf(it) }.getOrDefault(HabitLifecycleStatus.ACTIVE)
+        }
+    }
+
+    @TypeConverter
+    fun habitLifecycleStatusToString(status: HabitLifecycleStatus?): String? {
+        return status?.name
     }
 }

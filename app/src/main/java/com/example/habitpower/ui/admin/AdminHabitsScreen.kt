@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.data.model.HabitDefinition
+import com.example.habitpower.data.model.HabitLifecycleStatus
 import com.example.habitpower.data.model.HabitRecurrenceType
 import com.example.habitpower.data.model.HabitType
 import com.example.habitpower.data.model.TargetOperator
@@ -366,7 +367,7 @@ fun AdminHabitsScreen(
                     ) {
                         SectionHeader(
                             title = "Add Habit",
-                            subtitle = "Keep fields simple and clear. Required fields are marked with *."
+                            subtitle = "Set your minimum — the version you'll do even on your worst day. Required fields are marked with *."
                         )
                         Text(
                             text = "Fields marked * are required",
@@ -385,13 +386,13 @@ fun AdminHabitsScreen(
                             value = viewModel.goalIdentityStatement,
                             onValueChange = viewModel::updateGoalIdentityStatement,
                             modifier = Modifier.fillMaxWidth(),
-                            label = { Text("Type of person I want to be *") }
+                            label = { Text("Who I'm becoming *") }
                         )
                         OutlinedTextField(
                             value = viewModel.description,
                             onValueChange = viewModel::updateDescription,
                             modifier = Modifier.fillMaxWidth(),
-                            label = { Text("Goal description *") }
+                            label = { Text("What this habit means to me *") }
                         )
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -686,7 +687,16 @@ fun AdminHabitsScreen(
                                 value = viewModel.targetValue,
                                 onValueChange = viewModel::updateTargetValue,
                                 modifier = Modifier.fillMaxWidth(),
-                                label = { Text("Target value (optional)") }
+                                label = { Text("Daily commitment (optional)") },
+                                supportingText = if (viewModel.targetValue.isNotBlank()) {
+                                    {
+                                        Text(
+                                            text = "Set this to your minimum — the amount you'll do even on hard days. You'll almost always exceed it.",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                } else null
                             )
                             if (viewModel.targetValue.isNotBlank()) {
                                 OperatorSelector(
@@ -710,7 +720,8 @@ fun AdminHabitsScreen(
                     HabitSummaryCard(
                         habit = habit,
                         onEdit = { editingHabit = habit },
-                        onDelete = { habitToDelete = habit }
+                        onDelete = { habitToDelete = habit },
+                        onLifecycleChange = { status -> viewModel.setHabitLifecycle(habit, status) }
                     )
                 }
             }
@@ -776,8 +787,11 @@ private fun OperatorSelector(
 private fun HabitSummaryCard(
     habit: HabitDefinition,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onLifecycleChange: (HabitLifecycleStatus) -> Unit
 ) {
+    var lifecycleMenuExpanded by remember { mutableStateOf(false) }
+
     val targetLabel = habit.targetValue?.let {
         val opLabel = when (habit.operator) {
             TargetOperator.LESS_THAN_OR_EQUAL -> "≤"
@@ -801,6 +815,7 @@ private fun HabitSummaryCard(
         add("Recurs" to recurrenceLabel(habit.recurrenceType))
         habit.unit?.takeIf { it.isNotBlank() }?.let { add("Unit" to it) }
         targetLabel?.let { add("Target" to it) }
+        add("Status" to habit.lifecycleStatus.label)
     }
 
     LeafSectionItemCard(
@@ -808,6 +823,38 @@ private fun HabitSummaryCard(
         subtitle = habit.description.takeIf { it.isNotBlank() },
         attributes = attributes,
         trailingActions = {
+            Box {
+                TextButton(onClick = { lifecycleMenuExpanded = true }) {
+                    Text(
+                        habit.lifecycleStatus.label,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = "Change lifecycle status")
+                }
+                DropdownMenu(
+                    expanded = lifecycleMenuExpanded,
+                    onDismissRequest = { lifecycleMenuExpanded = false }
+                ) {
+                    HabitLifecycleStatus.values().forEach { status ->
+                        DropdownMenuItem(
+                            text = {
+                                Column {
+                                    Text(status.label, style = MaterialTheme.typography.bodyMedium)
+                                    Text(
+                                        status.description,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            },
+                            onClick = {
+                                lifecycleMenuExpanded = false
+                                onLifecycleChange(status)
+                            }
+                        )
+                    }
+                }
+            }
             IconButton(onClick = onEdit) {
                 Icon(Icons.Default.Edit, contentDescription = "Edit")
             }
@@ -858,15 +905,15 @@ private fun habitTypeLabel(type: HabitType): String = when (type) {
 }
 
 private fun habitTypeDescription(type: HabitType): String = when (type) {
-    HabitType.BOOLEAN -> "Simple completion check. Example: Did I stretch today?"
-    HabitType.NUMBER -> "Track numeric value. Example: Water intake = 2.5 L"
-    HabitType.DURATION -> "Track time duration. Example: Meditation = 20 min"
-    HabitType.COUNT -> "Track integer count. Example: Push-ups = 40"
-    HabitType.POMODORO -> "Track focus sessions. Example: 4 Pomodoro cycles"
-    HabitType.TIMER -> "Track a timed session in minutes. Example: Deep work = 45 min"
-    HabitType.TIME -> "Track timing relative to a target time. Example: Sleep by 10:30 PM"
-    HabitType.TEXT -> "Capture notes. Example: Journal reflection"
-    HabitType.ROUTINE -> "Execute a pre-configured routine of exercises. Example: Morning workout"
+    HabitType.BOOLEAN -> "Simple check-in. Set the minimum so low it's impossible to skip. Example: Did I stretch at all today?"
+    HabitType.NUMBER -> "Track a numeric value. Set your floor, not your ceiling. Example: Water = 4 glasses (minimum)"
+    HabitType.DURATION -> "Track time spent. Start tiny — showing up for 5 min beats skipping 20 min. Example: Meditation = 5 min"
+    HabitType.COUNT -> "Track integer count. Make the minimum laughably small. Example: Push-ups = 5"
+    HabitType.POMODORO -> "Track focus sessions. One session a day builds the habit. Example: 1 Pomodoro (minimum)"
+    HabitType.TIMER -> "Track a timed session in minutes. Example: Deep work = 15 min (your floor)"
+    HabitType.TIME -> "Track timing relative to a target time. Example: In bed by 11 PM"
+    HabitType.TEXT -> "Capture a note — any note. One sentence counts. Example: Journal reflection"
+    HabitType.ROUTINE -> "Execute a pre-configured routine of exercises. Example: Morning movement routine"
 }
 
 private fun recurrenceLabel(type: HabitRecurrenceType): String = when (type) {
