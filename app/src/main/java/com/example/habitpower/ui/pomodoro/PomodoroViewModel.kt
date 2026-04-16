@@ -137,6 +137,15 @@ class PomodoroViewModel(
         }
     }
 
+    fun addMinute() {
+        val current = _uiState.value.targetEndTime ?: return
+        _uiState.update { it.copy(targetEndTime = current + 60_000L) }
+    }
+
+    fun finishSessionEarly() {
+        completeSession()
+    }
+
     fun cancelSession() {
         val habit = _uiState.value.selectedHabit
         _uiState.update {

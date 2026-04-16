@@ -28,6 +28,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -137,17 +138,7 @@ fun ReportScreen(
                 }
             }
 
-            // ── Year in Review entry point ─────────────────────────────────────
-            if (onNavigateToYearInReview != null) {
-                item {
-                    YearInReviewBanner(
-                        year = java.time.LocalDate.now().year,
-                        onClick = onNavigateToYearInReview
-                    )
-                }
-            }
-
-            // ── Period selector ────────────────────────────────────────────────
+            // ── Period selector (pinned near top — controls everything below) ──
             item {
                 PeriodSelector(
                     selectedPeriod = state.selectedPeriod,
@@ -158,6 +149,16 @@ fun ReportScreen(
                     onUpdateEndDate = viewModel::updateEndDate,
                     showDatePicker = ::showDatePicker
                 )
+            }
+
+            // ── Year in Review entry point ─────────────────────────────────────
+            if (onNavigateToYearInReview != null) {
+                item {
+                    YearInReviewBanner(
+                        year = java.time.LocalDate.now().year,
+                        onClick = onNavigateToYearInReview
+                    )
+                }
             }
 
             if (state.isLoading) {
@@ -183,6 +184,14 @@ fun ReportScreen(
                     }
                 }
             } else {
+                // ══ SNAPSHOT ══════════════════════════════════════════════════
+                item {
+                    SectionHeader(
+                        title = "Snapshot",
+                        subtitle = "Where you stand in the selected period"
+                    )
+                }
+
                 // ── KPIs ───────────────────────────────────────────────────────
                 item {
                     Row(
@@ -200,23 +209,87 @@ fun ReportScreen(
                     }
                 }
 
+                // ── Life area gauges ───────────────────────────────────────────
+                if (state.lifeAreaGauges.isNotEmpty()) {
+                    item {
+                        Card {
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Text(
+                                    text = "Life Areas",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                state.lifeAreaGauges.chunked(2).forEach { rowItems ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    ) {
+                                        rowItems.forEach { gauge ->
+                                            LifeAreaGaugeCard(gauge = gauge, modifier = Modifier.weight(1f))
+                                        }
+                                        if (rowItems.size == 1) Spacer(modifier = Modifier.weight(1f))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ── Encouragement cards (strongest + weakest area) ─────────────
+                if (state.strongestAreaMessage != null || state.weakestAreaMessage != null) {
+                    item {
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            state.strongestAreaMessage?.let { message ->
+                                EncouragementCard(
+                                    title = "What is working",
+                                    message = message,
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                                )
+                            }
+                            state.weakestAreaMessage?.let { message ->
+                                EncouragementCard(
+                                    title = "Next breakthrough",
+                                    message = message,
+                                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // ── Divider between Snapshot and Trends ────────────────────────
+                item {
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                }
+
+                // ══ TRENDS ════════════════════════════════════════════════════
+                item {
+                    SectionHeader(
+                        title = "Trends",
+                        subtitle = "How your habits are moving over time"
+                    )
+                }
+
                 // ── Trend chart ────────────────────────────────────────────────
                 if (state.weeklyTrend.isNotEmpty()) {
                     item {
-                        val isDaily = state.weeklyTrend.size <= 14
-                        SectionHeader(
-                            title = if (isDaily) "Daily Completion" else "Week-by-Week Trend",
-                            subtitle = if (isDaily) "Each bar = one day" else "Each bar = one week's average completion"
-                        )
-                    }
-                    item {
                         Card {
-                            TrendBarChart(
-                                trends = state.weeklyTrend,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                            )
+                            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                val isDaily = state.weeklyTrend.size <= 14
+                                Text(
+                                    text = if (isDaily) "Daily Completion" else "Week-by-Week Completion",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                TrendBarChart(
+                                    trends = state.weeklyTrend,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         }
                     }
                 }
@@ -224,68 +297,27 @@ fun ReportScreen(
                 // ── Habit breakdown ────────────────────────────────────────────
                 if (state.habitConsistency.isNotEmpty()) {
                     item {
-                        SectionHeader(
-                            title = "Habit Breakdown",
-                            subtitle = "Lowest consistency first — your next focus is at the top"
-                        )
-                    }
-                    item {
                         Card {
                             Column(
                                 modifier = Modifier.padding(16.dp),
                                 verticalArrangement = Arrangement.spacedBy(14.dp)
                             ) {
+                                Text(
+                                    text = "Habit Breakdown",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = "Lowest consistency first — your next focus is at the top",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                                 state.habitConsistency.forEach { habit ->
                                     HabitConsistencyRow(habit = habit)
                                 }
                             }
                         }
-                    }
-                }
-
-                // ── Life area gauges ───────────────────────────────────────────
-                if (state.lifeAreaGauges.isNotEmpty()) {
-                    item {
-                        SectionHeader(
-                            title = "Life Area Gauges",
-                            subtitle = "Balanced progress across your key domains"
-                        )
-                    }
-                    item {
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            state.lifeAreaGauges.chunked(2).forEach { rowItems ->
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    rowItems.forEach { gauge ->
-                                        LifeAreaGaugeCard(gauge = gauge, modifier = Modifier.weight(1f))
-                                    }
-                                    if (rowItems.size == 1) Spacer(modifier = Modifier.weight(1f))
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // ── Encouragement cards ────────────────────────────────────────
-                state.strongestAreaMessage?.let { message ->
-                    item {
-                        EncouragementCard(
-                            title = "What is working",
-                            message = message,
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                        )
-                    }
-                }
-
-                state.weakestAreaMessage?.let { message ->
-                    item {
-                        EncouragementCard(
-                            title = "Next breakthrough",
-                            message = message,
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                        )
                     }
                 }
 
@@ -530,6 +562,12 @@ private fun LifeAreaGaugeCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            if (gauge.emoji != null) {
+                Text(
+                    text = gauge.emoji,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }
             Text(
                 text = gauge.name,
                 style = MaterialTheme.typography.titleMedium,

@@ -54,7 +54,7 @@ import com.example.habitpower.data.model.WorkoutSession
         UserStats::class,
         RoutineNotificationSettings::class
     ],
-    version = 20,
+    version = 21,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -227,6 +227,12 @@ abstract class HabitPowerDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_20_21 = object : Migration(20, 21) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE life_areas ADD COLUMN emoji TEXT")
+            }
+        }
+
         val MIGRATION_17_18 = object : Migration(17, 18) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE quotes ADD COLUMN source TEXT NOT NULL DEFAULT ''")
@@ -281,7 +287,8 @@ abstract class HabitPowerDatabase : RoomDatabase() {
                         MIGRATION_16_17,
                         MIGRATION_17_18,
                         MIGRATION_18_19,
-                        MIGRATION_19_20
+                        MIGRATION_19_20,
+                        MIGRATION_20_21
                     )
                     .build()
                 INSTANCE = instance

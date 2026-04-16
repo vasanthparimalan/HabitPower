@@ -23,6 +23,9 @@ class AdminLifeAreasViewModel(private val repository: LifeAreaRepository) : View
     var newDescription by mutableStateOf("")
         private set
 
+    var newEmoji by mutableStateOf("")
+        private set
+
     val lifeAreas: StateFlow<List<LifeArea>> = repository.getAll().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -37,24 +40,30 @@ class AdminLifeAreasViewModel(private val repository: LifeAreaRepository) : View
         newDescription = value
     }
 
+    fun updateNewEmoji(value: String) {
+        newEmoji = value.takeLast(2)
+    }
+
     fun createLifeArea() {
         val name = newName.trim()
         if (name.isBlank()) return
         val desc = newDescription.trim().ifBlank { null }
+        val emoji = newEmoji.trim().ifBlank { null }
         viewModelScope.launch {
             val nextOrder = (lifeAreas.value.maxOfOrNull { it.displayOrder } ?: -1) + 1
-            repository.create(LifeArea(name = name, description = desc, displayOrder = nextOrder))
+            repository.create(LifeArea(name = name, description = desc, displayOrder = nextOrder, emoji = emoji))
             newName = ""
             newDescription = ""
+            newEmoji = ""
             _createSuccessTick.value += 1
         }
     }
 
-    fun updateLifeArea(l: LifeArea, name: String, description: String?) {
+    fun updateLifeArea(l: LifeArea, name: String, description: String?, emoji: String?) {
         val trimmed = name.trim()
-        if (trimmed.isBlank() || (trimmed == l.name && (description ?: "") == (l.description ?: ""))) return
+        if (trimmed.isBlank()) return
         viewModelScope.launch {
-            repository.update(l.copy(name = trimmed, description = description))
+            repository.update(l.copy(name = trimmed, description = description, emoji = emoji))
         }
     }
 

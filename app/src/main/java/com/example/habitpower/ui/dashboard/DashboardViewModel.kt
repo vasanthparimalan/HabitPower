@@ -35,6 +35,7 @@ data class CompletionSoundPrefs(
 data class LifeAreaCompletion(
     val lifeAreaId: Long,
     val lifeAreaName: String,
+    val emoji: String?,
     val completedCount: Int,
     val totalCount: Int,
     val completionPercent: Float
@@ -344,6 +345,7 @@ class DashboardViewModel(
             LifeAreaCompletion(
                 lifeAreaId = area.id,
                 lifeAreaName = area.name,
+                emoji = area.emoji,
                 completedCount = completed,
                 totalCount = total,
                 completionPercent = percent

@@ -100,6 +100,15 @@ fun AdminLifeAreasScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
 
+                        OutlinedTextField(
+                            value = viewModel.newEmoji,
+                            onValueChange = { viewModel.updateNewEmoji(it) },
+                            label = { Text("Emoji (optional)") },
+                            placeholder = { Text("e.g. 🏃") },
+                            modifier = Modifier.fillMaxWidth(0.4f),
+                            singleLine = true
+                        )
+
                         Button(onClick = { viewModel.createLifeArea() }) {
                             Text("Add Life Area")
                         }
@@ -123,18 +132,27 @@ fun AdminLifeAreasScreen(
     editing.value?.let { area ->
         val editName = remember(area.id) { mutableStateOf(area.name) }
         val editDesc = remember(area.id) { mutableStateOf(area.description ?: "") }
+        val editEmoji = remember(area.id) { mutableStateOf(area.emoji ?: "") }
         AlertDialog(
             onDismissRequest = { editing.value = null },
             title = { Text("Edit Life Area") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(value = editName.value, onValueChange = { editName.value = it }, label = { Text("Name") })
-                    OutlinedTextField(value = editDesc.value, onValueChange = { editDesc.value = it }, label = { Text("Description") })
+                    OutlinedTextField(value = editName.value, onValueChange = { editName.value = it }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = editDesc.value, onValueChange = { editDesc.value = it }, label = { Text("Description") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(
+                        value = editEmoji.value,
+                        onValueChange = { editEmoji.value = it.takeLast(2) },
+                        label = { Text("Emoji") },
+                        placeholder = { Text("e.g. 🏃") },
+                        modifier = Modifier.fillMaxWidth(0.4f),
+                        singleLine = true
+                    )
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.updateLifeArea(area, editName.value, editDesc.value.ifBlank { null })
+                    viewModel.updateLifeArea(area, editName.value, editDesc.value.ifBlank { null }, editEmoji.value.ifBlank { null })
                     editing.value = null
                 }) {
                     Text("Save")
@@ -150,7 +168,7 @@ fun AdminLifeAreasScreen(
 @Composable
 private fun LifeAreaRow(item: LifeArea, onEdit: (LifeArea) -> Unit, onDelete: (LifeArea) -> Unit) {
     LeafSectionItemCard(
-        title = item.name,
+        title = if (item.emoji != null) "${item.emoji} ${item.name}" else item.name,
         subtitle = item.description,
         trailingActions = {
             IconButton(onClick = { onEdit(item) }) {

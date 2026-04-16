@@ -669,11 +669,11 @@ fun AdminHabitsScreen(
                                     viewModel.updateTargetValue(clamped)
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-                                label = { Text("Duration (minutes, max 1440)") },
+                                label = { Text("Minimum commitment (minutes)") },
                                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                                     keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
                                 ),
-                                supportingText = { Text("Max 1440 min = 24 hrs") }
+                                supportingText = { Text("Start small — what's the least you'd commit to each day?") }
                             )
                         } else if (viewModel.selectedType != HabitType.BOOLEAN && viewModel.selectedType != HabitType.TEXT) {
                             // Numeric habits: show unit + optional numeric target + operator

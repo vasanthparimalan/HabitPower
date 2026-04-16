@@ -177,11 +177,26 @@ fun PomodoroScreen(
 
                 Spacer(modifier = Modifier.height(64.dp))
 
-                OutlinedButton(
-                    onClick = { viewModel.cancelSession() },
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text("Cancel Session")
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        OutlinedButton(onClick = { viewModel.addMinute() }) {
+                            Text("+1 min")
+                        }
+                        Button(onClick = { viewModel.finishSessionEarly() }) {
+                            Text("Complete Session")
+                        }
+                    }
+                    OutlinedButton(
+                        onClick = { viewModel.cancelSession() },
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text("Cancel Session")
+                    }
                 }
 
                 Spacer(modifier = Modifier.weight(1f))

@@ -68,9 +68,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.sp
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.PI
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -80,6 +90,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -154,7 +166,7 @@ private fun completionMessage(habitName: String, done: Int, total: Int): String 
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel = viewModel(factory = AppViewModelProvider.Factory),
@@ -354,7 +366,7 @@ fun DashboardScreen(
             ) {
                 Icon(Icons.Default.Edit, contentDescription = "Check-In")
                 Spacer(Modifier.width(8.dp))
-                Text("Log Advanced")
+                Text("Log Today")
             }
         }
     ) { innerPadding ->
@@ -363,9 +375,13 @@ fun DashboardScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // ── 1. Daily Cue — thin banner, quote behind tap (idea 4) ─────────
             item {
+                val cuePhrase = remember {
+                    DAILY_CUE_PHRASES[LocalDate.now().dayOfYear % DAILY_CUE_PHRASES.size]
+                }
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
@@ -374,9 +390,6 @@ fun DashboardScreen(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        val cuePhrase = remember {
-                            DAILY_CUE_PHRASES[LocalDate.now().dayOfYear % DAILY_CUE_PHRASES.size]
-                        }
                         StatusChip(
                             text = "Daily Cue",
                             containerColor = MaterialTheme.colorScheme.primary,
@@ -399,100 +412,49 @@ fun DashboardScreen(
                     }
                 }
             }
-            // ── Gamification: streak + XP bar ────────────────────────────────
+
+            // ── 2. Today Tasks ────────────────────────────────────────────────
             item {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                var showBackfillMenu by remember { mutableStateOf(false) }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
                         Text(
-                            text = "Gamification Progress",
+                            text = "Today Tasks",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
-                        IconButton(onClick = { showGamificationInfoDialog = true }) {
-                            Icon(Icons.Default.Info, contentDescription = "How gamification works")
+                        Text(
+                            text = "Sorted by time so your day is visible at a glance",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Box {
+                        TextButton(onClick = { showBackfillMenu = true }) {
+                            Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Past Days", style = MaterialTheme.typography.labelMedium)
+                        }
+                        DropdownMenu(
+                            expanded = showBackfillMenu,
+                            onDismissRequest = { showBackfillMenu = false }
+                        ) {
+                            listOf(1L to "Yesterday", 2L to "2 days ago", 3L to "3 days ago").forEach { (daysBack, label) ->
+                                DropdownMenuItem(
+                                    text = { Text(label) },
+                                    onClick = {
+                                        showBackfillMenu = false
+                                        onNavigate(Screen.DailyCheckIn.createRoute(activeUser?.id, LocalDate.now().minusDays(daysBack)))
+                                    }
+                                )
+                            }
                         }
                     }
-                    GamificationSummaryCard(
-                        streak = gamificationState.streak,
-                        longestStreak = gamificationState.longestStreak,
-                        level = gamificationState.level,
-                        levelName = gamificationState.levelName,
-                        levelProgress = gamificationState.levelProgress,
-                        xpLabel = gamificationState.xpLabel
-                    )
                 }
-            }
-            item {
-                SectionHeader(
-                    title = "Last 3 Months Habits",
-                    subtitle = "Consistency overview by day"
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    MonthlyHeatmap(
-                        yearMonth = YearMonth.now().minusMonths(2),
-                        heatmapData = heatmapData
-                    )
-                    MonthlyHeatmap(
-                        yearMonth = YearMonth.now().minusMonths(1),
-                        heatmapData = heatmapData
-                    )
-                    MonthlyHeatmap(
-                        yearMonth = YearMonth.now(),
-                        heatmapData = heatmapData
-                    )
-                }
-            }
-
-            item {
-                DashboardKpiAndLifeAreaSection(
-                    currentStreak = currentStreak,
-                    thisWeekConsistency = thisWeekConsistency,
-                    bestPersonalRecord = bestPersonalRecord,
-                    lifeAreaCompletion = lifeAreaCompletion,
-                    selectedDate = selectedDate
-                )
-            }
-
-            item {
-                WeeklyReviewCard(
-                    currentStreak = currentStreak,
-                    thisWeekConsistency = thisWeekConsistency,
-                    bestPersonalRecord = bestPersonalRecord
-                )
-            }
-
-            item {
-                SectionHeader(
-                    title = "Daily Check-In",
-                    subtitle = "Use one place for all detailed logging and backfill edits"
-                )
-                Spacer(modifier = Modifier.height(AppSpacing.sm))
-                FilledTonalButton(
-                    onClick = { onNavigate(Screen.DailyCheckIn.createRoute(activeUser?.id, LocalDate.now())) },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Default.Edit, contentDescription = null)
-                    Spacer(modifier = Modifier.width(AppSpacing.sm))
-                    Text("Open Daily Check-In")
-                }
-            }
-
-            item { Spacer(modifier = Modifier.height(12.dp)) }
-
-            item {
-                SectionHeader(
-                    title = "Today Tasks",
-                    subtitle = "Sorted by time so your day is visible at a glance"
-                )
                 Spacer(modifier = Modifier.height(AppSpacing.sm))
 
                 fun sortByTime(list: List<DailyHabitItem>): List<DailyHabitItem> =
@@ -500,6 +462,7 @@ fun DashboardScreen(
 
                 val sortedPending = sortByTime(todayHabits.filter { !isCompleted(it) })
                 val sortedDone = sortByTime(todayHabits.filter { isCompleted(it) })
+                var showHonored by rememberSaveable { mutableStateOf(false) }
 
                 if (todayHabits.isEmpty()) {
                     Card(modifier = Modifier.fillMaxWidth()) {
@@ -569,24 +532,30 @@ fun DashboardScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                     }
 
+                    // Honored tasks — collapsed by default (idea 1)
                     if (sortedDone.isNotEmpty()) {
-                        if (sortedPending.isNotEmpty()) {
+                        TextButton(
+                            onClick = { showHonored = !showHonored },
+                            modifier = Modifier.padding(vertical = 0.dp)
+                        ) {
                             Text(
-                                text = "Honored",
+                                text = if (showHonored) "Hide ${sortedDone.size} honored ▲"
+                                       else "${sortedDone.size} honored — tap to see ▼",
                                 style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(vertical = 6.dp)
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        sortedDone.forEach { habit ->
-                            TodayTaskRow(
-                                habit = habit,
-                                isDone = true,
-                                onComplete = { viewModel.toggleHabit(habit.habitId, LocalDate.now()) },
-                                onOpen = { onNavigate(Screen.DailyCheckIn.createRoute(activeUser?.id, LocalDate.now())) },
-                                onEditTime = { newTime -> viewModel.updateHabitTime(habit.habitId, newTime) }
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
+                        if (showHonored) {
+                            sortedDone.forEach { habit ->
+                                TodayTaskRow(
+                                    habit = habit,
+                                    isDone = true,
+                                    onComplete = { viewModel.toggleHabit(habit.habitId, LocalDate.now()) },
+                                    onOpen = { onNavigate(Screen.DailyCheckIn.createRoute(activeUser?.id, LocalDate.now())) },
+                                    onEditTime = { newTime -> viewModel.updateHabitTime(habit.habitId, newTime) }
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
                         }
                     }
 
@@ -607,10 +576,88 @@ fun DashboardScreen(
                 }
             }
 
-            if (graduatedHabits.isNotEmpty()) {
-                item {
-                    IdentityWallCard(habits = graduatedHabits)
+            // ── Divider: task zone / analytics zone (idea 5) ─────────────────
+            item {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+            }
+
+            // ── 3. Your Progress ──────────────────────────────────────────────
+            item {
+                Text(
+                    text = "Your Progress",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
+
+            item {
+                DashboardKpiAndLifeAreaSection(
+                    currentStreak = currentStreak,
+                    thisWeekConsistency = thisWeekConsistency,
+                    bestPersonalRecord = bestPersonalRecord,
+                    lifeAreaCompletion = lifeAreaCompletion,
+                    selectedDate = selectedDate
+                )
+            }
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Your Level",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        IconButton(onClick = { showGamificationInfoDialog = true }) {
+                            Icon(Icons.Default.Info, contentDescription = "How gamification works")
+                        }
+                    }
+                    GamificationSummaryCard(
+                        streak = gamificationState.streak,
+                        longestStreak = gamificationState.longestStreak,
+                        level = gamificationState.level,
+                        levelName = gamificationState.levelName,
+                        levelProgress = gamificationState.levelProgress,
+                        xpLabel = gamificationState.xpLabel
+                    )
                 }
+            }
+            item {
+                SectionHeader(
+                    title = "Last 3 Months Habits",
+                    subtitle = "Consistency overview by day"
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    MonthlyHeatmap(yearMonth = YearMonth.now().minusMonths(2), heatmapData = heatmapData)
+                    MonthlyHeatmap(yearMonth = YearMonth.now().minusMonths(1), heatmapData = heatmapData)
+                    MonthlyHeatmap(yearMonth = YearMonth.now(), heatmapData = heatmapData)
+                }
+            }
+            item {
+                WeeklyReviewCard(
+                    currentStreak = currentStreak,
+                    thisWeekConsistency = thisWeekConsistency,
+                    bestPersonalRecord = bestPersonalRecord
+                )
+            }
+
+            // ── 4. Mastery: Identity Wall + Achievements combined (idea 6) ────
+            item {
+                MasteryCard(
+                    graduatedHabits = graduatedHabits,
+                    earnedBadges = gamificationState.earnedBadges
+                )
             }
 
             item { Spacer(modifier = Modifier.height(24.dp)) }
@@ -618,9 +665,13 @@ fun DashboardScreen(
     }
 }
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
-private fun IdentityWallCard(habits: List<com.example.habitpower.data.model.HabitDefinition>) {
-    var expanded by remember { mutableStateOf(false) }
+private fun MasteryCard(
+    graduatedHabits: List<com.example.habitpower.data.model.HabitDefinition>,
+    earnedBadges: List<com.example.habitpower.gamification.GamificationEngine.Badge.Metadata>
+) {
+    var showHabits by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -630,66 +681,113 @@ private fun IdentityWallCard(habits: List<com.example.habitpower.data.model.Habi
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        "Identity Wall",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer
-                    )
-                    Text(
-                        "${habits.size} habit${if (habits.size == 1) "" else "s"} internalized",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.75f)
-                    )
-                }
-                TextButton(onClick = { expanded = !expanded }) {
-                    Text(if (expanded) "Hide" else "Show")
-                }
-            }
+            Text(
+                text = "Mastery",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onTertiaryContainer
+            )
 
-            if (!expanded) {
+            // Achievements
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
-                    "These behaviors are now part of who you are. They no longer need tracking.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.75f)
+                    text = "Achievements${if (earnedBadges.isNotEmpty()) " · ${earnedBadges.size}" else ""}",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
                 )
+                if (earnedBadges.isEmpty()) {
+                    Text(
+                        text = "Keep going — badges unlock as you hit milestones.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.65f)
+                    )
+                } else {
+                    androidx.compose.foundation.layout.FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        earnedBadges.forEach { badge ->
+                            SuggestionChip(
+                                onClick = {},
+                                label = {
+                                    Text(
+                                        text = "${badge.emoji} ${badge.name}",
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
             }
 
-            if (expanded) {
-                habits.forEach { habit ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)
+            HorizontalDivider(color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.15f))
+
+            // Identity Wall
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "Identity Wall",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
                         )
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 12.dp, vertical = 10.dp),
-                            verticalArrangement = Arrangement.spacedBy(2.dp)
-                        ) {
-                            Text(
-                                habit.name,
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onTertiaryContainer
+                        Text(
+                            text = if (graduatedHabits.isEmpty()) "Habits you master will appear here"
+                                   else "${graduatedHabits.size} habit${if (graduatedHabits.size == 1) "" else "s"} internalized",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.65f)
+                        )
+                    }
+                    if (graduatedHabits.isNotEmpty()) {
+                        TextButton(onClick = { showHabits = !showHabits }) {
+                            Text(if (showHabits) "Hide" else "Show")
+                        }
+                    }
+                }
+                if (graduatedHabits.isEmpty()) {
+                    Text(
+                        text = "Keep showing up. When a habit becomes second nature, it graduates here.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.65f)
+                    )
+                }
+                if (showHabits) {
+                    graduatedHabits.forEach { habit ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)
                             )
-                            if (habit.goalIdentityStatement.isNotBlank()) {
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
                                 Text(
-                                    habit.goalIdentityStatement,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    fontStyle = FontStyle.Italic,
-                                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.75f)
+                                    habit.name,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onTertiaryContainer
                                 )
+                                if (habit.goalIdentityStatement.isNotBlank()) {
+                                    Text(
+                                        habit.goalIdentityStatement,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontStyle = FontStyle.Italic,
+                                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.75f)
+                                    )
+                                }
                             }
                         }
                     }
@@ -1211,7 +1309,7 @@ private fun DashboardKpiAndLifeAreaSection(
                 
                 if (activeSegments.isNotEmpty()) {
                     Text(
-                        text = "Tap chart for details",
+                        text = "Tap for breakdown",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                         fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
@@ -1230,6 +1328,8 @@ private fun LifeAreaRoseChart(
 ) {
     val segments = data.filter { it.totalCount > 0 }
     val palette = lifeAreaChartPalette()
+    val textMeasurer = rememberTextMeasurer()
+    val labelStyle = androidx.compose.ui.text.TextStyle(fontSize = 13.sp)
 
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         if (segments.isEmpty()) {
@@ -1251,21 +1351,13 @@ private fun LifeAreaRoseChart(
                     val color = palette[index % palette.size]
                     val completionRatio = segment.completionPercent.coerceIn(0f, 100f) / 100f
                     val petalRadius = innerRadius + ((maxRadius - innerRadius) * completionRatio)
-                    val backgroundTopLeft = Offset(
-                        x = center.x - maxRadius,
-                        y = center.y - maxRadius
-                    )
-                    val petalTopLeft = Offset(
-                        x = center.x - petalRadius,
-                        y = center.y - petalRadius
-                    )
 
                     drawArc(
                         color = color.copy(alpha = 0.22f),
                         startAngle = start,
                         sweepAngle = segmentSweep,
                         useCenter = true,
-                        topLeft = backgroundTopLeft,
+                        topLeft = Offset(center.x - maxRadius, center.y - maxRadius),
                         size = Size(maxRadius * 2f, maxRadius * 2f)
                     )
                     drawArc(
@@ -1273,8 +1365,22 @@ private fun LifeAreaRoseChart(
                         startAngle = start,
                         sweepAngle = segmentSweep,
                         useCenter = true,
-                        topLeft = petalTopLeft,
+                        topLeft = Offset(center.x - petalRadius, center.y - petalRadius),
                         size = Size(petalRadius * 2f, petalRadius * 2f)
+                    )
+
+                    // Emoji/initial label at ~80% of maxRadius on the background arc
+                    val midAngleRad = ((start + segmentSweep / 2) * PI / 180).toFloat()
+                    val labelRadius = maxRadius * 0.80f
+                    val lx = center.x + labelRadius * cos(midAngleRad.toDouble()).toFloat()
+                    val ly = center.y + labelRadius * sin(midAngleRad.toDouble()).toFloat()
+                    val label = segment.emoji ?: segment.lifeAreaName.take(1).uppercase()
+                    val measured = textMeasurer.measure(label, style = labelStyle)
+                    drawText(
+                        textMeasurer = textMeasurer,
+                        text = label,
+                        topLeft = Offset(lx - measured.size.width / 2f, ly - measured.size.height / 2f),
+                        style = labelStyle
                     )
                 }
 
@@ -1302,65 +1408,17 @@ private fun LifeAreaRoseChart(
 }
 
 @Composable
-private fun LifeAreaLegend(
-    segments: List<LifeAreaCompletion>,
-    modifier: Modifier = Modifier
-) {
-    val palette = lifeAreaChartPalette()
-    val entries = segments.mapIndexed { index, segment ->
-        segment to palette[index % palette.size]
-    }
-
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        entries.chunked(2).forEach { rowEntries ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                rowEntries.forEach { (segment, color) ->
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .background(color = color, shape = CircleShape)
-                        )
-                        Text(
-                            text = "${segment.lifeAreaName} ${segment.completionPercent.toInt()}%",
-                            style = MaterialTheme.typography.labelSmall,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-                if (rowEntries.size == 1) {
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-            }
-        }
-    }
-}
-
-@Composable
 private fun ChartDetailModal(
     data: List<LifeAreaCompletion>,
     onClose: () -> Unit
 ) {
     val segments = data.filter { it.totalCount > 0 }
-    val palette = lifeAreaChartPalette()
 
     AlertDialog(
         onDismissRequest = onClose,
         title = {
             Text(
-                text = "Life Area Completion",
+                text = "Life Area Breakdown",
                 style = MaterialTheme.typography.headlineSmall
             )
         },
@@ -1368,29 +1426,26 @@ private fun ChartDetailModal(
             if (segments.isEmpty()) {
                 Text("No assigned life-area habits.")
             } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(segments.size) { index ->
                         val segment = segments[index]
-                        val color = palette[index % palette.size]
-                        val totalCount = segments.sumOf { it.totalCount }
-                        val completedCount = segments.sumOf { it.completedCount }
-                        val overallPercent = if (totalCount == 0) 0 else (completedCount * 100 / totalCount)
+                        val progress = segment.completionPercent.coerceIn(0f, 100f) / 100f
+                        val isComplete = segment.completionPercent >= 100f
 
-                        Card(
+                        Column(
                             modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(12.dp),
+                                modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(12.dp)
-                                        .background(color = color, shape = CircleShape)
+                                Text(
+                                    text = segment.emoji ?: segment.lifeAreaName.take(1).uppercase(),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    modifier = Modifier.width(32.dp),
+                                    textAlign = TextAlign.Center
                                 )
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
@@ -1399,7 +1454,7 @@ private fun ChartDetailModal(
                                         fontWeight = FontWeight.SemiBold
                                     )
                                     Text(
-                                        text = "${segment.completedCount} / ${segment.totalCount}",
+                                        text = "${segment.completedCount} of ${segment.totalCount} completed",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -1408,19 +1463,31 @@ private fun ChartDetailModal(
                                     text = "${segment.completionPercent.toInt()}%",
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.Bold,
-                                    color = if (segment.completionPercent >= 100f) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                    }
+                                    color = if (isComplete) MaterialTheme.colorScheme.primary
+                                            else MaterialTheme.colorScheme.onSurface
                                 )
                             }
+                            LinearProgressIndicator(
+                                progress = { progress },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(6.dp)
+                                    .clip(RoundedCornerShape(3.dp)),
+                                color = if (isComplete) MaterialTheme.colorScheme.primary
+                                        else MaterialTheme.colorScheme.secondary,
+                                trackColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        }
+                        if (index < segments.size - 1) {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(top = 4.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                            )
                         }
                     }
-                    
-                    // Summary footer
+
                     item {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)

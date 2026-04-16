@@ -10,5 +10,6 @@ data class LifeArea(
     val name: String,
     val description: String? = null,
     val displayOrder: Int = 0,
-    val isActive: Boolean = true
+    val isActive: Boolean = true,
+    val emoji: String? = null
 )

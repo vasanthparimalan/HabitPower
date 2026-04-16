@@ -45,6 +45,7 @@ data class HabitConsistency(
 
 data class LifeAreaGauge(
     val name: String,
+    val emoji: String?,
     val completedCount: Int,
     val totalCount: Int,
     val completionRatio: Float,
@@ -283,10 +284,12 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
         lifeAreas: List<LifeArea>
     ): List<LifeAreaGauge> {
         val grouped = habits.groupBy { it.lifeAreaId }
-        val areaNames = lifeAreas.associateBy({ it.id }, { it.name })
+        val areaById = lifeAreas.associateBy { it.id }
 
         return grouped.map { (lifeAreaId, areaHabits) ->
-            val name = lifeAreaId?.let { areaNames[it] } ?: "Other"
+            val area = lifeAreaId?.let { areaById[it] }
+            val name = area?.name ?: "Other"
+            val emoji = area?.emoji
             val totalCount = areaHabits.size * dates.size
             val completedCount = dates.sumOf { date ->
                 areaHabits.count { habit -> isEntrySuccessful(entriesByKey[date to habit.id], habit) }
@@ -295,6 +298,7 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
 
             LifeAreaGauge(
                 name = name,
+                emoji = emoji,
                 completedCount = completedCount,
                 totalCount = totalCount,
                 completionRatio = ratio,
