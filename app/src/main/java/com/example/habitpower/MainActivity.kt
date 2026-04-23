@@ -33,6 +33,8 @@ import com.example.habitpower.ui.admin.ExportScreen
 import com.example.habitpower.ui.dashboard.DashboardScreen
 import com.example.habitpower.ui.execution.WorkoutRunnerScreen
 import com.example.habitpower.ui.exercises.AddEditExerciseScreen
+import com.example.habitpower.ui.exercises.ImportPackScreen
+import com.example.habitpower.ui.exercises.LibraryBrowseScreen
 import com.example.habitpower.ui.navigation.Screen
 import com.example.habitpower.ui.routines.AddEditRoutineScreen
 import com.example.habitpower.ui.routines.ExecuteRoutineScreen
@@ -242,6 +244,12 @@ fun HabitPowerAppContent() {
                 com.example.habitpower.ui.report.YearInReviewScreen(
                     navigateBack = { navController.popBackStack() }
                 )
+            }
+            composable(Screen.LibraryBrowse.route) {
+                LibraryBrowseScreen(navigateBack = { navController.popBackStack() })
+            }
+            composable(Screen.ImportPack.route) {
+                ImportPackScreen(navigateBack = { navController.popBackStack() })
             }
         }
     }

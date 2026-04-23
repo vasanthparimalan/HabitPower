@@ -65,6 +65,7 @@ fun AdminHabitsScreen(
 ) {
     val habits by viewModel.habits.collectAsState()
     val routines by viewModel.routines.collectAsState()
+    val lifeAreas by viewModel.lifeAreas.collectAsState()
     val context = LocalContext.current
 
     var editingHabit by remember { mutableStateOf<HabitDefinition?>(null) }
@@ -108,6 +109,8 @@ fun AdminHabitsScreen(
         var editDesc by remember { mutableStateOf(habit.description) }
         var editTarget by remember { mutableStateOf(habit.targetValue?.toString() ?: "") }
         var editOp by remember { mutableStateOf(habit.operator) }
+        var editRoutineId by remember { mutableStateOf(habit.routineId) }
+        var editLifeAreaId by remember { mutableStateOf(habit.lifeAreaId) }
         var editRecurrenceType by remember { mutableStateOf(habit.recurrenceType) }
         var editWeekMask by remember { mutableStateOf(habit.recurrenceDaysOfWeekMask) }
         var editIntervalText by remember { mutableStateOf(habit.recurrenceInterval.toString()) }
@@ -170,6 +173,48 @@ fun AdminHabitsScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
                         OperatorSelector(selected = editOp, onSelected = { editOp = it })
+                    }
+
+                    if (habit.type == HabitType.ROUTINE) {
+                        var routineExpanded by remember { mutableStateOf(false) }
+                        Text("Routine", style = MaterialTheme.typography.titleSmall)
+                        Box {
+                            TextButton(onClick = { routineExpanded = true }) {
+                                Text("Routine: ${routines.firstOrNull { it.id == editRoutineId }?.name ?: "Select routine"}")
+                                Icon(Icons.Default.ArrowDropDown, contentDescription = "Select routine")
+                            }
+                            DropdownMenu(expanded = routineExpanded, onDismissRequest = { routineExpanded = false }) {
+                                routines.forEach { routine ->
+                                    DropdownMenuItem(
+                                        text = { Text(routine.name) },
+                                        onClick = {
+                                            routineExpanded = false
+                                            editRoutineId = routine.id
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    var lifeAreaExpanded by remember { mutableStateOf(false) }
+                    Box {
+                        TextButton(onClick = { lifeAreaExpanded = true }) {
+                            Text("Life Area: ${lifeAreas.find { it.id == editLifeAreaId }?.let { "${it.emoji ?: ""} ${it.name}".trim() } ?: "None"}")
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Select life area")
+                        }
+                        DropdownMenu(expanded = lifeAreaExpanded, onDismissRequest = { lifeAreaExpanded = false }) {
+                            DropdownMenuItem(
+                                text = { Text("None") },
+                                onClick = { lifeAreaExpanded = false; editLifeAreaId = null }
+                            )
+                            lifeAreas.forEach { la ->
+                                DropdownMenuItem(
+                                    text = { Text("${la.emoji ?: ""} ${la.name}".trim()) },
+                                    onClick = { lifeAreaExpanded = false; editLifeAreaId = la.id }
+                                )
+                            }
+                        }
                     }
 
                     Text("Schedule", style = MaterialTheme.typography.titleSmall)
@@ -272,6 +317,8 @@ fun AdminHabitsScreen(
                         newDescription = editDesc,
                         newTarget = editTarget,
                         newOp = editOp,
+                        newRoutineId = editRoutineId,
+                        newLifeAreaId = editLifeAreaId,
                         recurrenceType = editRecurrenceType,
                         recurrenceDaysOfWeekMask = editWeekMask,
                         recurrenceIntervalText = editIntervalText,
@@ -556,7 +603,6 @@ fun AdminHabitsScreen(
                         }
 
                         // Life area selector
-                        val lifeAreas by viewModel.lifeAreas.collectAsState()
                         var lifeAreaExpanded by remember { mutableStateOf(false) }
                         Box {
                             TextButton(onClick = { lifeAreaExpanded = true }) {
@@ -719,6 +765,7 @@ fun AdminHabitsScreen(
                 items(habits, key = { it.id }) { habit ->
                     HabitSummaryCard(
                         habit = habit,
+                        lifeAreaName = lifeAreas.find { it.id == habit.lifeAreaId }?.let { "${it.emoji ?: ""} ${it.name}".trim() },
                         onEdit = { editingHabit = habit },
                         onDelete = { habitToDelete = habit },
                         onLifecycleChange = { status -> viewModel.setHabitLifecycle(habit, status) }
@@ -786,6 +833,7 @@ private fun OperatorSelector(
 @Composable
 private fun HabitSummaryCard(
     habit: HabitDefinition,
+    lifeAreaName: String?,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onLifecycleChange: (HabitLifecycleStatus) -> Unit
@@ -815,6 +863,7 @@ private fun HabitSummaryCard(
         add("Recurs" to recurrenceLabel(habit.recurrenceType))
         habit.unit?.takeIf { it.isNotBlank() }?.let { add("Unit" to it) }
         targetLabel?.let { add("Target" to it) }
+        lifeAreaName?.let { add("Life Area" to it) }
         add("Status" to habit.lifecycleStatus.label)
     }
 

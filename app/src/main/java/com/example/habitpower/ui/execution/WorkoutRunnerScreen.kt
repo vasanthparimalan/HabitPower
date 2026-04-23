@@ -1,6 +1,5 @@
 package com.example.habitpower.ui.execution
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -23,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -34,8 +36,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
+import com.example.habitpower.data.model.Exercise
 import com.example.habitpower.ui.AppViewModelProvider
+import com.example.habitpower.ui.exercises.ExerciseImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,24 +46,32 @@ fun WorkoutRunnerScreen(
     navigateBack: () -> Unit,
     viewModel: WorkoutRunnerViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    // Completion screen
     if (viewModel.isWorkoutComplete) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(32.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                imageVector = Icons.Default.Check,
+                Icons.Default.Check,
                 contentDescription = null,
                 modifier = Modifier.size(64.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.height(16.dp))
-            Text("Routine Complete!", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Text(
+                "Routine Complete!",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
             Spacer(Modifier.height(8.dp))
-            Text("All exercises done. Great work.", style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                "All exercises done. Great work.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Spacer(Modifier.height(32.dp))
             Button(onClick = navigateBack, modifier = Modifier.fillMaxWidth()) {
                 Text("Done")
@@ -69,15 +80,21 @@ fun WorkoutRunnerScreen(
         return
     }
 
-    val exercise = viewModel.currentExercise
-
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     val total = viewModel.totalExercises
                     val current = viewModel.currentExerciseIndex + 1
-                    Text(if (total > 0) "Exercise $current of $total" else "Routine")
+                    Text(
+                        if (!viewModel.isStarted) {
+                            viewModel.routineName.ifBlank { "Routine" }
+                        } else if (total > 0) {
+                            "Exercise $current of $total"
+                        } else {
+                            "Routine"
+                        }
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = navigateBack) {
@@ -87,11 +104,32 @@ fun WorkoutRunnerScreen(
             )
         }
     ) { innerPadding ->
+        if (!viewModel.isStarted) {
+            if (viewModel.allExercises.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                NormalRoutineIdleScreen(
+                    modifier = Modifier.padding(innerPadding),
+                    exercises = viewModel.allExercises,
+                    onStart = { viewModel.confirmStart() }
+                )
+            }
+            return@Scaffold
+        }
 
+        val exercise = viewModel.currentExercise
         if (exercise == null) {
-            // Exercises still loading
             Box(
-                modifier = Modifier.fillMaxSize().padding(innerPadding),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
@@ -99,87 +137,74 @@ fun WorkoutRunnerScreen(
             return@Scaffold
         }
 
+        val totalExercises = viewModel.totalExercises.coerceAtLeast(1)
+        val progress = (viewModel.currentExerciseIndex + 1).toFloat() / totalExercises.toFloat()
+        val nextExerciseName = viewModel.allExercises
+            .getOrNull(viewModel.currentExerciseIndex + 1)
+            ?.name
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // Exercise name
-            Text(
-                text = exercise.name,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier.fillMaxWidth()
             )
 
-            // Sets / Reps / Duration target
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                exercise.targetSets?.let {
-                    Text("Sets: $it", style = MaterialTheme.typography.titleMedium)
-                }
-                exercise.targetReps?.let {
-                    Text("Reps: $it", style = MaterialTheme.typography.titleMedium)
-                }
-                exercise.targetDurationSeconds?.let {
-                    Text("Target: ${formatTime(it)}", style = MaterialTheme.typography.titleMedium)
-                }
-                // Elapsed timer
-                if (viewModel.isTimerRunning || viewModel.timerSeconds > 0) {
-                    Spacer(Modifier.weight(1f))
-                    Text(
-                        text = formatTime(viewModel.timerSeconds),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-
-            // Image / placeholder
-            Box(
+            Column(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                if (!exercise.imageUri.isNullOrBlank()) {
-                    AsyncImage(
-                        model = exercise.imageUri,
-                        contentDescription = exercise.name,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit
+                Text(
+                    text = exercise.name,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+
+                if (exercise.description.isNotBlank()) {
+                    Text(
+                        text = exercise.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                } else {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(
-                            text = exercise.name.take(1).uppercase(),
-                            style = MaterialTheme.typography.displayLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
-                        )
+                }
+
+                ExerciseSpecsRow(
+                    exercise = exercise,
+                    extraSpecs = buildList {
+                        if (viewModel.isTimerRunning || viewModel.timerSeconds > 0) {
+                            add("Timer" to formatExerciseTime(viewModel.timerSeconds))
+                        }
                     }
+                )
+
+                ExerciseImage(
+                    imageUri = exercise.imageUri,
+                    contentDescription = exercise.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(240.dp),
+                    exerciseName = exercise.name,
+                    category = exercise.category,
+                    detailLabel = exercise.description.takeIf { it.isNotBlank() },
+                    contentScale = ContentScale.Fit
+                )
+
+                ExerciseInstructionBlock(exercise = exercise)
+
+                nextExerciseName?.let {
+                    NextUpCard(
+                        title = "Up next",
+                        body = it
+                    )
                 }
             }
 
-            // Instructions or notes
-            val detail = exercise.instructions?.takeIf { it.isNotBlank() }
-                ?: exercise.notes?.takeIf { it.isNotBlank() }
-            if (detail != null) {
-                Text(
-                    text = detail,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                )
-            }
-
-            // Controls
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -191,13 +216,12 @@ fun WorkoutRunnerScreen(
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(
-                        imageVector = if (viewModel.isTimerRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
+                        if (viewModel.isTimerRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
                         contentDescription = null
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(if (viewModel.isTimerRunning) "Pause" else "Start Timer")
                 }
-
                 Button(
                     onClick = { viewModel.nextExercise() },
                     modifier = Modifier.weight(1f)
@@ -209,8 +233,99 @@ fun WorkoutRunnerScreen(
     }
 }
 
-fun formatTime(seconds: Int): String {
-    val minutes = seconds / 60
-    val remainingSeconds = seconds % 60
-    return "%02d:%02d".format(minutes, remainingSeconds)
+@Composable
+private fun NormalRoutineIdleScreen(
+    modifier: Modifier = Modifier,
+    exercises: List<Exercise>,
+    onStart: () -> Unit
+) {
+    val firstExercise = exercises.firstOrNull()
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                "Ready to Start?",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                "${exercises.size} exercise${if (exercises.size != 1) "s" else ""} - manual advance",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            firstExercise?.let {
+                ExerciseImage(
+                    imageUri = it.imageUri,
+                    contentDescription = it.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp),
+                    exerciseName = it.name,
+                    category = it.category,
+                    detailLabel = it.description.takeIf { text -> text.isNotBlank() },
+                    contentScale = ContentScale.Fit
+                )
+            }
+
+            NextUpCard(
+                title = "How this mode feels",
+                body = "You decide when to move on, which makes this ideal for reps, weights, and form-focused work."
+            )
+
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                exercises.forEachIndexed { index, exercise ->
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            text = "${index + 1}. ${exercise.name}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium
+                        )
+                        if (exercise.description.isNotBlank()) {
+                            Text(
+                                text = exercise.description,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        val plan = buildString {
+                            exercise.targetSets?.let { append("$it sets") }
+                            exercise.targetReps?.let {
+                                if (isNotBlank()) append(" - ")
+                                append("$it reps")
+                            }
+                            exercise.targetDurationSeconds?.let {
+                                if (isNotBlank()) append(" - ")
+                                append(formatExerciseTime(it))
+                            }
+                        }
+                        if (plan.isNotBlank()) {
+                            Text(
+                                text = plan,
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        Button(onClick = onStart, modifier = Modifier.fillMaxWidth().height(56.dp)) {
+            Icon(Icons.Default.PlayArrow, contentDescription = null)
+            Spacer(Modifier.size(8.dp))
+            Text("Start Routine", style = MaterialTheme.typography.titleMedium)
+        }
+    }
 }

@@ -13,6 +13,7 @@ import com.example.habitpower.data.model.Routine
 import com.example.habitpower.data.model.RoutineType
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -30,7 +31,9 @@ class AddEditRoutineViewModel(
     var routineType by mutableStateOf(RoutineType.NORMAL)
         private set
     var restTimeSeconds by mutableStateOf("")
-        private set  // For timed routines
+        private set
+    var repeatCount by mutableStateOf("1")
+        private set
 
     var isSaving by mutableStateOf(false)
         private set
@@ -57,15 +60,12 @@ class AddEditRoutineViewModel(
                     description = it.description
                     routineType = it.type
                     restTimeSeconds = it.restTimeSeconds.toString()
+                    repeatCount = it.repeatCount.toString()
                 }
-                // Load initially-assigned exercises ONE TIME (first emission).
-                // We do NOT use collect() here to avoid the live-update overwriting
-                // any in-progress user edits when another coroutine emits a new list.
-                val exercises = repository.getExercisesForRoutine(routineId).stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.Eagerly,
-                    initialValue = emptyList()
-                ).value
+                // Load initially-assigned exercises ONE TIME (first real DB emission).
+                // .first() suspends until the DB query emits its first result, avoiding
+                // the race where .value returns the empty initial value before the query runs.
+                val exercises = repository.getExercisesForRoutine(routineId).first()
                 _addedExercises.clear()
                 _addedExercises.addAll(exercises)
             }
@@ -76,6 +76,7 @@ class AddEditRoutineViewModel(
     fun updateDescription(input: String) { description = input }
     fun updateRoutineType(type: RoutineType) { routineType = type }
     fun updateRestTimeSeconds(input: String) { restTimeSeconds = input }
+    fun updateRepeatCount(input: String) { repeatCount = input }
 
     fun addExercise(exercise: Exercise) {
         if (_addedExercises.none { it.id == exercise.id }) {
@@ -110,7 +111,8 @@ class AddEditRoutineViewModel(
                     name = name.trim(),
                     description = description.trim(),
                     type = routineType,
-                    restTimeSeconds = restTimeSeconds.toIntOrNull() ?: 0
+                    restTimeSeconds = restTimeSeconds.toIntOrNull() ?: 0,
+                    repeatCount = (repeatCount.toIntOrNull() ?: 1).coerceAtLeast(1)
                 )
 
                 val savedId = if (routineId == null) {

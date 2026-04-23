@@ -1,0 +1,7706 @@
+[
+  {
+    "wger_id": 1115,
+    "name": "3D lunge warmup",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1115.webp"
+  },
+  {
+    "wger_id": 1092,
+    "name": "Bag training",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1092.webp"
+  },
+  {
+    "wger_id": 1525,
+    "name": "Ball Slams",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1525.webp"
+  },
+  {
+    "wger_id": 1524,
+    "name": "Battle Ropes",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Shoulders",
+    "instructions": "1. Hold one rope end in each hand.\n2. Alternate arms up and down in a wave pattern.\n3. Maintain low, athletic stance.\n4. Keep core engaged throughout.",
+    "tags": "cardio",
+    "imageUri": "exercises/1524.webp"
+  },
+  {
+    "wger_id": null,
+    "name": "Bear Crawl",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Core",
+    "instructions": "1. Start on hands and knees, knees hovering 2 inches off floor.\n2. Move opposite hand and foot forward simultaneously.\n3. Keep hips low, back flat.\n4. Crawl for set distance.",
+    "tags": "cardio_other",
+    "imageUri": null
+  },
+  {
+    "wger_id": 1373,
+    "name": "box jumps",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1373.webp"
+  },
+  {
+    "wger_id": 1579,
+    "name": "Bronco",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1579.webp"
+  },
+  {
+    "wger_id": null,
+    "name": "Burpee",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Full Body",
+    "instructions": "1. Stand, then drop hands to floor.\n2. Jump or step feet back to plank.\n3. Lower chest to floor.\n4. Push up, jump feet forward.\n5. Jump up with arms overhead.",
+    "tags": "cardio_other",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Butt Kicks",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Hamstrings",
+    "instructions": "1. Run in place, kicking heels up toward glutes.\n2. Keep knees pointing straight down.\n3. Pump arms naturally.\n4. Maintain consistent tempo.",
+    "tags": "cardio_other",
+    "imageUri": null
+  },
+  {
+    "wger_id": 1449,
+    "name": "ClimbMill",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1449.webp"
+  },
+  {
+    "wger_id": 177,
+    "name": "Cycling",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/177.webp"
+  },
+  {
+    "wger_id": null,
+    "name": "Cycling (Stationary)",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Quadriceps",
+    "instructions": "1. Adjust seat so leg is nearly extended at bottom of stroke.\n2. Maintain a cadence of 60–90 RPM.\n3. Alternate between easy and hard intervals as programmed.",
+    "tags": "cardio_other",
+    "imageUri": null
+  },
+  {
+    "wger_id": 1204,
+    "name": "Cycling cardio session",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1204.webp"
+  },
+  {
+    "wger_id": 1940,
+    "name": "Diaphragmatic Breathing",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1940.webp"
+  },
+  {
+    "wger_id": 962,
+    "name": "Elliptical",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Full Body",
+    "instructions": "1. Stand on pedals with slight forward lean.\n2. Push and pull handles in opposition to legs.\n3. Maintain consistent resistance for steady state or increase for intervals.",
+    "tags": "cardio",
+    "imageUri": "exercises/962.webp"
+  },
+  {
+    "wger_id": 285,
+    "name": "High Knee Jumps",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/285.webp"
+  },
+  {
+    "wger_id": 983,
+    "name": "High knees",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Hip Flexors",
+    "instructions": "1. Run in place, driving knees up to hip height.\n2. Pump arms in opposition.\n3. Land on balls of feet.\n4. Maintain quick pace.",
+    "tags": "cardio",
+    "imageUri": "exercises/983.webp"
+  },
+  {
+    "wger_id": null,
+    "name": "High-Intensity Interval Run",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Full Body",
+    "instructions": "1. Warm up 5 min at easy pace.\n2. Sprint at 80–90% effort for 20–30 seconds.\n3. Walk or jog 60–90 seconds to recover.\n4. Repeat 6–10 rounds; cool down 5 min.",
+    "tags": "cardio_other",
+    "imageUri": null
+  },
+  {
+    "wger_id": 319,
+    "name": "Jogging",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/319.webp"
+  },
+  {
+    "wger_id": null,
+    "name": "Jump Rope",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Calves",
+    "instructions": "1. Hold handles, elbows near ribs.\n2. Use wrists to rotate rope.\n3. Jump just enough to clear rope.\n4. Land softly on balls of feet.",
+    "tags": "cardio_other",
+    "imageUri": null
+  },
+  {
+    "wger_id": 993,
+    "name": "Jump rope: basic jumps",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/993.webp"
+  },
+  {
+    "wger_id": null,
+    "name": "Lateral Shuffle",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Glutes",
+    "instructions": "1. Start in athletic stance, knees bent.\n2. Shuffle laterally by stepping one foot out, then bringing other foot to meet it.\n3. Stay low; maintain quick footwork.",
+    "tags": "cardio_other",
+    "imageUri": null
+  },
+  {
+    "wger_id": 1584,
+    "name": "March or jog in place",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1584.webp"
+  },
+  {
+    "wger_id": null,
+    "name": "Medicine Ball Slam",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Core",
+    "instructions": "1. Stand with feet shoulder-width, hold ball overhead.\n2. Slam ball to floor as hard as possible.\n3. Squat to pick it up.\n4. Repeat at high intensity.",
+    "tags": "cardio_other",
+    "imageUri": null
+  },
+  {
+    "wger_id": 1376,
+    "name": "Recumbent Bike",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1376.webp"
+  },
+  {
+    "wger_id": 1093,
+    "name": "Rowing Machine",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Upper Back",
+    "instructions": "1. Drive with legs first, then lean back, then pull handle to lower ribs.\n2. Return in reverse: arms out, lean forward, bend knees.\n3. Maintain 18–24 strokes per minute for steady state.",
+    "tags": "cardio",
+    "imageUri": "exercises/1093.webp"
+  },
+  {
+    "wger_id": 529,
+    "name": "Run - Interval Training",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/529.webp"
+  },
+  {
+    "wger_id": 530,
+    "name": "Run - Treadmill",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/530.webp"
+  },
+  {
+    "wger_id": null,
+    "name": "Running (Easy Pace)",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Full Body",
+    "instructions": "1. Start at a comfortable, conversational pace.\n2. Land mid-foot, arms swinging loosely.\n3. Maintain easy breathing throughout.\n4. Warm up for 5 min, run for the set duration.",
+    "tags": "cardio_other",
+    "imageUri": null
+  },
+  {
+    "wger_id": 1574,
+    "name": "Schwimmen",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1574.webp"
+  },
+  {
+    "wger_id": 1526,
+    "name": "Ski Machine",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1526.webp"
+  },
+  {
+    "wger_id": 595,
+    "name": "Skipping - Standard",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/595.webp"
+  },
+  {
+    "wger_id": 1523,
+    "name": "Sled Push",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1523.webp"
+  },
+  {
+    "wger_id": null,
+    "name": "Speed Skaters",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Glutes",
+    "instructions": "1. Start in athletic stance.\n2. Leap laterally onto one foot, swinging arms across body.\n3. Land softly and leap to opposite side.\n4. Mimic a speed skater's stride.",
+    "tags": "cardio_other",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Squat Jump",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Quadriceps",
+    "instructions": "1. Descend into a squat.\n2. At the bottom, explode upward into a jump.\n3. Land softly with bent knees and immediately lower into the next squat.",
+    "tags": "cardio_other",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Stair Climbing",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Glutes",
+    "instructions": "1. Walk or run up stairs at a steady pace.\n2. Drive through the heel of each step.\n3. Use arms for momentum on harder efforts.",
+    "tags": "cardio_other",
+    "imageUri": null
+  },
+  {
+    "wger_id": 1548,
+    "name": "Stair Master",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1548.webp"
+  },
+  {
+    "wger_id": 624,
+    "name": "Stationary Bike",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/624.webp"
+  },
+  {
+    "wger_id": 927,
+    "name": "Suspended crossess",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/927.jpg"
+  },
+  {
+    "wger_id": 961,
+    "name": "Swimming 50m sprints",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/961.webp"
+  },
+  {
+    "wger_id": null,
+    "name": "Swimming Laps",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Full Body",
+    "instructions": "1. Push off wall; use freestyle, breaststroke or backstroke.\n2. Breathe rhythmically every 2–3 strokes.\n3. Focus on long, efficient pulls.",
+    "tags": "cardio_other",
+    "imageUri": null
+  },
+  {
+    "wger_id": 1285,
+    "name": "Talons fesses",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1285.jpg"
+  },
+  {
+    "wger_id": 1615,
+    "name": "Treadmill Cardio",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/1615.jpg"
+  },
+  {
+    "wger_id": null,
+    "name": "Tuck Jump",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Hip Flexors",
+    "instructions": "1. Stand with feet hip-width.\n2. Dip and jump explosively.\n3. Pull knees to chest at peak of jump.\n4. Land softly and repeat.",
+    "tags": "cardio_other",
+    "imageUri": null
+  },
+  {
+    "wger_id": 1104,
+    "name": "Walking",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": "Full Body",
+    "instructions": "1. Walk at a brisk, purposeful pace.\n2. Swing arms naturally.\n3. Keep core lightly engaged.\n4. Aim for 100+ steps per minute for a brisk walk.",
+    "tags": "cardio",
+    "imageUri": "exercises/1104.webp"
+  },
+  {
+    "wger_id": 908,
+    "name": "Zone 2 Running",
+    "category": "CARDIO_OTHER",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "cardio",
+    "imageUri": "exercises/908.webp"
+  },
+  {
+    "wger_id": 1948,
+    "name": "1 Leg Box Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1948.webp"
+  },
+  {
+    "wger_id": 1470,
+    "name": "1-Arm Half-Kneeling Lat Pulldown",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1470.webp"
+  },
+  {
+    "wger_id": 9,
+    "name": "2 Handed Kettlebell Swing",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/9.webp"
+  },
+  {
+    "wger_id": 1924,
+    "name": "3008 Abdominal Crunch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1924.webp"
+  },
+  {
+    "wger_id": 997,
+    "name": "4-count burpees",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/997.webp"
+  },
+  {
+    "wger_id": 1573,
+    "name": "Ab wheel",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1573.jpg"
+  },
+  {
+    "wger_id": 1933,
+    "name": "Abdominal Crunch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1933.webp"
+  },
+  {
+    "wger_id": 1828,
+    "name": "Abdominal Draw-In",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1828.webp"
+  },
+  {
+    "wger_id": 56,
+    "name": "Abdominal Stabilization",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/56.webp"
+  },
+  {
+    "wger_id": 1096,
+    "name": "Abduction while standing",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1096.webp"
+  },
+  {
+    "wger_id": 1102,
+    "name": "Alternate back lunges",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1102.jpg"
+  },
+  {
+    "wger_id": 1012,
+    "name": "Alternating bicep curls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1012.png"
+  },
+  {
+    "wger_id": 1192,
+    "name": "Alternating Biceps Curls With Dumbbell",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1192.png"
+  },
+  {
+    "wger_id": 1567,
+    "name": "Alternating dumbbell hammer curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1567.png"
+  },
+  {
+    "wger_id": 1486,
+    "name": "Alternating High Cable Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1486.webp"
+  },
+  {
+    "wger_id": 1501,
+    "name": "Alternative DB Gorilla rows",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1501.webp"
+  },
+  {
+    "wger_id": 1804,
+    "name": "ankle dorsiflexion rocks",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1804.webp"
+  },
+  {
+    "wger_id": 1864,
+    "name": "Ankle Roll",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1864.png"
+  },
+  {
+    "wger_id": 1141,
+    "name": "Arabesque",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1141.jpg"
+  },
+  {
+    "wger_id": 1545,
+    "name": "Archer Pull Up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1545.webp"
+  },
+  {
+    "wger_id": 1294,
+    "name": "Arco femorale una gamba",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1294.webp"
+  },
+  {
+    "wger_id": 1606,
+    "name": "Arm Raises (T/Y/I)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1606.webp"
+  },
+  {
+    "wger_id": 20,
+    "name": "Arnold Shoulder Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/20.webp"
+  },
+  {
+    "wger_id": 1737,
+    "name": "Assisted chin-ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1737.webp"
+  },
+  {
+    "wger_id": 1929,
+    "name": "Assisted Pull-Up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1929.webp"
+  },
+  {
+    "wger_id": 1219,
+    "name": "Australian pull-ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1219.webp"
+  },
+  {
+    "wger_id": 31,
+    "name": "Axe Hold",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/31.webp"
+  },
+  {
+    "wger_id": 1263,
+    "name": "Back bridge",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1263.webp"
+  },
+  {
+    "wger_id": 1742,
+    "name": "Back Lever",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1742.webp"
+  },
+  {
+    "wger_id": 1010,
+    "name": "Back neck stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1010.webp"
+  },
+  {
+    "wger_id": 995,
+    "name": "Backward arm circles",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/995.webp"
+  },
+  {
+    "wger_id": 1005,
+    "name": "Backward shoulder rotation",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1005.webp"
+  },
+  {
+    "wger_id": 165,
+    "name": "Ball crunches",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/165.webp"
+  },
+  {
+    "wger_id": 1826,
+    "name": "Band pull-apart with external rotation",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1826.webp"
+  },
+  {
+    "wger_id": 1380,
+    "name": "Band pull-aparts",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1380.webp"
+  },
+  {
+    "wger_id": 1865,
+    "name": "Banded Ankle Mobility",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1865.png"
+  },
+  {
+    "wger_id": 1842,
+    "name": "Banded Clamshell",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1842.webp"
+  },
+  {
+    "wger_id": 1877,
+    "name": "Banded Scapular Retraction",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1877.webp"
+  },
+  {
+    "wger_id": 1838,
+    "name": "Banded Shoulder Drills",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1838.webp"
+  },
+  {
+    "wger_id": 41,
+    "name": "Barbell Ab Rollout",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/41.webp"
+  },
+  {
+    "wger_id": 1638,
+    "name": "Barbell Clean and press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1638.webp"
+  },
+  {
+    "wger_id": 1801,
+    "name": "Barbell Full Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1801.jpg"
+  },
+  {
+    "wger_id": 43,
+    "name": "Barbell Hack Squats",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/43.webp"
+  },
+  {
+    "wger_id": 901,
+    "name": "Barbell Hip Thrust",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/901.webp"
+  },
+  {
+    "wger_id": 46,
+    "name": "Barbell Lunges Standing",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/46.webp"
+  },
+  {
+    "wger_id": 802,
+    "name": "Barbell Lunges Walking",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/802.webp"
+  },
+  {
+    "wger_id": 48,
+    "name": "Barbell Reverse Wrist Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/48.webp"
+  },
+  {
+    "wger_id": 1700,
+    "name": "Barbell Romanian Deadlift (RDL)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1700.webp"
+  },
+  {
+    "wger_id": 1698,
+    "name": "Barbell Row (Overhand)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1698.webp"
+  },
+  {
+    "wger_id": 1699,
+    "name": "Barbell Row (Underhand)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1699.webp"
+  },
+  {
+    "wger_id": 1925,
+    "name": "Barbell Silverback Shrug",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1925.webp"
+  },
+  {
+    "wger_id": 1627,
+    "name": "Barbell squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1627.webp"
+  },
+  {
+    "wger_id": 1830,
+    "name": "Barbell Step Back Lunge",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1830.jpg"
+  },
+  {
+    "wger_id": 50,
+    "name": "Barbell Triceps Extension",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/50.png"
+  },
+  {
+    "wger_id": 51,
+    "name": "Barbell Wrist Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/51.webp"
+  },
+  {
+    "wger_id": 1493,
+    "name": "Bayesian Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1493.webp"
+  },
+  {
+    "wger_id": 1687,
+    "name": "Bear crawl pull through",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1687.webp"
+  },
+  {
+    "wger_id": 57,
+    "name": "Bear Walk 2",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/57.webp"
+  },
+  {
+    "wger_id": 1807,
+    "name": "Behind the Back Cable Lateral Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1807.webp"
+  },
+  {
+    "wger_id": 1935,
+    "name": "Belt Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1935.webp"
+  },
+  {
+    "wger_id": 73,
+    "name": "Bench Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/73.png"
+  },
+  {
+    "wger_id": 76,
+    "name": "Bench Press Narrow Grip",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/76.png"
+  },
+  {
+    "wger_id": 75,
+    "name": "Benchpress Dumbbells",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/75.png"
+  },
+  {
+    "wger_id": 79,
+    "name": "Bent High Pulls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/79.webp"
+  },
+  {
+    "wger_id": 1469,
+    "name": "Bent over Cable Flye",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1469.webp"
+  },
+  {
+    "wger_id": 81,
+    "name": "Bent Over Dumbbell Rows",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/81.png"
+  },
+  {
+    "wger_id": 1082,
+    "name": "Bent over row to external rotation",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1082.webp"
+  },
+  {
+    "wger_id": 83,
+    "name": "Bent Over Rowing",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/83.png"
+  },
+  {
+    "wger_id": 84,
+    "name": "Bent Over Rowing Reverse",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/84.png"
+  },
+  {
+    "wger_id": 1840,
+    "name": "Bent-Leg Hamstring Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1840.webp"
+  },
+  {
+    "wger_id": 82,
+    "name": "Bent-over Lateral Raises",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/82.webp"
+  },
+  {
+    "wger_id": 1280,
+    "name": "Biceps Close Grip Pull Down",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1280.webp"
+  },
+  {
+    "wger_id": 1424,
+    "name": "Biceps Curl Machine",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1424.webp"
+  },
+  {
+    "wger_id": 95,
+    "name": "Biceps Curl With Cable",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/95.png"
+  },
+  {
+    "wger_id": 91,
+    "name": "Biceps Curls With Barbell",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/91.png"
+  },
+  {
+    "wger_id": 92,
+    "name": "Biceps Curls With Dumbbell",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/92.png"
+  },
+  {
+    "wger_id": 958,
+    "name": "Biceps with TRX",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/958.png"
+  },
+  {
+    "wger_id": 1412,
+    "name": "bicycle crunches",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1412.webp"
+  },
+  {
+    "wger_id": 1572,
+    "name": "Bird Dog",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1572.webp"
+  },
+  {
+    "wger_id": 1483,
+    "name": "Bizeps Curls Trifecta",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1483.webp"
+  },
+  {
+    "wger_id": 1475,
+    "name": "Black Widow Knee Slides",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1475.webp"
+  },
+  {
+    "wger_id": 1363,
+    "name": "Blackroll",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1363.webp"
+  },
+  {
+    "wger_id": 112,
+    "name": "Body-Ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/112.webp"
+  },
+  {
+    "wger_id": 1608,
+    "name": "Bodyweight Biceps Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1608.webp"
+  },
+  {
+    "wger_id": 977,
+    "name": "Box squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/977.webp"
+  },
+  {
+    "wger_id": 124,
+    "name": "Braced Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/124.webp"
+  },
+  {
+    "wger_id": 1577,
+    "name": "Bretzel stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1577.webp"
+  },
+  {
+    "wger_id": 988,
+    "name": "Bulgarian split squats left",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/988.png"
+  },
+  {
+    "wger_id": 989,
+    "name": "Bulgarian split squats right",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/989.webp"
+  },
+  {
+    "wger_id": 1706,
+    "name": "Bulgarian Squat with Dumbbells",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1706.jpg"
+  },
+  {
+    "wger_id": 132,
+    "name": "Burpees",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/132.webp"
+  },
+  {
+    "wger_id": 1710,
+    "name": "Butchers Block Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1710.webp"
+  },
+  {
+    "wger_id": 135,
+    "name": "Butterfly",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/135.png"
+  },
+  {
+    "wger_id": 137,
+    "name": "Butterfly Narrow Grip",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/137.webp"
+  },
+  {
+    "wger_id": 139,
+    "name": "Butterfly Reverse",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/139.webp"
+  },
+  {
+    "wger_id": 1476,
+    "name": "Butterfly Sit Up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1476.webp"
+  },
+  {
+    "wger_id": 1843,
+    "name": "Butterfly Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1843.webp"
+  },
+  {
+    "wger_id": 1908,
+    "name": "Butterfly Superman",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1908.webp"
+  },
+  {
+    "wger_id": 1656,
+    "name": "Cable Chest Press - Decline",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1656.webp"
+  },
+  {
+    "wger_id": 1660,
+    "name": "Cable Chest Press - Incline",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1660.webp"
+  },
+  {
+    "wger_id": 1109,
+    "name": "Cable Concentration Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1109.png"
+  },
+  {
+    "wger_id": 323,
+    "name": "Cable Cross-over",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/323.png"
+  },
+  {
+    "wger_id": 1531,
+    "name": "Cable Curls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1531.webp"
+  },
+  {
+    "wger_id": 142,
+    "name": "Cable External Rotation",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/142.webp"
+  },
+  {
+    "wger_id": 924,
+    "name": "Cable Fly",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/924.webp"
+  },
+  {
+    "wger_id": 1691,
+    "name": "Cable Fly Lower Chest",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1691.webp"
+  },
+  {
+    "wger_id": 1689,
+    "name": "Cable Fly Middle Chest",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1689.webp"
+  },
+  {
+    "wger_id": 1690,
+    "name": "Cable Fly Upper Chest",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1690.webp"
+  },
+  {
+    "wger_id": 1745,
+    "name": "Cable Front Raise with a small bar",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1745.jpg"
+  },
+  {
+    "wger_id": 1378,
+    "name": "Cable Lateral Raises (Single Arm)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1378.jpg"
+  },
+  {
+    "wger_id": 1457,
+    "name": "Cable Press Around",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1457.webp"
+  },
+  {
+    "wger_id": 1751,
+    "name": "Cable pull through",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1751.webp"
+  },
+  {
+    "wger_id": 822,
+    "name": "Cable Rear Delt Fly",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/822.png"
+  },
+  {
+    "wger_id": 1936,
+    "name": "Cable Rear-Delt Fly (single arm)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1936.webp"
+  },
+  {
+    "wger_id": 1472,
+    "name": "Cable Shrug-In",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1472.webp"
+  },
+  {
+    "wger_id": 1665,
+    "name": "Cable Tri Extension - External Rotation",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1665.webp"
+  },
+  {
+    "wger_id": 1662,
+    "name": "Cable Tri Extension - Internal Rotation",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1662.webp"
+  },
+  {
+    "wger_id": 1509,
+    "name": "Cable Tricep Kickback",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1509.webp"
+  },
+  {
+    "wger_id": 1661,
+    "name": "Cable Triceps Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1661.webp"
+  },
+  {
+    "wger_id": 145,
+    "name": "Cable Woodchoppers",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/145.webp"
+  },
+  {
+    "wger_id": 146,
+    "name": "Calf Press Using Leg Press Machine",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/146.png"
+  },
+  {
+    "wger_id": 1466,
+    "name": "Calf Raise using Hack Squat Machine",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1466.webp"
+  },
+  {
+    "wger_id": 1365,
+    "name": "Calf Raise with machine (seated)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1365.webp"
+  },
+  {
+    "wger_id": 148,
+    "name": "Calf Raises on Hackenschmitt Machine",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/148.webp"
+  },
+  {
+    "wger_id": 1203,
+    "name": "Calf raises, left leg",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1203.webp"
+  },
+  {
+    "wger_id": 702,
+    "name": "Calf raises, one legged",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/702.webp"
+  },
+  {
+    "wger_id": 1021,
+    "name": "Calf raises, right leg",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1021.webp"
+  },
+  {
+    "wger_id": 1854,
+    "name": "Calves foam roller",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1854.webp"
+  },
+  {
+    "wger_id": 1911,
+    "name": "Cat Plank",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1911.webp"
+  },
+  {
+    "wger_id": 1938,
+    "name": "Cat-Cow",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1938.webp"
+  },
+  {
+    "wger_id": 1774,
+    "name": "Chair dips",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1774.webp"
+  },
+  {
+    "wger_id": 129,
+    "name": "Chest Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/129.webp"
+  },
+  {
+    "wger_id": 1825,
+    "name": "Chest-Supported Rear Delt Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1825.webp"
+  },
+  {
+    "wger_id": 1002,
+    "name": "Child's pose",
+    "category": "STRENGTH",
+    "primaryMuscle": "Lower Back",
+    "instructions": "1. Kneel, then fold torso over thighs.\n2. Extend arms forward or rest at sides.\n3. Forehead to mat.\n4. Breathe deeply; hold as long as comfortable.",
+    "tags": "strength",
+    "imageUri": "exercises/1002.webp"
+  },
+  {
+    "wger_id": 1006,
+    "name": "Chin tuck",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1006.webp"
+  },
+  {
+    "wger_id": 152,
+    "name": "Chin Up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/152.webp"
+  },
+  {
+    "wger_id": 154,
+    "name": "Chin-ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/154.png"
+  },
+  {
+    "wger_id": 1823,
+    "name": "Clamshell",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1823.webp"
+  },
+  {
+    "wger_id": 1554,
+    "name": "Clap Push-UP",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1554.webp"
+  },
+  {
+    "wger_id": 1223,
+    "name": "Claps over the head",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1223.webp"
+  },
+  {
+    "wger_id": 1446,
+    "name": "Clean and Jerk OL",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1446.webp"
+  },
+  {
+    "wger_id": 1901,
+    "name": "Clean and Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1901.webp"
+  },
+  {
+    "wger_id": 1015,
+    "name": "Clockwise neck circles",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1015.webp"
+  },
+  {
+    "wger_id": 1897,
+    "name": "Close-Grip Bench Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1897.webp"
+  },
+  {
+    "wger_id": 158,
+    "name": "Close-grip Lat Pull Down",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/158.webp"
+  },
+  {
+    "wger_id": 1086,
+    "name": "Close-grip Press-ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1086.jpg"
+  },
+  {
+    "wger_id": 1450,
+    "name": "Cobra Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1450.webp"
+  },
+  {
+    "wger_id": 980,
+    "name": "commando pull-ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/980.webp"
+  },
+  {
+    "wger_id": 1649,
+    "name": "Concentration Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1649.jpg"
+  },
+  {
+    "wger_id": 1605,
+    "name": "Copenhagen Adduction Exercise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1605.webp"
+  },
+  {
+    "wger_id": 1912,
+    "name": "Core Rotation",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1912.webp"
+  },
+  {
+    "wger_id": 1407,
+    "name": "Cossack squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1407.webp"
+  },
+  {
+    "wger_id": 1016,
+    "name": "Counterclockwise neck circles",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1016.webp"
+  },
+  {
+    "wger_id": 161,
+    "name": "Cross-Bench Dumbbell Pullovers",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/161.webp"
+  },
+  {
+    "wger_id": 1458,
+    "name": "Cross-Body Cable Y-Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1458.webp"
+  },
+  {
+    "wger_id": 1400,
+    "name": "Crossbody Hamstring Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1400.webp"
+  },
+  {
+    "wger_id": 1395,
+    "name": "Crossbody Leg Swings",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1395.webp"
+  },
+  {
+    "wger_id": 167,
+    "name": "Crunches",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/167.png"
+  },
+  {
+    "wger_id": 172,
+    "name": "Crunches on Machine",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/172.webp"
+  },
+  {
+    "wger_id": 173,
+    "name": "Crunches With Cable",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/173.webp"
+  },
+  {
+    "wger_id": 174,
+    "name": "Crunches With Legs Up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/174.webp"
+  },
+  {
+    "wger_id": 1666,
+    "name": "Curl  - With Shoulder Elevated",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1666.webp"
+  },
+  {
+    "wger_id": 1190,
+    "name": "Curl de biceps con agarre prono",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1190.png"
+  },
+  {
+    "wger_id": 974,
+    "name": "Curl with kettlebell two hands",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/974.webp"
+  },
+  {
+    "wger_id": 1502,
+    "name": "DB Cross Body Hammer Curls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1502.webp"
+  },
+  {
+    "wger_id": 1499,
+    "name": "DB Skull Crushers",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1499.webp"
+  },
+  {
+    "wger_id": 1497,
+    "name": "DB Underhand bench press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1497.webp"
+  },
+  {
+    "wger_id": 1496,
+    "name": "DB Upper Chest Variation",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1496.webp"
+  },
+  {
+    "wger_id": 1881,
+    "name": "DB Wrist Extension",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1881.webp"
+  },
+  {
+    "wger_id": 178,
+    "name": "Deadbug",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/178.webp"
+  },
+  {
+    "wger_id": 182,
+    "name": "Deadhang",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/182.webp"
+  },
+  {
+    "wger_id": 184,
+    "name": "Deadlifts",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/184.jpeg"
+  },
+  {
+    "wger_id": 1889,
+    "name": "Decline Bench Leg Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1889.webp"
+  },
+  {
+    "wger_id": 185,
+    "name": "Decline Bench Press Barbell",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/185.png"
+  },
+  {
+    "wger_id": 186,
+    "name": "Decline Bench Press Dumbbell",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/186.webp"
+  },
+  {
+    "wger_id": 188,
+    "name": "Decline Pushups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/188.webp"
+  },
+  {
+    "wger_id": 189,
+    "name": "Deficit Deadlift",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/189.webp"
+  },
+  {
+    "wger_id": 1777,
+    "name": "Deficit Push ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1777.webp"
+  },
+  {
+    "wger_id": 1536,
+    "name": "Delt Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1536.webp"
+  },
+  {
+    "wger_id": 193,
+    "name": "Diagonal Shoulder Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/193.webp"
+  },
+  {
+    "wger_id": 1945,
+    "name": "Diamond push ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1945.jpg"
+  },
+  {
+    "wger_id": 197,
+    "name": "Dips Between Two Benches",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/197.png"
+  },
+  {
+    "wger_id": 1713,
+    "name": "Doorway Pectoral Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1713.webp"
+  },
+  {
+    "wger_id": 1360,
+    "name": "Double Kettlebell Clean and Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1360.webp"
+  },
+  {
+    "wger_id": 1361,
+    "name": "Double Kettlebell Front Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1361.webp"
+  },
+  {
+    "wger_id": 1243,
+    "name": "Double Leg Calf Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1243.png"
+  },
+  {
+    "wger_id": 1827,
+    "name": "Double-Leg Abdominal Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1827.webp"
+  },
+  {
+    "wger_id": 1481,
+    "name": "Drag Pushdown",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1481.webp"
+  },
+  {
+    "wger_id": 1201,
+    "name": "Dragon squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1201.webp"
+  },
+  {
+    "wger_id": 1409,
+    "name": "Dragon-flag",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1409.webp"
+  },
+  {
+    "wger_id": 1512,
+    "name": "Drop Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1512.webp"
+  },
+  {
+    "wger_id": 1676,
+    "name": "Dumbbell Bench Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1676.webp"
+  },
+  {
+    "wger_id": 1639,
+    "name": "Dumbbell Bent Over Face Pull",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1639.webp"
+  },
+  {
+    "wger_id": 1085,
+    "name": "Dumbbell Bent Over Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1085.jpg"
+  },
+  {
+    "wger_id": 1226,
+    "name": "Dumbbell bicep curl to press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1226.jpg"
+  },
+  {
+    "wger_id": 1504,
+    "name": "Dumbbell Bradford press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1504.webp"
+  },
+  {
+    "wger_id": 1482,
+    "name": "Dumbbell Cheat Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1482.webp"
+  },
+  {
+    "wger_id": 1278,
+    "name": "Dumbbell Chest Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1278.webp"
+  },
+  {
+    "wger_id": 1228,
+    "name": "Dumbbell close grip bench press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1228.webp"
+  },
+  {
+    "wger_id": 202,
+    "name": "Dumbbell Concentration Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/202.webp"
+  },
+  {
+    "wger_id": 1415,
+    "name": "Dumbbell Crunches",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1415.webp"
+  },
+  {
+    "wger_id": 1931,
+    "name": "Dumbbell Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1931.webp"
+  },
+  {
+    "wger_id": 1370,
+    "name": "Dumbbell Deadlift",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1370.webp"
+  },
+  {
+    "wger_id": 1224,
+    "name": "Dumbbell drag curls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1224.webp"
+  },
+  {
+    "wger_id": 1116,
+    "name": "Dumbbell farmer's carry",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1116.webp"
+  },
+  {
+    "wger_id": 1674,
+    "name": "Dumbbell Floor Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1674.webp"
+  },
+  {
+    "wger_id": 1503,
+    "name": "Dumbbell Frog Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1503.webp"
+  },
+  {
+    "wger_id": 1640,
+    "name": "Dumbbell Front Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1640.webp"
+  },
+  {
+    "wger_id": 203,
+    "name": "Dumbbell Goblet Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/203.jpeg"
+  },
+  {
+    "wger_id": 1087,
+    "name": "Dumbbell Hang Power Cleans",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1087.jpg"
+  },
+  {
+    "wger_id": 1353,
+    "name": "Dumbbell Hex Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1353.webp"
+  },
+  {
+    "wger_id": 1642,
+    "name": "Dumbbell Hip Thrust",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1642.webp"
+  },
+  {
+    "wger_id": 204,
+    "name": "Dumbbell Incline Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/204.webp"
+  },
+  {
+    "wger_id": 1643,
+    "name": "Dumbbell Incline Fly",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1643.webp"
+  },
+  {
+    "wger_id": 205,
+    "name": "Dumbbell Lunges Standing",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/205.webp"
+  },
+  {
+    "wger_id": 206,
+    "name": "Dumbbell Lunges Walking",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/206.png"
+  },
+  {
+    "wger_id": 1488,
+    "name": "Dumbbell Pullover",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1488.webp"
+  },
+  {
+    "wger_id": 801,
+    "name": "Dumbbell Push-Up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/801.webp"
+  },
+  {
+    "wger_id": 1227,
+    "name": "Dumbbell rear delt row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1227.webp"
+  },
+  {
+    "wger_id": 1651,
+    "name": "Dumbbell Rear Lunge",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1651.webp"
+  },
+  {
+    "wger_id": 1652,
+    "name": "Dumbbell Romanian Deadlift",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1652.webp"
+  },
+  {
+    "wger_id": 1602,
+    "name": "Dumbbell Scaption",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1602.webp"
+  },
+  {
+    "wger_id": 1429,
+    "name": "Dumbbell Shoulder Rotations",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1429.webp"
+  },
+  {
+    "wger_id": 1645,
+    "name": "Dumbbell Shrug",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1645.webp"
+  },
+  {
+    "wger_id": 1650,
+    "name": "Dumbbell Side Bend",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1650.webp"
+  },
+  {
+    "wger_id": 1653,
+    "name": "Dumbbell Side Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1653.webp"
+  },
+  {
+    "wger_id": 1234,
+    "name": "Dumbbell Single-leg Hip Thrust",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1234.webp"
+  },
+  {
+    "wger_id": 1947,
+    "name": "dumbbell snatch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1947.webp"
+  },
+  {
+    "wger_id": 1366,
+    "name": "Dumbbell Split Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1366.webp"
+  },
+  {
+    "wger_id": 1088,
+    "name": "Dumbbell sumo deadlift",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1088.jpg"
+  },
+  {
+    "wger_id": 1684,
+    "name": "Dumbbell Thruster",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1684.webp"
+  },
+  {
+    "wger_id": 211,
+    "name": "Dumbbell Triceps Extension",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/211.webp"
+  },
+  {
+    "wger_id": 1463,
+    "name": "Dumbbell Underhand Dead Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1463.webp"
+  },
+  {
+    "wger_id": 1229,
+    "name": "Dumbbell upright-row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1229.webp"
+  },
+  {
+    "wger_id": 1225,
+    "name": "Dumbbell wide bicep curls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1225.webp"
+  },
+  {
+    "wger_id": 208,
+    "name": "Dumbbells on Scott Machine",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/208.webp"
+  },
+  {
+    "wger_id": 1824,
+    "name": "Dumbell Tate Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1824.webp"
+  },
+  {
+    "wger_id": 1286,
+    "name": "Dynamic Planche",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1286.webp"
+  },
+  {
+    "wger_id": 1099,
+    "name": "Dynamic side hold",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1099.webp"
+  },
+  {
+    "wger_id": 1498,
+    "name": "Elbows Tucked DB Bench Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1498.webp"
+  },
+  {
+    "wger_id": 1391,
+    "name": "Elephant Walks",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1391.webp"
+  },
+  {
+    "wger_id": 1027,
+    "name": "Elevated prayer stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1027.webp"
+  },
+  {
+    "wger_id": 1590,
+    "name": "Estiramiento de brazos y cuello",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1590.webp"
+  },
+  {
+    "wger_id": 1589,
+    "name": "Estiramiento de piernas y cadera",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1589.webp"
+  },
+  {
+    "wger_id": 1241,
+    "name": "Exercise Band Dorsiflexion",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1241.webp"
+  },
+  {
+    "wger_id": 1242,
+    "name": "Exercise Band Plantarflexion",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1242.webp"
+  },
+  {
+    "wger_id": 1835,
+    "name": "External Rotation Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1835.webp"
+  },
+  {
+    "wger_id": 1921,
+    "name": "Extreme Lat Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1921.webp"
+  },
+  {
+    "wger_id": 1919,
+    "name": "Extreme Pec Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1919.webp"
+  },
+  {
+    "wger_id": 1920,
+    "name": "Extreme Shoulder Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1920.webp"
+  },
+  {
+    "wger_id": 1732,
+    "name": "Face pulls with yellow/green band",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1732.jpg"
+  },
+  {
+    "wger_id": 222,
+    "name": "Facepull",
+    "category": "STRENGTH",
+    "primaryMuscle": "Rear Deltoids",
+    "instructions": "1. Set cable at head height with rope attachment.\n2. Pull rope toward face, elbows flaring out.\n3. Externally rotate and squeeze rear delts at end.\n4. Return slowly.",
+    "tags": "strength",
+    "imageUri": "exercises/222.webp"
+  },
+  {
+    "wger_id": 1217,
+    "name": "Finger Pushup",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1217.png"
+  },
+  {
+    "wger_id": 820,
+    "name": "Fingerboard 20 mm edge",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/820.webp"
+  },
+  {
+    "wger_id": 1694,
+    "name": "Flat Machine Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1694.webp"
+  },
+  {
+    "wger_id": 1946,
+    "name": "Floor Bench Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1946.jpg"
+  },
+  {
+    "wger_id": 1000,
+    "name": "Floor dips",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1000.png"
+  },
+  {
+    "wger_id": 1746,
+    "name": "Floor dumbbell bench press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1746.jpg"
+  },
+  {
+    "wger_id": 1833,
+    "name": "Floor Glider Hamstring Curls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1833.webp"
+  },
+  {
+    "wger_id": 1468,
+    "name": "Floor Skull Crusher",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1468.webp"
+  },
+  {
+    "wger_id": 235,
+    "name": "Flutter Kicks",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/235.webp"
+  },
+  {
+    "wger_id": 237,
+    "name": "Fly With Cable",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/237.png"
+  },
+  {
+    "wger_id": 238,
+    "name": "Fly With Dumbbells",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/238.png"
+  },
+  {
+    "wger_id": 239,
+    "name": "Fly With Dumbbells, Decline Bench",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/239.webp"
+  },
+  {
+    "wger_id": 1860,
+    "name": "Foam Roller Adductors",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1860.webp"
+  },
+  {
+    "wger_id": 1856,
+    "name": "Foam Roller Anterior tibialis",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1856.jpg"
+  },
+  {
+    "wger_id": 1859,
+    "name": "Foam Roller Gluteus",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1859.webp"
+  },
+  {
+    "wger_id": 1857,
+    "name": "Foam Roller Iliotibial band",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1857.jpg"
+  },
+  {
+    "wger_id": 1858,
+    "name": "Foam Roller quadriceps",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1858.jpg"
+  },
+  {
+    "wger_id": 1333,
+    "name": "Forearm Curls (underhand grip)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1333.webp"
+  },
+  {
+    "wger_id": 994,
+    "name": "Forward arm circles",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/994.webp"
+  },
+  {
+    "wger_id": 1004,
+    "name": "Forward shoulder rotation",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1004.webp"
+  },
+  {
+    "wger_id": 1238,
+    "name": "Frog stand",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1238.webp"
+  },
+  {
+    "wger_id": 1844,
+    "name": "Frog Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1844.webp"
+  },
+  {
+    "wger_id": 1245,
+    "name": "Front Lever",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1245.webp"
+  },
+  {
+    "wger_id": 1252,
+    "name": "Front lever pull-up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1252.webp"
+  },
+  {
+    "wger_id": 1214,
+    "name": "Front lever tuck",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1214.webp"
+  },
+  {
+    "wger_id": 1011,
+    "name": "Front neck stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1011.webp"
+  },
+  {
+    "wger_id": 1307,
+    "name": "Front Plank",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1307.webp"
+  },
+  {
+    "wger_id": 827,
+    "name": "Front Plate Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/827.webp"
+  },
+  {
+    "wger_id": 259,
+    "name": "Front Pull narrow",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/259.webp"
+  },
+  {
+    "wger_id": 258,
+    "name": "Front pull wide",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/258.webp"
+  },
+  {
+    "wger_id": 1731,
+    "name": "Front Raise (Cable)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1731.webp"
+  },
+  {
+    "wger_id": 256,
+    "name": "Front Raises",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/256.png"
+  },
+  {
+    "wger_id": 254,
+    "name": "Front Raises with Plates",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/254.webp"
+  },
+  {
+    "wger_id": 257,
+    "name": "Front Squats",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/257.png"
+  },
+  {
+    "wger_id": 516,
+    "name": "Front Wood Chop",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/516.webp"
+  },
+  {
+    "wger_id": 260,
+    "name": "Full Sit Outs",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/260.webp"
+  },
+  {
+    "wger_id": 265,
+    "name": "Glute Bridge",
+    "category": "STRENGTH",
+    "primaryMuscle": "Glutes",
+    "instructions": "1. Lie on back, knees bent, feet flat.\n2. Drive hips toward ceiling, squeezing glutes.\n3. Hold for 2 seconds at top.\n4. Lower slowly.",
+    "tags": "strength",
+    "imageUri": "exercises/265.webp"
+  },
+  {
+    "wger_id": 1686,
+    "name": "Glute Bridge Single-Arm Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1686.webp"
+  },
+  {
+    "wger_id": 1528,
+    "name": "Glute Drive",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1528.webp"
+  },
+  {
+    "wger_id": 1723,
+    "name": "Glute Kickback (Machine)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1723.webp"
+  },
+  {
+    "wger_id": 1392,
+    "name": "Good Morning",
+    "category": "STRENGTH",
+    "primaryMuscle": "Hamstrings",
+    "instructions": "1. Stand with bar on upper back, feet hip-width.\n2. Hinge at hips, keeping back flat.\n3. Lower torso until nearly parallel to floor.\n4. Return to standing by extending hips.",
+    "tags": "strength",
+    "imageUri": "exercises/1392.webp"
+  },
+  {
+    "wger_id": 268,
+    "name": "Good Mornings",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/268.png"
+  },
+  {
+    "wger_id": 1414,
+    "name": "Hack Squats",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1414.webp"
+  },
+  {
+    "wger_id": 1932,
+    "name": "Hammer Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": "Biceps",
+    "instructions": "1. Hold dumbbells with neutral grip (palms facing each other).\n2. Curl dumbbells toward shoulders without rotating wrists.\n3. Lower slowly.",
+    "tags": "strength",
+    "imageUri": "exercises/1932.webp"
+  },
+  {
+    "wger_id": 272,
+    "name": "Hammer Curls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/272.png"
+  },
+  {
+    "wger_id": 275,
+    "name": "Hammercurls on Cable",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/275.png"
+  },
+  {
+    "wger_id": 1831,
+    "name": "Hammerstrength Decline Chest Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1831.jpg"
+  },
+  {
+    "wger_id": 1398,
+    "name": "Hamstring Chokes",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1398.webp"
+  },
+  {
+    "wger_id": 1855,
+    "name": "Hamstring Foam roller",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1855.webp"
+  },
+  {
+    "wger_id": 1387,
+    "name": "Hamstring Kicks",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1387.png"
+  },
+  {
+    "wger_id": 279,
+    "name": "Hand Grip",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/279.webp"
+  },
+  {
+    "wger_id": 1516,
+    "name": "Handstand",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1516.webp"
+  },
+  {
+    "wger_id": 907,
+    "name": "Handstand Push Up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/907.webp"
+  },
+  {
+    "wger_id": 283,
+    "name": "Hanging Leg Raises",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/283.webp"
+  },
+  {
+    "wger_id": 1018,
+    "name": "Head tilts",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1018.webp"
+  },
+  {
+    "wger_id": 1007,
+    "name": "Head turns",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1007.webp"
+  },
+  {
+    "wger_id": 1411,
+    "name": "Heel Touches",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1411.webp"
+  },
+  {
+    "wger_id": 1303,
+    "name": "Helms Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1303.webp"
+  },
+  {
+    "wger_id": 284,
+    "name": "Hercules Pillars",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/284.webp"
+  },
+  {
+    "wger_id": 1001,
+    "name": "High plank",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1001.webp"
+  },
+  {
+    "wger_id": 289,
+    "name": "High Pull",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/289.webp"
+  },
+  {
+    "wger_id": 1492,
+    "name": "High Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1492.webp"
+  },
+  {
+    "wger_id": 1882,
+    "name": "High-Cable Lateral Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1882.webp"
+  },
+  {
+    "wger_id": 1508,
+    "name": "High-Incline Smith Machine Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1508.webp"
+  },
+  {
+    "wger_id": 1080,
+    "name": "Hindu Pushups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1080.webp"
+  },
+  {
+    "wger_id": 291,
+    "name": "Hindu Squats",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/291.webp"
+  },
+  {
+    "wger_id": 1906,
+    "name": "Hip Bridge",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1906.webp"
+  },
+  {
+    "wger_id": 1862,
+    "name": "Hip Circles",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1862.png"
+  },
+  {
+    "wger_id": 1863,
+    "name": "Hip Crossover",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1863.png"
+  },
+  {
+    "wger_id": 1867,
+    "name": "Hip Flexor Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": "Hip Flexors",
+    "instructions": "1. Kneel with one knee on floor, other foot forward.\n2. Push hips forward gently.\n3. Keep torso upright.\n4. Hold 20–30 seconds each side.",
+    "tags": "strength",
+    "imageUri": "exercises/1867.png"
+  },
+  {
+    "wger_id": 1578,
+    "name": "Hip hinge",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1578.webp"
+  },
+  {
+    "wger_id": 292,
+    "name": "Hip Raise, Lying",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/292.webp"
+  },
+  {
+    "wger_id": 294,
+    "name": "Hip Thrust",
+    "category": "STRENGTH",
+    "primaryMuscle": "Glutes",
+    "instructions": "1. Upper back against a bench, bar across hips.\n2. Drive hips upward by squeezing glutes.\n3. Pause at the top for one second.\n4. Lower slowly.",
+    "tags": "strength",
+    "imageUri": "exercises/294.webp"
+  },
+  {
+    "wger_id": 297,
+    "name": "Hollow Hold",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/297.webp"
+  },
+  {
+    "wger_id": 1712,
+    "name": "Horizontal Shoulder Flexion Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1712.webp"
+  },
+  {
+    "wger_id": 1101,
+    "name": "Horizontal traction isometry",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1101.webp"
+  },
+  {
+    "wger_id": 1846,
+    "name": "Horse Stance (Side Splits)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1846.webp"
+  },
+  {
+    "wger_id": 1487,
+    "name": "Hyper Y W Combo",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1487.webp"
+  },
+  {
+    "wger_id": 301,
+    "name": "Hyperextensions",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/301.png"
+  },
+  {
+    "wger_id": 1248,
+    "name": "Ice Scream maker",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1248.webp"
+  },
+  {
+    "wger_id": 538,
+    "name": "Incline Bench Press - Barbell",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/538.png"
+  },
+  {
+    "wger_id": 537,
+    "name": "Incline Bench Press - Dumbbell",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/537.png"
+  },
+  {
+    "wger_id": 828,
+    "name": "Incline Bench Reverse Fly",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/828.png"
+  },
+  {
+    "wger_id": 1444,
+    "name": "Incline Chest Press DB",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1444.webp"
+  },
+  {
+    "wger_id": 1283,
+    "name": "Incline Chest-Supported Dumbbell Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1283.jpg"
+  },
+  {
+    "wger_id": 1467,
+    "name": "Incline Close Grip Barbell Bench Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1467.webp"
+  },
+  {
+    "wger_id": 171,
+    "name": "Incline Crunches",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/171.png"
+  },
+  {
+    "wger_id": 1879,
+    "name": "Incline DB Y-Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1879.webp"
+  },
+  {
+    "wger_id": 1276,
+    "name": "Incline Dumbbell Bench Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1276.png"
+  },
+  {
+    "wger_id": 308,
+    "name": "Incline Dumbbell Fly",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/308.webp"
+  },
+  {
+    "wger_id": 1277,
+    "name": "Incline Dumbbell Press",
+    "category": "STRENGTH",
+    "primaryMuscle": "Upper Chest",
+    "instructions": "1. Set bench to 30–45 degree incline.\n2. Hold dumbbells at chest level.\n3. Press up and slightly inward.\n4. Lower to chest level.",
+    "tags": "strength",
+    "imageUri": "exercises/1277.jpg"
+  },
+  {
+    "wger_id": 310,
+    "name": "Incline Dumbbell Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/310.webp"
+  },
+  {
+    "wger_id": 1441,
+    "name": "Incline OHP DB",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1441.webp"
+  },
+  {
+    "wger_id": 312,
+    "name": "Incline Plank With Alternate Floor Touch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/312.webp"
+  },
+  {
+    "wger_id": 313,
+    "name": "Incline Push up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/313.webp"
+  },
+  {
+    "wger_id": 1716,
+    "name": "Incline Shoulder Press Up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1716.webp"
+  },
+  {
+    "wger_id": 911,
+    "name": "Incline Skull Crush",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/911.webp"
+  },
+  {
+    "wger_id": 1692,
+    "name": "Incline Smith Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1692.webp"
+  },
+  {
+    "wger_id": 1693,
+    "name": "Incline Static Hold",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1693.webp"
+  },
+  {
+    "wger_id": 1927,
+    "name": "Inverted Lat Pull Down",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1927.webp"
+  },
+  {
+    "wger_id": 1198,
+    "name": "Inverted Rows",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1198.jpg"
+  },
+  {
+    "wger_id": 1914,
+    "name": "Isometria alle parallele",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1914.webp"
+  },
+  {
+    "wger_id": 1282,
+    "name": "Isometria trazioni impugnatura inversa",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1282.webp"
+  },
+  {
+    "wger_id": 1733,
+    "name": "Isometric Squat to Failure",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1733.webp"
+  },
+  {
+    "wger_id": 314,
+    "name": "Isometric Wipers",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/314.webp"
+  },
+  {
+    "wger_id": 1719,
+    "name": "Jalon caballero unialteral",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1719.webp"
+  },
+  {
+    "wger_id": 1445,
+    "name": "Jerk OL",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1445.webp"
+  },
+  {
+    "wger_id": 1302,
+    "name": "JM Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1302.webp"
+  },
+  {
+    "wger_id": 320,
+    "name": "Jumping Jacks",
+    "category": "STRENGTH",
+    "primaryMuscle": "Full Body",
+    "instructions": "1. Stand with feet together, arms at sides.\n2. Jump to spread feet wide while raising arms overhead.\n3. Jump back to start.\n4. Maintain rhythm.",
+    "tags": "strength",
+    "imageUri": "exercises/320.webp"
+  },
+  {
+    "wger_id": 1003,
+    "name": "Kettlebell deadlifts",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1003.webp"
+  },
+  {
+    "wger_id": 1641,
+    "name": "Kettlebell One Legged Deadlift",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1641.webp"
+  },
+  {
+    "wger_id": 1612,
+    "name": "kettlebell sumo deadlift",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1612.jpg"
+  },
+  {
+    "wger_id": 960,
+    "name": "Kettlebell Swing",
+    "category": "STRENGTH",
+    "primaryMuscle": "Glutes",
+    "instructions": "1. Stand with feet slightly wider than hip-width.\n2. Hinge back, swing kettlebell between legs.\n3. Drive hips forward explosively to swing it to chest height.\n4. Let it swing back between legs and repeat.",
+    "tags": "strength",
+    "imageUri": "exercises/960.webp"
+  },
+  {
+    "wger_id": 331,
+    "name": "Kettlebell Swings",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/331.webp"
+  },
+  {
+    "wger_id": 1688,
+    "name": "Kickstand RDL",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1688.webp"
+  },
+  {
+    "wger_id": 1218,
+    "name": "knee push-ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1218.webp"
+  },
+  {
+    "wger_id": 978,
+    "name": "Knee Raises",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/978.webp"
+  },
+  {
+    "wger_id": 1452,
+    "name": "Knee to Chest Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1452.webp"
+  },
+  {
+    "wger_id": 990,
+    "name": "Kneeling kickbacks",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/990.webp"
+  },
+  {
+    "wger_id": 1910,
+    "name": "Kneeling Superman",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1910.webp"
+  },
+  {
+    "wger_id": 1511,
+    "name": "Kong Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1511.webp"
+  },
+  {
+    "wger_id": 1442,
+    "name": "Kreis Press DB",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1442.webp"
+  },
+  {
+    "wger_id": 1471,
+    "name": "Kroc Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1471.webp"
+  },
+  {
+    "wger_id": 382,
+    "name": "L Hold",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/382.webp"
+  },
+  {
+    "wger_id": 1853,
+    "name": "L-Sit (Foot Supported)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1853.webp"
+  },
+  {
+    "wger_id": 1741,
+    "name": "L-Sit Pull-ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1741.webp"
+  },
+  {
+    "wger_id": 346,
+    "name": "Landmine press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/346.webp"
+  },
+  {
+    "wger_id": 1779,
+    "name": "Landmine Rotation",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1779.webp"
+  },
+  {
+    "wger_id": 1829,
+    "name": "Landmine Squat to Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1829.webp"
+  },
+  {
+    "wger_id": 1546,
+    "name": "Larsen Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1546.webp"
+  },
+  {
+    "wger_id": 1434,
+    "name": "Lat Pull DB",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1434.webp"
+  },
+  {
+    "wger_id": 1806,
+    "name": "Lat Pull Down",
+    "category": "STRENGTH",
+    "primaryMuscle": "Latissimus Dorsi",
+    "instructions": "1. Sit at cable machine, overhand grip wider than shoulders.\n2. Pull bar to upper chest, driving elbows down.\n3. Return slowly to full arm extension.",
+    "tags": "strength",
+    "imageUri": "exercises/1806.webp"
+  },
+  {
+    "wger_id": 354,
+    "name": "Lat Pull Down (Leaning Back)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/354.webp"
+  },
+  {
+    "wger_id": 355,
+    "name": "Lat Pull Down (Straight Back)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/355.webp"
+  },
+  {
+    "wger_id": 1659,
+    "name": "Lat Pulldown - Cross Body Single Arm",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1659.webp"
+  },
+  {
+    "wger_id": 1697,
+    "name": "Lat Pulldown (Wide Grip)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1697.webp"
+  },
+  {
+    "wger_id": 1325,
+    "name": "Lateral Push Off",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1325.jpg"
+  },
+  {
+    "wger_id": 348,
+    "name": "Lateral Raises",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/348.png"
+  },
+  {
+    "wger_id": 349,
+    "name": "Lateral Rows on Cable, One Armed",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/349.png"
+  },
+  {
+    "wger_id": 1514,
+    "name": "Lateral Walk",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1514.webp"
+  },
+  {
+    "wger_id": 351,
+    "name": "Lateral-to-Front Raises",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/351.webp"
+  },
+  {
+    "wger_id": 1013,
+    "name": "Left levator scapulae stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1013.webp"
+  },
+  {
+    "wger_id": 1008,
+    "name": "Left neck stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1008.webp"
+  },
+  {
+    "wger_id": 364,
+    "name": "Leg Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": "Hamstrings",
+    "instructions": "1. Lie face down on machine, ankles under pad.\n2. Curl legs toward glutes.\n3. Lower slowly.",
+    "tags": "strength",
+    "imageUri": "exercises/364.png"
+  },
+  {
+    "wger_id": 1603,
+    "name": "Leg curl with elastic",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1603.webp"
+  },
+  {
+    "wger_id": 365,
+    "name": "Leg Curls (laying)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/365.png"
+  },
+  {
+    "wger_id": 366,
+    "name": "Leg Curls (sitting)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/366.png"
+  },
+  {
+    "wger_id": 367,
+    "name": "Leg Curls (standing)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/367.png"
+  },
+  {
+    "wger_id": 851,
+    "name": "Leg Extension",
+    "category": "STRENGTH",
+    "primaryMuscle": "Quadriceps",
+    "instructions": "1. Sit on machine, ankles under pad.\n2. Extend legs fully, pause, then lower slowly.",
+    "tags": "strength",
+    "imageUri": "exercises/851.webp"
+  },
+  {
+    "wger_id": 371,
+    "name": "Leg Press",
+    "category": "STRENGTH",
+    "primaryMuscle": "Quadriceps",
+    "instructions": "1. Sit in machine, feet shoulder-width on platform.\n2. Lower platform until knees are at 90 degrees.\n3. Press back to start without locking knees.",
+    "tags": "strength",
+    "imageUri": "exercises/371.webp"
+  },
+  {
+    "wger_id": 375,
+    "name": "Leg Press on Hackenschmidt Machine",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/375.png"
+  },
+  {
+    "wger_id": 1515,
+    "name": "Leg Press Toe Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1515.webp"
+  },
+  {
+    "wger_id": 373,
+    "name": "Leg Presses (narrow)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/373.png"
+  },
+  {
+    "wger_id": 374,
+    "name": "Leg Presses (wide)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/374.webp"
+  },
+  {
+    "wger_id": 376,
+    "name": "Leg Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/376.webp"
+  },
+  {
+    "wger_id": 979,
+    "name": "Leg raises pull up bar",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/979.webp"
+  },
+  {
+    "wger_id": 377,
+    "name": "Leg Raises, Lying",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/377.png"
+  },
+  {
+    "wger_id": 378,
+    "name": "Leg Raises, Standing",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/378.webp"
+  },
+  {
+    "wger_id": 1909,
+    "name": "Leg Wheel",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1909.webp"
+  },
+  {
+    "wger_id": 1918,
+    "name": "Legend Chest Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1918.webp"
+  },
+  {
+    "wger_id": 1773,
+    "name": "Legend Incline Bench Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1773.webp"
+  },
+  {
+    "wger_id": 379,
+    "name": "Leverage Machine Chest Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/379.webp"
+  },
+  {
+    "wger_id": 380,
+    "name": "Leverage Machine Iso Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/380.webp"
+  },
+  {
+    "wger_id": 1478,
+    "name": "Levitation Crunch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1478.webp"
+  },
+  {
+    "wger_id": 1949,
+    "name": "Limber 11",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1949.webp"
+  },
+  {
+    "wger_id": 394,
+    "name": "Long-Pulley (low Row)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/394.png"
+  },
+  {
+    "wger_id": 395,
+    "name": "Long-Pulley, Narrow",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/395.webp"
+  },
+  {
+    "wger_id": 397,
+    "name": "Low Box Squat - Wide Stance",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/397.webp"
+  },
+  {
+    "wger_id": 1271,
+    "name": "Low Pulley Cable fFly",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1271.webp"
+  },
+  {
+    "wger_id": 1270,
+    "name": "Low Pulley Cable Fly",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1270.webp"
+  },
+  {
+    "wger_id": 1348,
+    "name": "Lower Back Extensions",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1348.webp"
+  },
+  {
+    "wger_id": 1868,
+    "name": "Lunge with Twist Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1868.png"
+  },
+  {
+    "wger_id": 984,
+    "name": "Lunges",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/984.png"
+  },
+  {
+    "wger_id": 1535,
+    "name": "lying bicep curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1535.webp"
+  },
+  {
+    "wger_id": 1530,
+    "name": "Lying Dumbbell Curls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1530.webp"
+  },
+  {
+    "wger_id": 1869,
+    "name": "Lying Figure Four Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1869.png"
+  },
+  {
+    "wger_id": 1870,
+    "name": "Lying Hamstring Stretch with Band",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1870.png"
+  },
+  {
+    "wger_id": 1871,
+    "name": "Lying Knee to Chest Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1871.png"
+  },
+  {
+    "wger_id": 1313,
+    "name": "Lying Leg Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1313.webp"
+  },
+  {
+    "wger_id": 406,
+    "name": "Lying Rotator Cuff Exercise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/406.webp"
+  },
+  {
+    "wger_id": 1480,
+    "name": "Lying Triceps Extensions",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1480.webp"
+  },
+  {
+    "wger_id": 1490,
+    "name": "Lying Triceps Kickback",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1490.webp"
+  },
+  {
+    "wger_id": 926,
+    "name": "Machine chest fly",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/926.webp"
+  },
+  {
+    "wger_id": 1883,
+    "name": "Machine Chest Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1883.webp"
+  },
+  {
+    "wger_id": 1655,
+    "name": "Machine Chest Press Exercise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1655.webp"
+  },
+  {
+    "wger_id": 1748,
+    "name": "Machine Hip Abduction",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1748.jpg"
+  },
+  {
+    "wger_id": 1654,
+    "name": "Machine lateral wise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1654.jpg"
+  },
+  {
+    "wger_id": 1744,
+    "name": "Machine Side Lateral Raises",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1744.jpg"
+  },
+  {
+    "wger_id": 1304,
+    "name": "Meadows Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1304.webp"
+  },
+  {
+    "wger_id": 976,
+    "name": "Medicine ball booklet crunch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/976.webp"
+  },
+  {
+    "wger_id": 1089,
+    "name": "Medicine ball twist",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1089.jpeg"
+  },
+  {
+    "wger_id": 418,
+    "name": "Military Press mit SZ-Bar",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/418.png"
+  },
+  {
+    "wger_id": 1635,
+    "name": "Modified pulldown",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1635.webp"
+  },
+  {
+    "wger_id": 996,
+    "name": "Mountain climbers",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/996.webp"
+  },
+  {
+    "wger_id": 423,
+    "name": "Muscle up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/423.webp"
+  },
+  {
+    "wger_id": 1939,
+    "name": "Neck CARs",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1939.webp"
+  },
+  {
+    "wger_id": 1717,
+    "name": "Neck extension",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1717.webp"
+  },
+  {
+    "wger_id": 1017,
+    "name": "Neck half circles",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1017.webp"
+  },
+  {
+    "wger_id": 427,
+    "name": "Negative Crunches",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/427.png"
+  },
+  {
+    "wger_id": 1510,
+    "name": "Neutral Grip Lat Pulldown",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1510.webp"
+  },
+  {
+    "wger_id": 1738,
+    "name": "Neutral-grip pull-ups or TRX rows",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1738.jpg"
+  },
+  {
+    "wger_id": 1461,
+    "name": "No Leg Drive Dumbbell Chest Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1461.webp"
+  },
+  {
+    "wger_id": 998,
+    "name": "No push-up burpees",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/998.webp"
+  },
+  {
+    "wger_id": 910,
+    "name": "Nordic Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/910.webp"
+  },
+  {
+    "wger_id": 1484,
+    "name": "Omni Cable Cross-over",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1484.webp"
+  },
+  {
+    "wger_id": 1186,
+    "name": "One Arm Bent Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1186.jpg"
+  },
+  {
+    "wger_id": 1668,
+    "name": "One Arm Overhead Cable Tricep Extension",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1668.webp"
+  },
+  {
+    "wger_id": 803,
+    "name": "One Arm Triceps Extensions on Cable",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/803.webp"
+  },
+  {
+    "wger_id": 1293,
+    "name": "One armed push-ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1293.webp"
+  },
+  {
+    "wger_id": 1701,
+    "name": "One-Arm Heavy Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1701.webp"
+  },
+  {
+    "wger_id": 975,
+    "name": "one-handed kettlebell curls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/975.webp"
+  },
+  {
+    "wger_id": 1822,
+    "name": "Open Book",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1822.webp"
+  },
+  {
+    "wger_id": 439,
+    "name": "Overhand Cable Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/439.webp"
+  },
+  {
+    "wger_id": 1893,
+    "name": "Overhead Barbell Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1893.webp"
+  },
+  {
+    "wger_id": 1513,
+    "name": "Overhead Cable Tricep Extension",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1513.webp"
+  },
+  {
+    "wger_id": 687,
+    "name": "Overhead Press",
+    "category": "STRENGTH",
+    "primaryMuscle": "Shoulders",
+    "instructions": "1. Stand with bar at shoulder height, grip just outside shoulders.\n2. Press bar overhead to full lockout.\n3. Lower bar back to shoulders under control.\n4. Keep core tight; avoid excessive back arch.",
+    "tags": "strength",
+    "imageUri": "exercises/687.webp"
+  },
+  {
+    "wger_id": 441,
+    "name": "Overhead Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/441.webp"
+  },
+  {
+    "wger_id": 1519,
+    "name": "Overhead Triceps Extension",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1519.webp"
+  },
+  {
+    "wger_id": 1808,
+    "name": "Parallel Bar Hold",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1808.webp"
+  },
+  {
+    "wger_id": 1616,
+    "name": "Patada de burro con mancuerna",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1616.jpg"
+  },
+  {
+    "wger_id": 1703,
+    "name": "Patadas traseras",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1703.webp"
+  },
+  {
+    "wger_id": 445,
+    "name": "Pause Bench",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/445.webp"
+  },
+  {
+    "wger_id": 1464,
+    "name": "Pause Hack Squats",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1464.webp"
+  },
+  {
+    "wger_id": 1904,
+    "name": "Pec Deck",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1904.webp"
+  },
+  {
+    "wger_id": 1775,
+    "name": "Pec deck rear delt fly",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1775.webp"
+  },
+  {
+    "wger_id": 448,
+    "name": "Pendelay Rows",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/448.webp"
+  },
+  {
+    "wger_id": 1521,
+    "name": "Pendular hack",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1521.webp"
+  },
+  {
+    "wger_id": 1527,
+    "name": "Pendulum Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1527.webp"
+  },
+  {
+    "wger_id": 1580,
+    "name": "Perpendicular Unilateral Landmine Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1580.webp"
+  },
+  {
+    "wger_id": 1872,
+    "name": "Pigeon Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1872.png"
+  },
+  {
+    "wger_id": 454,
+    "name": "Pike Push Ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/454.webp"
+  },
+  {
+    "wger_id": 1436,
+    "name": "Pin Bench Press BB",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1436.webp"
+  },
+  {
+    "wger_id": 1437,
+    "name": "Pin Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1437.webp"
+  },
+  {
+    "wger_id": 456,
+    "name": "Pistol Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/456.jpg"
+  },
+  {
+    "wger_id": 1020,
+    "name": "Pistol squats right",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1020.webp"
+  },
+  {
+    "wger_id": 1288,
+    "name": "Planche de cote dynamique",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1288.webp"
+  },
+  {
+    "wger_id": 1489,
+    "name": "Plank Jacks",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1489.webp"
+  },
+  {
+    "wger_id": 1766,
+    "name": "Plank Reach",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1766.webp"
+  },
+  {
+    "wger_id": 1091,
+    "name": "Plank Shoulder Taps",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1091.jpg"
+  },
+  {
+    "wger_id": 1410,
+    "name": "Plank with Alternating Leg Lift",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1410.webp"
+  },
+  {
+    "wger_id": 1406,
+    "name": "Plank-to-Elbow Extension",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1406.webp"
+  },
+  {
+    "wger_id": 1275,
+    "name": "Plantarflexion Stretch with Band",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1275.png"
+  },
+  {
+    "wger_id": 1430,
+    "name": "Plate Pinch Hold",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1430.webp"
+  },
+  {
+    "wger_id": 1079,
+    "name": "Plate twist",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1079.jpg"
+  },
+  {
+    "wger_id": 683,
+    "name": "Power Clean",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/683.webp"
+  },
+  {
+    "wger_id": 1658,
+    "name": "Preacher Curl - Externally Rotated",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1658.webp"
+  },
+  {
+    "wger_id": 1657,
+    "name": "Preacher Curl - Internally Rotated",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1657.webp"
+  },
+  {
+    "wger_id": 465,
+    "name": "Preacher Curls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/465.png"
+  },
+  {
+    "wger_id": 1208,
+    "name": "Prisoner Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1208.webp"
+  },
+  {
+    "wger_id": 468,
+    "name": "Prone Scapular Retraction - Arms at Side",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/468.webp"
+  },
+  {
+    "wger_id": 1284,
+    "name": "Pseudo Planche Push-up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1284.webp"
+  },
+  {
+    "wger_id": 477,
+    "name": "Pull Ups on Machine",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/477.webp"
+  },
+  {
+    "wger_id": 1537,
+    "name": "Pull-up Isometric Hold",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1537.webp"
+  },
+  {
+    "wger_id": 475,
+    "name": "Pull-ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/475.jpg"
+  },
+  {
+    "wger_id": 1696,
+    "name": "Pull-Ups (Neutral Grip)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1696.webp"
+  },
+  {
+    "wger_id": 1695,
+    "name": "Pull-Ups (Wide Grip)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1695.webp"
+  },
+  {
+    "wger_id": 1905,
+    "name": "Pullback",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1905.webp"
+  },
+  {
+    "wger_id": 1273,
+    "name": "Pullover",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1273.webp"
+  },
+  {
+    "wger_id": 1384,
+    "name": "Pullover Machine",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1384.webp"
+  },
+  {
+    "wger_id": 821,
+    "name": "Pullup on fingerboard",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/821.webp"
+  },
+  {
+    "wger_id": 1462,
+    "name": "punches",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1462.webp"
+  },
+  {
+    "wger_id": 1440,
+    "name": "Push OHP",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1440.webp"
+  },
+  {
+    "wger_id": 478,
+    "name": "Push Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/478.jpg"
+  },
+  {
+    "wger_id": 1551,
+    "name": "Push-Up",
+    "category": "STRENGTH",
+    "primaryMuscle": "Chest",
+    "instructions": "1. Start in high plank: hands under shoulders, body straight.\n2. Lower chest toward floor, elbows at 45 degrees.\n3. Push through palms back to start.",
+    "tags": "strength",
+    "imageUri": "exercises/1551.webp"
+  },
+  {
+    "wger_id": 985,
+    "name": "Push-up rotations",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/985.webp"
+  },
+  {
+    "wger_id": 1675,
+    "name": "Push-Ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1675.webp"
+  },
+  {
+    "wger_id": 1873,
+    "name": "Quad Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1873.png"
+  },
+  {
+    "wger_id": 957,
+    "name": "Quadriped Arm and Leg Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/957.png"
+  },
+  {
+    "wger_id": 1915,
+    "name": "Quadruped Hip Abduction",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1915.webp"
+  },
+  {
+    "wger_id": 1028,
+    "name": "Quadruped thoracic rotation left",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1028.webp"
+  },
+  {
+    "wger_id": 1029,
+    "name": "Quadruped thoracic rotation right",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1029.webp"
+  },
+  {
+    "wger_id": 484,
+    "name": "Rack Deadlift",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/484.png"
+  },
+  {
+    "wger_id": 1287,
+    "name": "Reach ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1287.webp"
+  },
+  {
+    "wger_id": 829,
+    "name": "Rear Delt Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/829.png"
+  },
+  {
+    "wger_id": 487,
+    "name": "Rear Delt Raises",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/487.webp"
+  },
+  {
+    "wger_id": 1216,
+    "name": "Recruitment Pulls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1216.webp"
+  },
+  {
+    "wger_id": 1491,
+    "name": "Remada unilateral no cabo",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1491.jpg"
+  },
+  {
+    "wger_id": 1718,
+    "name": "Remo alto polea alta",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1718.webp"
+  },
+  {
+    "wger_id": 1119,
+    "name": "Remo maquina agarre estrecho",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1119.png"
+  },
+  {
+    "wger_id": 1120,
+    "name": "Remo maquina agarre estrecho supino",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1120.png"
+  },
+  {
+    "wger_id": 490,
+    "name": "Renegade Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/490.webp"
+  },
+  {
+    "wger_id": 1114,
+    "name": "Rest (for timed workouts)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1114.webp"
+  },
+  {
+    "wger_id": 493,
+    "name": "Reverse Bar Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/493.webp"
+  },
+  {
+    "wger_id": 1473,
+    "name": "Reverse Cable Flye",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1473.webp"
+  },
+  {
+    "wger_id": 1772,
+    "name": "Reverse crunch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1772.webp"
+  },
+  {
+    "wger_id": 495,
+    "name": "Reverse Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/495.webp"
+  },
+  {
+    "wger_id": 914,
+    "name": "Reverse EZ Bar Cable Curls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/914.webp"
+  },
+  {
+    "wger_id": 1709,
+    "name": "Reverse Fly Standing",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1709.webp"
+  },
+  {
+    "wger_id": 1290,
+    "name": "Reverse Grip Barbell Curls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1290.webp"
+  },
+  {
+    "wger_id": 498,
+    "name": "Reverse Grip Bench Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/498.webp"
+  },
+  {
+    "wger_id": 1809,
+    "name": "Reverse Hyperextension",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1809.webp"
+  },
+  {
+    "wger_id": 999,
+    "name": "Reverse lunges",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/999.jpg"
+  },
+  {
+    "wger_id": 909,
+    "name": "Reverse Nordic Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/909.webp"
+  },
+  {
+    "wger_id": 500,
+    "name": "Reverse Plank",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/500.webp"
+  },
+  {
+    "wger_id": 913,
+    "name": "Reverse Preacher Curl (Close Grip)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/913.webp"
+  },
+  {
+    "wger_id": 1215,
+    "name": "Reverse Snow Angel",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1215.webp"
+  },
+  {
+    "wger_id": 1433,
+    "name": "Reverse Wood Chops",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1433.webp"
+  },
+  {
+    "wger_id": 1014,
+    "name": "Right levator scapulae stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1014.webp"
+  },
+  {
+    "wger_id": 1009,
+    "name": "Right neck stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1009.webp"
+  },
+  {
+    "wger_id": 501,
+    "name": "Ring Dips",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/501.webp"
+  },
+  {
+    "wger_id": 1832,
+    "name": "Ring Support Hold",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1832.webp"
+  },
+  {
+    "wger_id": 1485,
+    "name": "Rocking Triceps Pushdown",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1485.webp"
+  },
+  {
+    "wger_id": 1399,
+    "name": "Roll Down",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1399.webp"
+  },
+  {
+    "wger_id": 505,
+    "name": "Roman Chair",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/505.webp"
+  },
+  {
+    "wger_id": 1750,
+    "name": "Romanian Deadlift",
+    "category": "STRENGTH",
+    "primaryMuscle": "Hamstrings",
+    "instructions": "1. Stand with bar at hips, slight knee bend.\n2. Hinge hips back, keeping bar close to legs.\n3. Lower until a deep hamstring stretch is felt.\n4. Drive hips forward to return.",
+    "tags": "strength",
+    "imageUri": "exercises/1750.webp"
+  },
+  {
+    "wger_id": 1211,
+    "name": "Romanian deadlift, single leg",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1211.webp"
+  },
+  {
+    "wger_id": 1634,
+    "name": "Rope Pullover/row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1634.webp"
+  },
+  {
+    "wger_id": 1374,
+    "name": "Rotary Torso Machine",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1374.webp"
+  },
+  {
+    "wger_id": 512,
+    "name": "Rowing seated, narrow grip",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/512.png"
+  },
+  {
+    "wger_id": 674,
+    "name": "Rowing with TRX band",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/674.webp"
+  },
+  {
+    "wger_id": 510,
+    "name": "Rowing, Lying on Bench",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/510.webp"
+  },
+  {
+    "wger_id": 513,
+    "name": "Rowing, T-bar",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/513.png"
+  },
+  {
+    "wger_id": 1613,
+    "name": "rubber band glute kickback",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1613.jpg"
+  },
+  {
+    "wger_id": 1874,
+    "name": "Runners Lunge Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1874.png"
+  },
+  {
+    "wger_id": 1193,
+    "name": "Russian Twist",
+    "category": "STRENGTH",
+    "primaryMuscle": "Obliques",
+    "instructions": "1. Sit with knees bent, feet off floor, torso reclined.\n2. Hold weight and rotate torso side to side.\n3. Tap weight to floor at each side.",
+    "tags": "strength",
+    "imageUri": "exercises/1193.png"
+  },
+  {
+    "wger_id": 1435,
+    "name": "Scapula Pulls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1435.webp"
+  },
+  {
+    "wger_id": 1338,
+    "name": "Schoulder Raise (Dumbbell)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1338.webp"
+  },
+  {
+    "wger_id": 545,
+    "name": "Scissors",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/545.webp"
+  },
+  {
+    "wger_id": 1207,
+    "name": "Scorpion Kick",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1207.webp"
+  },
+  {
+    "wger_id": 1094,
+    "name": "Seated Bench Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1094.webp"
+  },
+  {
+    "wger_id": 1922,
+    "name": "Seated Cable chest fly",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1922.webp"
+  },
+  {
+    "wger_id": 1117,
+    "name": "Seated Cable Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1117.png"
+  },
+  {
+    "wger_id": 921,
+    "name": "Seated Cable Rows",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/921.png"
+  },
+  {
+    "wger_id": 1477,
+    "name": "Seated Corkscrew",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1477.webp"
+  },
+  {
+    "wger_id": 1620,
+    "name": "Seated Dumbbell Calf Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1620.jpeg"
+  },
+  {
+    "wger_id": 1289,
+    "name": "Seated Dumbbell Curls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1289.webp"
+  },
+  {
+    "wger_id": 918,
+    "name": "Seated Dumbbell Side Lateral",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/918.webp"
+  },
+  {
+    "wger_id": 1680,
+    "name": "seated figure four",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1680.webp"
+  },
+  {
+    "wger_id": 1672,
+    "name": "Seated Hip Abduction",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1672.webp"
+  },
+  {
+    "wger_id": 12,
+    "name": "Seated Hip Adduction",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/12.webp"
+  },
+  {
+    "wger_id": 1105,
+    "name": "Seated Knee Tuck",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1105.png"
+  },
+  {
+    "wger_id": 1770,
+    "name": "Seated machine row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1770.png"
+  },
+  {
+    "wger_id": 1845,
+    "name": "Seated Pancake Good Morning",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1845.webp"
+  },
+  {
+    "wger_id": 1098,
+    "name": "Seated rear delt rise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1098.jpg"
+  },
+  {
+    "wger_id": 1725,
+    "name": "Seated Row (Machine)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1725.png"
+  },
+  {
+    "wger_id": 1841,
+    "name": "Seated Shoulder Extension Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1841.webp"
+  },
+  {
+    "wger_id": 1749,
+    "name": "Seated Triceps Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1749.png"
+  },
+  {
+    "wger_id": 1928,
+    "name": "Seated V-Grip Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1928.webp"
+  },
+  {
+    "wger_id": 1448,
+    "name": "Seated W Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1448.png"
+  },
+  {
+    "wger_id": 1884,
+    "name": "Shinbox IR Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1884.webp"
+  },
+  {
+    "wger_id": 562,
+    "name": "Shotgun Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/562.webp"
+  },
+  {
+    "wger_id": 1081,
+    "name": "Shoulder dislocates",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1081.webp"
+  },
+  {
+    "wger_id": 1714,
+    "name": "Shoulder Dumbbell Pendular Exercise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1714.webp"
+  },
+  {
+    "wger_id": 1729,
+    "name": "Shoulder External Rotation (Cable)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1729.webp"
+  },
+  {
+    "wger_id": 1715,
+    "name": "Shoulder External Rotation with Dumbbell",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1715.webp"
+  },
+  {
+    "wger_id": 1728,
+    "name": "Shoulder Internal Rotation (Cable)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1728.webp"
+  },
+  {
+    "wger_id": 1337,
+    "name": "Shoulder Press (Dumbbell)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1337.webp"
+  },
+  {
+    "wger_id": 566,
+    "name": "Shoulder Press, Barbell",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/566.png"
+  },
+  {
+    "wger_id": 567,
+    "name": "Shoulder Press, Dumbbells",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/567.png"
+  },
+  {
+    "wger_id": 543,
+    "name": "Shoulder Press, on Machine",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/543.png"
+  },
+  {
+    "wger_id": 569,
+    "name": "Shoulder Press, on Multi Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/569.webp"
+  },
+  {
+    "wger_id": 1443,
+    "name": "Shoulder Raise Side and Front DB",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1443.webp"
+  },
+  {
+    "wger_id": 570,
+    "name": "Shoulder Shrug",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/570.jpg"
+  },
+  {
+    "wger_id": 1209,
+    "name": "Shoulder width three-point push-up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1209.webp"
+  },
+  {
+    "wger_id": 1755,
+    "name": "Shoulder Y-pull cable",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1755.webp"
+  },
+  {
+    "wger_id": 1739,
+    "name": "Shrimp Squad",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1739.webp"
+  },
+  {
+    "wger_id": 575,
+    "name": "Shrugs on Multipress",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/575.webp"
+  },
+  {
+    "wger_id": 571,
+    "name": "Shrugs, Barbells",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/571.png"
+  },
+  {
+    "wger_id": 572,
+    "name": "Shrugs, Dumbbells",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/572.png"
+  },
+  {
+    "wger_id": 556,
+    "name": "Side Bends on Machine",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/556.webp"
+  },
+  {
+    "wger_id": 576,
+    "name": "Side Crunch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/576.png"
+  },
+  {
+    "wger_id": 577,
+    "name": "Side Dumbbell Trunk Flexion",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/577.webp"
+  },
+  {
+    "wger_id": 1753,
+    "name": "Side lateral raise - Back (Cable)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1753.webp"
+  },
+  {
+    "wger_id": 1752,
+    "name": "Side lateral raise - Front (Cable)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1752.webp"
+  },
+  {
+    "wger_id": 1730,
+    "name": "Side Lateral Raise (Cable)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1730.webp"
+  },
+  {
+    "wger_id": 1202,
+    "name": "Side Lying Hip Abduction",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1202.webp"
+  },
+  {
+    "wger_id": 580,
+    "name": "Side Plank",
+    "category": "STRENGTH",
+    "primaryMuscle": "Obliques",
+    "instructions": "1. Lie on one side, forearm on floor.\n2. Stack feet, raise hips off floor in a straight line.\n3. Hold position, switch sides.",
+    "tags": "strength",
+    "imageUri": "exercises/580.webp"
+  },
+  {
+    "wger_id": 1019,
+    "name": "Side plank right",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1019.webp"
+  },
+  {
+    "wger_id": 1195,
+    "name": "Side Slides + Squats",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1195.webp"
+  },
+  {
+    "wger_id": 986,
+    "name": "Side split squats left",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/986.webp"
+  },
+  {
+    "wger_id": 987,
+    "name": "Side split squats right",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/987.webp"
+  },
+  {
+    "wger_id": 1727,
+    "name": "Side Straight-Arm Pulldown (Cable)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1727.webp"
+  },
+  {
+    "wger_id": 1861,
+    "name": "Side stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1861.png"
+  },
+  {
+    "wger_id": 583,
+    "name": "Side to Side Push Ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/583.webp"
+  },
+  {
+    "wger_id": 1582,
+    "name": "Side-laying interior rotation",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1582.png"
+  },
+  {
+    "wger_id": 578,
+    "name": "Side-lying External Rotation",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/578.webp"
+  },
+  {
+    "wger_id": 1022,
+    "name": "Single Arm Plank to Row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1022.jpg"
+  },
+  {
+    "wger_id": 1637,
+    "name": "Single arm row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1637.webp"
+  },
+  {
+    "wger_id": 71,
+    "name": "Single Leg Extension",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/71.webp"
+  },
+  {
+    "wger_id": 1740,
+    "name": "Single Leg Glute Bridge",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1740.webp"
+  },
+  {
+    "wger_id": 1393,
+    "name": "Single Leg Hamstring Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1393.webp"
+  },
+  {
+    "wger_id": 1388,
+    "name": "Single Leg RDL",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1388.webp"
+  },
+  {
+    "wger_id": 584,
+    "name": "Single-arm Preacher Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/584.webp"
+  },
+  {
+    "wger_id": 1736,
+    "name": "Single-Leg Deadlift with Dumbbell",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1736.webp"
+  },
+  {
+    "wger_id": 1734,
+    "name": "Single-Leg Lunge with Kettlebell:",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1734.webp"
+  },
+  {
+    "wger_id": 1735,
+    "name": "Single-leg side glute press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1735.webp"
+  },
+  {
+    "wger_id": 1394,
+    "name": "Sit & Reach",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1394.webp"
+  },
+  {
+    "wger_id": 1479,
+    "name": "Sit Up Elbow Thrust",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1479.webp"
+  },
+  {
+    "wger_id": 591,
+    "name": "Sit-ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/591.webp"
+  },
+  {
+    "wger_id": 1494,
+    "name": "Sitting Calf Raises",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1494.webp"
+  },
+  {
+    "wger_id": 1274,
+    "name": "Sitting Calf Stretch (Dorsiflexion)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1274.png"
+  },
+  {
+    "wger_id": 245,
+    "name": "Skullcrusher Dumbbells",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/245.webp"
+  },
+  {
+    "wger_id": 1210,
+    "name": "Skydiver with arms in T-position",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1210.webp"
+  },
+  {
+    "wger_id": 1711,
+    "name": "Sleeper Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1711.webp"
+  },
+  {
+    "wger_id": 1604,
+    "name": "Sliding Lateral Lunge",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1604.webp"
+  },
+  {
+    "wger_id": 804,
+    "name": "Sloper hanging",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/804.webp"
+  },
+  {
+    "wger_id": 598,
+    "name": "Smith Machine Close-grip Bench Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/598.webp"
+  },
+  {
+    "wger_id": 1593,
+    "name": "Smith Machine Split Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1593.webp"
+  },
+  {
+    "wger_id": 1747,
+    "name": "Smith machine squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1747.jpg"
+  },
+  {
+    "wger_id": 916,
+    "name": "Smith Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/916.webp"
+  },
+  {
+    "wger_id": 1576,
+    "name": "Snap Down",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1576.webp"
+  },
+  {
+    "wger_id": 1447,
+    "name": "Snatch OL",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1447.webp"
+  },
+  {
+    "wger_id": 1839,
+    "name": "Solo Hip Flexor Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1839.webp"
+  },
+  {
+    "wger_id": 604,
+    "name": "Speed Deadlift",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/604.webp"
+  },
+  {
+    "wger_id": 1810,
+    "name": "Sphinx",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1810.webp"
+  },
+  {
+    "wger_id": 1465,
+    "name": "Spider Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1465.webp"
+  },
+  {
+    "wger_id": 607,
+    "name": "Splinter Sit-ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/607.webp"
+  },
+  {
+    "wger_id": 991,
+    "name": "Split squats left",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/991.webp"
+  },
+  {
+    "wger_id": 992,
+    "name": "Split squats right",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/992.webp"
+  },
+  {
+    "wger_id": 614,
+    "name": "Squat Jumps",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/614.webp"
+  },
+  {
+    "wger_id": 616,
+    "name": "Squat Thrust",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/616.webp"
+  },
+  {
+    "wger_id": 615,
+    "name": "Squats",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/615.webp"
+  },
+  {
+    "wger_id": 341,
+    "name": "Squats on Multipress",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/341.webp"
+  },
+  {
+    "wger_id": 1724,
+    "name": "Standing Adduction (Cable)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1724.webp"
+  },
+  {
+    "wger_id": 621,
+    "name": "Standing Bicep Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/621.webp"
+  },
+  {
+    "wger_id": 1232,
+    "name": "Standing biceps stretch left",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1232.webp"
+  },
+  {
+    "wger_id": 1233,
+    "name": "Standing biceps stretch right",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1233.webp"
+  },
+  {
+    "wger_id": 622,
+    "name": "Standing Calf Raises",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/622.jpeg"
+  },
+  {
+    "wger_id": 1239,
+    "name": "Standing Calf Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1239.jpg"
+  },
+  {
+    "wger_id": 1575,
+    "name": "Standing Dowel Shoulder press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1575.webp"
+  },
+  {
+    "wger_id": 1875,
+    "name": "Standing IT Band Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1875.png"
+  },
+  {
+    "wger_id": 1396,
+    "name": "Standing Pancake",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1396.webp"
+  },
+  {
+    "wger_id": 1397,
+    "name": "Standing Pancake Good Morning",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1397.webp"
+  },
+  {
+    "wger_id": 623,
+    "name": "Standing Rope Forearm",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/623.webp"
+  },
+  {
+    "wger_id": 1426,
+    "name": "Standing Side Crunches",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1426.webp"
+  },
+  {
+    "wger_id": 1240,
+    "name": "Standing Soleus Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1240.webp"
+  },
+  {
+    "wger_id": 981,
+    "name": "Step-ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/981.webp"
+  },
+  {
+    "wger_id": 627,
+    "name": "Stiff-legged Deadlifts",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/627.webp"
+  },
+  {
+    "wger_id": 1847,
+    "name": "Straddle L-Sit",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1847.webp"
+  },
+  {
+    "wger_id": 912,
+    "name": "Straight Bar Cable Curls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/912.webp"
+  },
+  {
+    "wger_id": 917,
+    "name": "Straight Bar Cable Front Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/917.webp"
+  },
+  {
+    "wger_id": 628,
+    "name": "Straight-arm Pull Down (bar Attachment)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/628.webp"
+  },
+  {
+    "wger_id": 629,
+    "name": "Straight-arm Pull Down (rope Attachment)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/629.webp"
+  },
+  {
+    "wger_id": 1726,
+    "name": "Straight-Arm Pulldown (Cable)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1726.png"
+  },
+  {
+    "wger_id": 1776,
+    "name": "Suitcase Carry",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1776.webp"
+  },
+  {
+    "wger_id": 630,
+    "name": "Sumo Deadlift",
+    "category": "STRENGTH",
+    "primaryMuscle": "Inner Thighs",
+    "instructions": "1. Wide stance, toes pointed out, grip inside legs.\n2. Keep chest tall, back flat.\n3. Drive hips forward to stand.",
+    "tags": "strength",
+    "imageUri": "exercises/630.webp"
+  },
+  {
+    "wger_id": 632,
+    "name": "Sumo Squats",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/632.webp"
+  },
+  {
+    "wger_id": 636,
+    "name": "Superman",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/636.webp"
+  },
+  {
+    "wger_id": 1886,
+    "name": "Supine Hip Abduction",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1886.webp"
+  },
+  {
+    "wger_id": 1583,
+    "name": "Supine press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1583.webp"
+  },
+  {
+    "wger_id": 1757,
+    "name": "supino",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1757.webp"
+  },
+  {
+    "wger_id": 1778,
+    "name": "Supino inclinado",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1778.webp"
+  },
+  {
+    "wger_id": 1876,
+    "name": "Supported Calf Stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1876.png"
+  },
+  {
+    "wger_id": 919,
+    "name": "T-Bar row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/919.webp"
+  },
+  {
+    "wger_id": 650,
+    "name": "Thruster",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/650.webp"
+  },
+  {
+    "wger_id": 1200,
+    "name": "Tibialis raises",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1200.webp"
+  },
+  {
+    "wger_id": 1425,
+    "name": "Toe Taps",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1425.webp"
+  },
+  {
+    "wger_id": 1390,
+    "name": "Toe Touch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1390.webp"
+  },
+  {
+    "wger_id": 1529,
+    "name": "Toes to bar",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1529.webp"
+  },
+  {
+    "wger_id": 1451,
+    "name": "Torso rotation stretch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1451.webp"
+  },
+  {
+    "wger_id": 1455,
+    "name": "Towel Superman",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1455.webp"
+  },
+  {
+    "wger_id": 1803,
+    "name": "Trap Bar Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1803.webp"
+  },
+  {
+    "wger_id": 1581,
+    "name": "Trap press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1581.jpg"
+  },
+  {
+    "wger_id": 1834,
+    "name": "Trap-3 Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1834.webp"
+  },
+  {
+    "wger_id": 1292,
+    "name": "Trazioni impugnatura inversa",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1292.webp"
+  },
+  {
+    "wger_id": 655,
+    "name": "Tricep Dumbbell Kickback",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/655.webp"
+  },
+  {
+    "wger_id": 805,
+    "name": "Tricep Pushdown on Cable",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/805.webp"
+  },
+  {
+    "wger_id": 1900,
+    "name": "Tricep Rope Pushdowns",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1900.webp"
+  },
+  {
+    "wger_id": 1372,
+    "name": "Triceps Dips (Assisted)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1372.webp"
+  },
+  {
+    "wger_id": 659,
+    "name": "Triceps Extensions on Cable",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/659.png"
+  },
+  {
+    "wger_id": 660,
+    "name": "Triceps Extensions on Cable With Bar",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/660.webp"
+  },
+  {
+    "wger_id": 661,
+    "name": "Triceps on Machine",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/661.webp"
+  },
+  {
+    "wger_id": 1336,
+    "name": "Triceps Overhead (Dumbbell)",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1336.webp"
+  },
+  {
+    "wger_id": 1185,
+    "name": "Triceps Pushdown",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1185.jpg"
+  },
+  {
+    "wger_id": 1230,
+    "name": "Triceps stretch left",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1230.webp"
+  },
+  {
+    "wger_id": 1231,
+    "name": "Triceps stretch right",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1231.webp"
+  },
+  {
+    "wger_id": 672,
+    "name": "Trunk Rotation With Cable",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/672.webp"
+  },
+  {
+    "wger_id": 1269,
+    "name": "TRX dips",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1269.webp"
+  },
+  {
+    "wger_id": 1261,
+    "name": "TRX gorilla biceps curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1261.webp"
+  },
+  {
+    "wger_id": 1260,
+    "name": "TRX hammer curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1260.webp"
+  },
+  {
+    "wger_id": 1259,
+    "name": "TRX Obliques",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1259.webp"
+  },
+  {
+    "wger_id": 1246,
+    "name": "TRX roll out",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1246.webp"
+  },
+  {
+    "wger_id": 959,
+    "name": "TRX Rows",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/959.png"
+  },
+  {
+    "wger_id": 1262,
+    "name": "Trx Single Arm Bicep Curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1262.webp"
+  },
+  {
+    "wger_id": 1266,
+    "name": "TRX Tricep Extension",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1266.webp"
+  },
+  {
+    "wger_id": 1704,
+    "name": "Tuck L-sit",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1704.webp"
+  },
+  {
+    "wger_id": 1916,
+    "name": "Tuck planche",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1916.png"
+  },
+  {
+    "wger_id": 675,
+    "name": "Turkish Get-Up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/675.webp"
+  },
+  {
+    "wger_id": 1607,
+    "name": "Typewriter Pull-ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1607.webp"
+  },
+  {
+    "wger_id": 684,
+    "name": "Underhand Lat Pull Down",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/684.webp"
+  },
+  {
+    "wger_id": 1636,
+    "name": "Unilateral Cable row",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1636.webp"
+  },
+  {
+    "wger_id": 1795,
+    "name": "unilateral cross body cable pull down",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1795.webp"
+  },
+  {
+    "wger_id": 1913,
+    "name": "Unilateral Hip Thrust",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1913.webp"
+  },
+  {
+    "wger_id": 1907,
+    "name": "Unilateral Lunges",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1907.webp"
+  },
+  {
+    "wger_id": 1381,
+    "name": "Upper Back",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1381.webp"
+  },
+  {
+    "wger_id": 688,
+    "name": "Upper External Oblique",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/688.webp"
+  },
+  {
+    "wger_id": 694,
+    "name": "Upright Row w/ Dumbbells",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/694.png"
+  },
+  {
+    "wger_id": 691,
+    "name": "Upright Row, on Multi Press",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/691.jpg"
+  },
+  {
+    "wger_id": 695,
+    "name": "V-Bar Pulldown",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/695.webp"
+  },
+  {
+    "wger_id": 1090,
+    "name": "Vpushup",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1090.webp"
+  },
+  {
+    "wger_id": 1474,
+    "name": "W-Raise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1474.webp"
+  },
+  {
+    "wger_id": 1103,
+    "name": "walking bridge",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1103.webp"
+  },
+  {
+    "wger_id": 1903,
+    "name": "Walking Lunges",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1903.png"
+  },
+  {
+    "wger_id": 1679,
+    "name": "Wall Angels",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1679.webp"
+  },
+  {
+    "wger_id": 1100,
+    "name": "Wall balls",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1100.jpg"
+  },
+  {
+    "wger_id": 1196,
+    "name": "Wall Drills",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1196.webp"
+  },
+  {
+    "wger_id": 711,
+    "name": "Wall Handstand",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/711.webp"
+  },
+  {
+    "wger_id": 713,
+    "name": "Wall Pushup",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/713.webp"
+  },
+  {
+    "wger_id": 716,
+    "name": "Wall Slides",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/716.webp"
+  },
+  {
+    "wger_id": 718,
+    "name": "Wall Squat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/718.webp"
+  },
+  {
+    "wger_id": 1408,
+    "name": "Wall-sit",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1408.webp"
+  },
+  {
+    "wger_id": 1648,
+    "name": "Weighted Crunch",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1648.jpg"
+  },
+  {
+    "wger_id": 1902,
+    "name": "Weighted push-ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1902.png"
+  },
+  {
+    "wger_id": 722,
+    "name": "Weighted Step-ups",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/722.webp"
+  },
+  {
+    "wger_id": 1880,
+    "name": "Wide Grip Pull Up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1880.webp"
+  },
+  {
+    "wger_id": 1542,
+    "name": "Wide Pull Up",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1542.webp"
+  },
+  {
+    "wger_id": 723,
+    "name": "Wide-grip Pulldown",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/723.webp"
+  },
+  {
+    "wger_id": 1743,
+    "name": "Windshield Wipers",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1743.webp"
+  },
+  {
+    "wger_id": 1771,
+    "name": "Wrist curl, cable",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1771.webp"
+  },
+  {
+    "wger_id": 1205,
+    "name": "Wrist curl, dumbbells",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1205.webp"
+  },
+  {
+    "wger_id": 1244,
+    "name": "Yoga exercise: Cow-cat",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1244.webp"
+  },
+  {
+    "wger_id": 1885,
+    "name": "YTWL Exercise",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1885.webp"
+  },
+  {
+    "wger_id": 1683,
+    "name": "Zottman curl",
+    "category": "STRENGTH",
+    "primaryMuscle": null,
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1683.webp"
+  },
+  {
+    "wger_id": null,
+    "name": "Calf Stretch Against Wall",
+    "category": "STRETCHING",
+    "primaryMuscle": "Calves",
+    "instructions": "1. Place palms on wall, one foot back.\n2. Keep rear heel on floor and press hip forward.\n3. Feel calf stretch.\n4. Hold 20–30 seconds each side.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Cat-Cow Mobility",
+    "category": "STRETCHING",
+    "primaryMuscle": "Spine",
+    "instructions": "1. On hands and knees, alternate between arching and rounding spine.\n2. Inhale on arch, exhale on round.\n3. 10 slow repetitions.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Chest Opener Stretch",
+    "category": "STRETCHING",
+    "primaryMuscle": "Chest",
+    "instructions": "1. Clasp hands behind back.\n2. Squeeze shoulder blades together and lift chest.\n3. Hold 20–30 seconds.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Child's Pose Stretch",
+    "category": "STRETCHING",
+    "primaryMuscle": "Lower Back",
+    "instructions": "1. Kneel and sit back on heels.\n2. Fold torso forward, arms extended.\n3. Forehead rests on floor.\n4. Hold 30–60 seconds while breathing.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Doorway Chest Stretch",
+    "category": "STRETCHING",
+    "primaryMuscle": "Chest",
+    "instructions": "1. Stand in a doorway, arms at 90 degrees.\n2. Step one foot forward.\n3. Lean into doorway until chest stretches.\n4. Hold 20–30 seconds.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Figure-4 Piriformis Stretch",
+    "category": "STRETCHING",
+    "primaryMuscle": "Glutes",
+    "instructions": "1. Lie on back, cross one ankle over opposite knee.\n2. Pull uncrossed leg toward chest.\n3. Feel stretch in crossed-leg glute.\n4. Hold 30 seconds each side.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "IT Band Stretch",
+    "category": "STRETCHING",
+    "primaryMuscle": "Outer Thigh",
+    "instructions": "1. Stand and cross one foot behind the other.\n2. Lean sideways in the direction of the back foot.\n3. Extend arm overhead for a deeper stretch.\n4. Hold 20–30 seconds each side.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Lying Knee-to-Chest",
+    "category": "STRETCHING",
+    "primaryMuscle": "Lower Back",
+    "instructions": "1. Lie on back.\n2. Pull both knees toward chest with arms.\n3. Rock gently side to side.\n4. Hold 30 seconds.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Neck Rotation Stretch",
+    "category": "STRETCHING",
+    "primaryMuscle": "Neck",
+    "instructions": "1. Sit tall and slowly turn head to one side.\n2. Hold when resistance is felt.\n3. Return to center and repeat other side.\n4. 15–20 seconds each side.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Neck Side Stretch",
+    "category": "STRETCHING",
+    "primaryMuscle": "Neck",
+    "instructions": "1. Sit or stand upright.\n2. Tilt ear toward shoulder.\n3. Optionally press hand gently on head.\n4. Hold 15–20 seconds each side.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Seated Butterfly Stretch",
+    "category": "STRETCHING",
+    "primaryMuscle": "Inner Thighs",
+    "instructions": "1. Sit with soles of feet together.\n2. Hold ankles and gently press knees toward floor.\n3. Hinge forward from hips for deeper stretch.\n4. Hold 30 seconds.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Seated Spinal Twist",
+    "category": "STRETCHING",
+    "primaryMuscle": "Spine",
+    "instructions": "1. Sit in a chair with feet flat.\n2. Rotate torso to one side, placing hands on chair back.\n3. Hold 15–20 seconds; repeat other side.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Shoulder Cross-Body Stretch",
+    "category": "STRETCHING",
+    "primaryMuscle": "Rear Deltoids",
+    "instructions": "1. Bring one arm across chest.\n2. Use opposite hand to pull arm closer.\n3. Hold 20–30 seconds each arm.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Standing Hamstring Stretch",
+    "category": "STRETCHING",
+    "primaryMuscle": "Hamstrings",
+    "instructions": "1. Stand and place one heel on a step or low surface.\n2. Keep leg straight and hinge forward from hips.\n3. Feel the stretch in the back of the thigh.\n4. Hold 20–30 seconds each side.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Standing Quad Stretch",
+    "category": "STRETCHING",
+    "primaryMuscle": "Quadriceps",
+    "instructions": "1. Stand on one foot.\n2. Bend opposite knee, pulling foot toward glutes.\n3. Keep knees together.\n4. Hold 20–30 seconds each side.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Standing Side Stretch",
+    "category": "STRETCHING",
+    "primaryMuscle": "Obliques",
+    "instructions": "1. Stand with feet hip-width apart.\n2. Raise one arm overhead and lean to the opposite side.\n3. Hold 15–20 seconds each side.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Thoracic Rotation Stretch",
+    "category": "STRETCHING",
+    "primaryMuscle": "Upper Back",
+    "instructions": "1. Sit cross-legged or on a chair.\n2. Place one hand behind head, elbow out.\n3. Rotate shoulder open toward ceiling.\n4. 10 reps each side.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Tricep Overhead Stretch",
+    "category": "STRETCHING",
+    "primaryMuscle": "Triceps",
+    "instructions": "1. Raise one arm, bend elbow behind head.\n2. Use opposite hand to gently push elbow.\n3. Hold 20–30 seconds each side.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Wrist Flexor Stretch",
+    "category": "STRETCHING",
+    "primaryMuscle": "Forearms",
+    "instructions": "1. Extend one arm forward, palm up.\n2. Use opposite hand to gently pull fingers back.\n3. Hold 15–20 seconds each side.",
+    "tags": "stretching",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Boat Pose",
+    "category": "YOGA",
+    "primaryMuscle": "Abs",
+    "instructions": "1. Sit with knees bent, feet off floor.\n2. Balance on sit bones.\n3. Extend legs to 45 degrees, arms forward.\n4. Hold for 5 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Bridge Pose",
+    "category": "YOGA",
+    "primaryMuscle": "Glutes",
+    "instructions": "1. Lie on back, knees bent, feet flat.\n2. Press feet down, lift hips.\n3. Interlace fingers under back.\n4. Hold 5 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Camel Pose",
+    "category": "YOGA",
+    "primaryMuscle": "Hip Flexors",
+    "instructions": "1. Kneel with hips over knees.\n2. Place hands on lower back, fingers pointing down.\n3. Gently arch back, reaching for heels.\n4. Hold 3–5 breaths; come up slowly.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Cat-Cow Stretch",
+    "category": "YOGA",
+    "primaryMuscle": "Spine",
+    "instructions": "1. Start on hands and knees.\n2. Inhale: drop belly, lift head and tailbone (Cow).\n3. Exhale: round spine toward ceiling, tuck chin (Cat).\n4. Flow between for 10 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Chair Pose",
+    "category": "YOGA",
+    "primaryMuscle": "Quadriceps",
+    "instructions": "1. Stand with feet together.\n2. Bend knees as if sitting back into a chair.\n3. Raise arms overhead.\n4. Hold 5 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Cobra Pose",
+    "category": "YOGA",
+    "primaryMuscle": "Lower Back",
+    "instructions": "1. Lie face down, hands under shoulders.\n2. Inhale and press chest off floor.\n3. Keep pelvis on mat.\n4. Hold 3–5 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Corpse Pose",
+    "category": "YOGA",
+    "primaryMuscle": "Full Body",
+    "instructions": "1. Lie flat on back, legs slightly apart.\n2. Arms at sides, palms up.\n3. Close eyes, relax every muscle.\n4. Hold 5–10 minutes.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Crow Pose",
+    "category": "YOGA",
+    "primaryMuscle": "Core",
+    "instructions": "1. Squat and place palms on floor.\n2. Place knees on back of upper arms.\n3. Lean forward, shift weight into hands.\n4. Lift feet off floor and hold.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Downward-Facing Dog",
+    "category": "YOGA",
+    "primaryMuscle": "Hamstrings",
+    "instructions": "1. Start on hands and knees.\n2. Tuck toes, lift hips up and back.\n3. Straighten legs as much as possible.\n4. Press palms into floor, lengthen spine.\n5. Hold 5 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Eagle Pose",
+    "category": "YOGA",
+    "primaryMuscle": "Shoulders",
+    "instructions": "1. Stand, cross one thigh over other, hook foot if possible.\n2. Cross elbows at 90 degrees, forearms intertwined.\n3. Bend standing knee and hold 5 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Garland Pose",
+    "category": "YOGA",
+    "primaryMuscle": "Inner Thighs",
+    "instructions": "1. Stand with feet wider than hips, toes out.\n2. Lower into a deep squat.\n3. Press elbows against inner knees.\n4. Hands at heart center. Hold 5 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Half Moon Pose",
+    "category": "YOGA",
+    "primaryMuscle": "Glutes",
+    "instructions": "1. From Warrior II, reach forward hand to floor or block.\n2. Lift rear leg to hip height.\n3. Extend top arm toward ceiling.\n4. Hold 3–5 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Happy Baby Pose",
+    "category": "YOGA",
+    "primaryMuscle": "Inner Groin",
+    "instructions": "1. Lie on back, draw knees toward chest.\n2. Grab outer edges of feet.\n3. Flex feet, stack ankles over knees.\n4. Gently rock side to side. Hold 5 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Legs Up the Wall",
+    "category": "YOGA",
+    "primaryMuscle": "Calves",
+    "instructions": "1. Sit sideways next to a wall.\n2. Swing legs up the wall as you lie back.\n3. Arms resting at sides, palms up.\n4. Hold 5–10 minutes breathing deeply.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Locust Pose",
+    "category": "YOGA",
+    "primaryMuscle": "Lower Back",
+    "instructions": "1. Lie face down, arms at sides.\n2. Inhale and lift chest, arms and legs simultaneously.\n3. Engage back muscles throughout.\n4. Hold 3–5 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Pigeon Pose",
+    "category": "YOGA",
+    "primaryMuscle": "Hip Flexors",
+    "instructions": "1. From Downward Dog, bring one shin forward parallel to mat.\n2. Extend rear leg behind.\n3. Fold torso over front shin.\n4. Hold 5–10 breaths each side.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Seated Forward Fold",
+    "category": "YOGA",
+    "primaryMuscle": "Hamstrings",
+    "instructions": "1. Sit with legs extended.\n2. Inhale to lengthen spine.\n3. Exhale and hinge forward from hips.\n4. Hold feet, shins, or use a strap.\n5. Hold 5–10 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Seated Twist",
+    "category": "YOGA",
+    "primaryMuscle": "Spine",
+    "instructions": "1. Sit with legs extended.\n2. Cross one foot over opposite knee.\n3. Twist toward bent knee, placing elbow outside it.\n4. Hold 5 breaths each side.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Sun Salutation A",
+    "category": "YOGA",
+    "primaryMuscle": "Full Body",
+    "instructions": "1. Begin in Mountain Pose, hands at heart.\n2. Inhale: raise arms overhead.\n3. Exhale: fold forward.\n4. Inhale: half-lift.\n5. Exhale: step or jump to plank, lower to floor.\n6. Inhale: Upward Dog.\n7. Exhale: Downward Dog for 5 breaths.\n8. Walk to front, half-lift, fold, return to Mountain.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Tree Pose",
+    "category": "YOGA",
+    "primaryMuscle": "Hip Abductors",
+    "instructions": "1. Stand on one foot.\n2. Place the sole of the other foot on the inner calf or thigh.\n3. Hands at heart or raised overhead.\n4. Focus gaze on a fixed point. Hold 5–10 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Triangle Pose",
+    "category": "YOGA",
+    "primaryMuscle": "Obliques",
+    "instructions": "1. Stand with wide stance.\n2. Front foot faces forward, rear foot 90 degrees.\n3. Extend front arm toward front foot, reaching shin, ankle or floor.\n4. Extend other arm toward ceiling.\n5. Hold 5 breaths each side.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Warrior I",
+    "category": "YOGA",
+    "primaryMuscle": "Hip Flexors",
+    "instructions": "1. Step one foot back into a lunge.\n2. Turn rear foot out 45 degrees.\n3. Square hips forward, raise arms overhead.\n4. Bend front knee to 90 degrees, hold 5 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Warrior II",
+    "category": "YOGA",
+    "primaryMuscle": "Hips",
+    "instructions": "1. Step feet wide apart.\n2. Turn front foot out 90 degrees, rear foot in slightly.\n3. Bend front knee, extend arms parallel to floor.\n4. Gaze over front hand. Hold 5 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": null,
+    "name": "Warrior III",
+    "category": "YOGA",
+    "primaryMuscle": "Glutes",
+    "instructions": "1. From standing, shift weight to one foot.\n2. Hinge forward, extending rear leg back to hip height.\n3. Arms extend forward or at sides.\n4. Body forms a T-shape. Hold 3–5 breaths.",
+    "tags": "yoga",
+    "imageUri": null
+  },
+  {
+    "wger_id": 1194,
+    "name": "Pallof Press",
+    "category": "STRENGTH",
+    "primaryMuscle": "Core",
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1194.png"
+  },
+  {
+    "wger_id": 1377,
+    "name": "Torso Twist",
+    "category": "STRENGTH",
+    "primaryMuscle": "Obliques",
+    "instructions": null,
+    "tags": "strength",
+    "imageUri": "exercises/1377.jpg"
+  }
+]

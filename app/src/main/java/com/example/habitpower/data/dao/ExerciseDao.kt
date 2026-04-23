@@ -11,8 +11,14 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ExerciseDao {
-    @Query("SELECT * FROM exercises")
+    @Query("SELECT * FROM exercises ORDER BY name ASC")
     fun getAllExercises(): Flow<List<Exercise>>
+
+    @Query("SELECT * FROM exercises ORDER BY name ASC")
+    suspend fun getAllExercisesSync(): List<Exercise>
+
+    @Query("SELECT name FROM exercises")
+    suspend fun getAllExerciseNames(): List<String>
 
     @Query("SELECT * FROM exercises WHERE id = :id")
     suspend fun getExerciseById(id: Long): Exercise?

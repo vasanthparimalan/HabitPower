@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -37,8 +38,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.data.model.Exercise
+import com.example.habitpower.data.model.ExerciseCategory
 import com.example.habitpower.data.model.Routine
 import com.example.habitpower.ui.AppViewModelProvider
+import com.example.habitpower.ui.exercises.CategorySectionHeader
 import com.example.habitpower.ui.exercises.ExerciseItem
 import com.example.habitpower.ui.exercises.ExercisesViewModel
 import com.example.habitpower.ui.navigation.Screen
@@ -170,29 +173,64 @@ private fun ExercisesList(
     onNavigate: (String) -> Unit,
     onDeleteExercise: (Exercise) -> Unit
 ) {
-    if (exercises.isEmpty()) {
-        Box(
-            modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
+    val grouped = ExerciseCategory.entries.associateWith { category ->
+        exercises.filter { it.category == category }
+    }
+    val expandedSections = remember {
+        mutableStateMapOf<ExerciseCategory, Boolean>().apply {
+            ExerciseCategory.entries.forEach { category -> this[category] = true }
+        }
+    }
+    fun isExpanded(category: ExerciseCategory) = expandedSections[category] == true
+
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item("exercise_library_hint") {
             Text(
-                "No exercises yet.\nTap + to create your first exercise.",
-                style = MaterialTheme.typography.bodyLarge,
+                text = if (exercises.isEmpty()) {
+                    "Your exercise space is ready. Bundled exercises appear here automatically, and you can still add your own with +."
+                } else {
+                    "Collapse sections to scan faster, or open any exercise to adjust its details."
+                },
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-    } else {
-        LazyColumn(
-            modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(exercises, key = { it.id }) { exercise ->
-                ExerciseItem(
-                    exercise = exercise,
-                    onEditClick = { onNavigate(Screen.AddEditExercise.createRoute(exercise.id)) },
-                    onDeleteClick = { onDeleteExercise(exercise) }
+
+        ExerciseCategory.entries.forEach { category ->
+            val itemsInCategory = grouped.getValue(category)
+            item(key = "${category.name}_header") {
+                CategorySectionHeader(
+                    title = category.displayName,
+                    count = itemsInCategory.size,
+                    isExpanded = isExpanded(category),
+                    onToggle = { expandedSections[category] = !isExpanded(category) }
                 )
+            }
+            if (isExpanded(category)) {
+                if (itemsInCategory.isEmpty()) {
+                    item(key = "${category.name}_empty") {
+                        Text(
+                            text = "No ${category.displayName.lowercase()} exercises yet.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 4.dp)
+                        )
+                    }
+                } else {
+                    items(itemsInCategory, key = { it.id }) { exercise ->
+                        ExerciseItem(
+                            exercise = exercise,
+                            onEditClick = { onNavigate(Screen.AddEditExercise.createRoute(exercise.id)) },
+                            onDeleteClick = { onDeleteExercise(exercise) }
+                        )
+                    }
+                }
             }
         }
     }
@@ -207,8 +245,11 @@ fun RoutineItem(
     onPlayClick: () -> Unit
 ) {
     val attributes = buildList {
-        add("Type" to routine.type.name)
+        add("Type" to routine.type.displayName)
         add("Exercises" to exerciseCount.toString())
+        if (routine.type == com.example.habitpower.data.model.RoutineType.TIMED && routine.repeatCount > 1) {
+            add("Rounds" to routine.repeatCount.toString())
+        }
     }
 
     LeafSectionItemCard(

@@ -10,6 +10,7 @@ import com.example.habitpower.data.dao.DailyHealthStatDao
 import com.example.habitpower.data.dao.ExerciseDao
 import com.example.habitpower.data.dao.HabitTrackingDao
 import com.example.habitpower.data.dao.LifeAreaDao
+import com.example.habitpower.data.dao.PomodoroSessionDao
 import com.example.habitpower.data.dao.QuoteDao
 import com.example.habitpower.data.dao.RoutineDao
 import com.example.habitpower.data.dao.RoutineNotificationSettingsDao
@@ -18,6 +19,7 @@ import com.example.habitpower.data.dao.UserStatsDao
 import com.example.habitpower.data.dao.WorkoutSessionDao
 import com.example.habitpower.data.model.DailyHabitEntry
 import com.example.habitpower.data.model.DailyHealthStat
+import com.example.habitpower.data.model.PomodoroSession
 import com.example.habitpower.data.model.Exercise
 import com.example.habitpower.data.model.HabitDefinition
 import com.example.habitpower.data.model.LifeArea
@@ -52,9 +54,10 @@ import com.example.habitpower.data.model.WorkoutSession
         DailyHabitEntry::class,
         Quote::class,
         UserStats::class,
-        RoutineNotificationSettings::class
+        RoutineNotificationSettings::class,
+        PomodoroSession::class
     ],
-    version = 21,
+    version = 25,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -69,6 +72,7 @@ abstract class HabitPowerDatabase : RoomDatabase() {
     abstract fun quoteDao(): QuoteDao
     abstract fun userStatsDao(): UserStatsDao
     abstract fun routineNotificationSettingsDao(): RoutineNotificationSettingsDao
+    abstract fun pomodoroSessionDao(): PomodoroSessionDao
 
     companion object {
         @Volatile
@@ -233,6 +237,39 @@ abstract class HabitPowerDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_21_22 = object : Migration(21, 22) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS `pomodoro_sessions` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `userId` INTEGER NOT NULL,
+                        `date` INTEGER NOT NULL,
+                        `durationMinutes` INTEGER NOT NULL,
+                        `completedAt` INTEGER NOT NULL,
+                        `linkedHabitId` INTEGER
+                    )"""
+                )
+            }
+        }
+
+        val MIGRATION_22_23 = object : Migration(22, 23) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE exercises ADD COLUMN category TEXT NOT NULL DEFAULT 'STRENGTH'")
+            }
+        }
+
+        val MIGRATION_23_24 = object : Migration(23, 24) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE routines ADD COLUMN repeatCount INTEGER NOT NULL DEFAULT 1")
+            }
+        }
+
+        val MIGRATION_24_25 = object : Migration(24, 25) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE exercises ADD COLUMN wgerExerciseId INTEGER")
+            }
+        }
+
         val MIGRATION_17_18 = object : Migration(17, 18) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE quotes ADD COLUMN source TEXT NOT NULL DEFAULT ''")
@@ -288,7 +325,11 @@ abstract class HabitPowerDatabase : RoomDatabase() {
                         MIGRATION_17_18,
                         MIGRATION_18_19,
                         MIGRATION_19_20,
-                        MIGRATION_20_21
+                        MIGRATION_20_21,
+                        MIGRATION_21_22,
+                        MIGRATION_22_23,
+                        MIGRATION_23_24,
+                        MIGRATION_24_25
                     )
                     .build()
                 INSTANCE = instance

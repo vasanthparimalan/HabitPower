@@ -5,11 +5,13 @@ import com.example.habitpower.data.dao.DailyHealthStatDao
 import com.example.habitpower.data.dao.ExerciseDao
 import com.example.habitpower.data.dao.HabitTrackingDao
 import com.example.habitpower.data.dao.LifeAreaDao
+import com.example.habitpower.data.dao.PomodoroSessionDao
 import com.example.habitpower.data.dao.RoutineDao
 import com.example.habitpower.data.dao.UserDao
 import com.example.habitpower.data.dao.WorkoutSessionDao
 import com.example.habitpower.data.model.DailyHabitEntry
 import com.example.habitpower.data.dao.RoutineNotificationSettingsDao
+import com.example.habitpower.data.model.PomodoroSession
 import com.example.habitpower.data.model.DailyHabitItem
 import com.example.habitpower.data.model.DailyHealthStat
 import com.example.habitpower.data.model.Exercise
@@ -26,6 +28,7 @@ import com.example.habitpower.data.model.UserLifeAreaAssignment
 import com.example.habitpower.data.model.UserProfile
 import com.example.habitpower.data.model.WorkoutSession
 import com.example.habitpower.reminder.HabitReminderScheduler
+import com.example.habitpower.util.ExerciseImageSupport
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,7 +53,8 @@ class HabitPowerRepository(
     private val lifeAreaDao: LifeAreaDao,
     private val quoteDao: com.example.habitpower.data.dao.QuoteDao,
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val routineNotificationSettingsDao: RoutineNotificationSettingsDao
+    private val routineNotificationSettingsDao: RoutineNotificationSettingsDao,
+    private val pomodoroSessionDao: PomodoroSessionDao
 ) {
     private val refreshTrigger = MutableStateFlow(0)
 
@@ -165,6 +169,49 @@ class HabitPowerRepository(
     fun getAllExercises(): Flow<List<Exercise>> = exerciseDao.getAllExercises()
     suspend fun getExerciseById(id: Long): Exercise? = exerciseDao.getExerciseById(id)
     suspend fun insertExercise(exercise: Exercise): Long = exerciseDao.insertExercise(exercise)
+
+    /**
+     * Seeds the exercises table from the bundled library on first launch (and picks up
+     * any new exercises added to the library in future app updates).
+     * Idempotent — skips names already present, so safe to call on every launch.
+     */
+    suspend fun seedExercisesIfNeeded(libraryItems: List<com.example.habitpower.data.model.ExerciseLibraryItem>) {
+        val existingByName = exerciseDao.getAllExercisesSync()
+            .associateBy { it.name.trim().lowercase() }
+
+        libraryItems.forEach { item ->
+            val key = item.name.trim().lowercase()
+            val existing = existingByName[key]
+            if (existing == null) {
+                exerciseDao.insertExercise(
+                    Exercise(
+                        name = item.name,
+                        description = item.primaryMuscle ?: "",
+                        imageUri = item.imageUri,
+                        targetDurationSeconds = null,
+                        targetReps = null,
+                        targetSets = null,
+                        notes = null,
+                        instructions = item.instructions,
+                        tags = item.category.name.lowercase(),
+                        category = item.category,
+                        wgerExerciseId = item.wgerExerciseId
+                    )
+                )
+            } else {
+                val merged = existing.copy(
+                    description = existing.description.ifBlank { item.primaryMuscle.orEmpty() },
+                    imageUri = item.imageUri ?: existing.imageUri,
+                    instructions = existing.instructions?.takeIf { it.isNotBlank() } ?: item.instructions,
+                    tags = existing.tags.ifBlank { item.category.name.lowercase() },
+                    wgerExerciseId = existing.wgerExerciseId ?: item.wgerExerciseId
+                )
+                if (merged != existing) {
+                    exerciseDao.updateExercise(merged)
+                }
+            }
+        }
+    }
     suspend fun updateExercise(exercise: Exercise) = exerciseDao.updateExercise(exercise)
     suspend fun deleteExercise(exercise: Exercise) = exerciseDao.deleteExercise(exercise)
 
@@ -199,6 +246,8 @@ class HabitPowerRepository(
     fun getRoutineStartSoundId(): Flow<String> = userPreferencesRepository.routineStartSoundId
     fun getRoutineEndSoundEnabled(): Flow<Boolean> = userPreferencesRepository.routineEndSoundEnabled
     fun getRoutineEndSoundId(): Flow<String> = userPreferencesRepository.routineEndSoundId
+    fun getRoutineTtsEnabled(): Flow<Boolean> = userPreferencesRepository.routineTtsEnabled
+    suspend fun saveRoutineTtsEnabled(enabled: Boolean) = userPreferencesRepository.saveRoutineTtsEnabled(enabled)
 
     fun getSessionsForDate(date: LocalDate): Flow<List<WorkoutSession>> = workoutSessionDao.getSessionsForDate(date)
     fun getSessionsForDateRange(startDate: LocalDate, endDate: LocalDate): Flow<List<WorkoutSession>> =
@@ -789,7 +838,20 @@ class HabitPowerRepository(
             ExerciseEntry("Three Stage Pranayama", 1, "6 Count", "")
         )
 
-        val imageUri = "android.resource://com.example.habitpower/drawable/exercise_placeholder"
+        // Returns the asset URI for a bundled exercise image if the file exists under
+        // app/src/main/assets/exercises/, otherwise falls back to the vector placeholder.
+        // Naming convention: lowercase, spaces → underscores, e.g. "Push-Up" → "push_up.webp"
+        // Build a one-time lookup so we only store bundled image URIs that really exist.
+        val exerciseAssetNames = runCatching {
+            context.assets.list("exercises")
+                ?.map { it.lowercase() }
+                ?.toSet()
+                ?: emptySet()
+        }.getOrDefault(emptySet())
+
+        fun exerciseAssetUri(exerciseName: String): String? {
+            return ExerciseImageSupport.resolveBundledAssetUri(exerciseName, exerciseAssetNames)
+        }
 
         suspend fun insertRoutineWithExercises(name: String, entries: List<ExerciseEntry>, description: String) {
             val routineId = routineDao.insertRoutine(Routine(name = name, description = description))
@@ -797,7 +859,7 @@ class HabitPowerRepository(
                 val exercise = Exercise(
                     name = entry.name,
                     description = entry.notes,
-                    imageUri = imageUri,
+                    imageUri = exerciseAssetUri(entry.name),
                     targetDurationSeconds = if (entry.repsOrTime.contains("sec")) {
                         entry.repsOrTime.replace(Regex("[^0-9]"), "").toIntOrNull()
                     } else {
@@ -938,4 +1000,44 @@ class HabitPowerRepository(
         val targetValue: Double? = null,
         val lifeAreaName: String
     )
+
+    // ── Pomodoro free sessions ─────────────────────────────────────────────────
+
+    suspend fun saveFreeSession(userId: Long, durationMinutes: Int): PomodoroSession {
+        val session = PomodoroSession(
+            userId = userId,
+            date = LocalDate.now(),
+            durationMinutes = durationMinutes,
+            completedAt = System.currentTimeMillis()
+        )
+        val id = pomodoroSessionDao.insert(session)
+        return session.copy(id = id)
+    }
+
+    fun getUnlinkedSessionsForDate(userId: Long, date: LocalDate): Flow<List<PomodoroSession>> =
+        pomodoroSessionDao.getUnlinkedSessionsForDate(userId, date)
+
+    suspend fun linkSessionToHabit(
+        sessionId: Long,
+        habitId: Long,
+        userId: Long,
+        currentPomodoroCount: Double
+    ) {
+        pomodoroSessionDao.linkToHabit(sessionId, habitId)
+        saveDailyHabitEntry(
+            userId = userId,
+            date = LocalDate.now(),
+            habitId = habitId,
+            type = HabitType.POMODORO,
+            numericValue = currentPomodoroCount + 1.0
+        )
+    }
+
+    suspend fun discardSession(session: PomodoroSession) {
+        pomodoroSessionDao.delete(session)
+    }
+
+    suspend fun cleanupOldUnlinkedSessions(userId: Long) {
+        pomodoroSessionDao.deleteOldUnlinked(userId, LocalDate.now())
+    }
 }

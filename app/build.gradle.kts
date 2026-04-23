@@ -76,6 +76,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
+    implementation(libs.reorderable)
     implementation(libs.materialIconsExtended)
     implementation(libs.datastorePreferences)
 

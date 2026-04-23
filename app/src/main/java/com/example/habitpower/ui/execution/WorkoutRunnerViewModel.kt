@@ -22,19 +22,24 @@ class WorkoutRunnerViewModel(
 
     private val routineId: Long = savedStateHandle.get<String>("routineId")?.toLongOrNull() ?: -1L
 
-    private var exercises = listOf<Exercise>()
+    var routineName by mutableStateOf("")
+        private set
+    var allExercises by mutableStateOf<List<Exercise>>(emptyList())
+        private set
 
     var currentExerciseIndex by mutableIntStateOf(0)
         private set
-
     var totalExercises by mutableIntStateOf(0)
         private set
-
     var currentExercise by mutableStateOf<Exercise?>(null)
         private set
 
     val isLastExercise: Boolean
-        get() = currentExerciseIndex >= exercises.size - 1
+        get() = currentExerciseIndex >= allExercises.size - 1
+
+    /** True once the user taps "Start" on the idle screen. */
+    var isStarted by mutableStateOf(false)
+        private set
 
     var isWorkoutComplete by mutableStateOf(false)
         private set
@@ -50,21 +55,28 @@ class WorkoutRunnerViewModel(
     init {
         if (routineId != -1L) {
             viewModelScope.launch {
+                val routine = repository.getRoutineById(routineId)
+                routineName = routine?.name ?: ""
+            }
+            viewModelScope.launch {
                 repository.getExercisesForRoutine(routineId).collect { loaded ->
-                    exercises = loaded
+                    allExercises = loaded
                     totalExercises = loaded.size
+                    // Pre-load first exercise for the idle screen preview — don't start timer
                     if (loaded.isNotEmpty() && currentExercise == null) {
-                        startWorkout()
+                        currentExercise = loaded[0]
                     }
                 }
             }
         }
     }
 
-    private fun startWorkout() {
-        if (exercises.isEmpty()) return
-        currentExercise = exercises[0]
+    /** User tapped Start on the idle preview screen. */
+    fun confirmStart() {
+        if (allExercises.isEmpty()) return
+        isStarted = true
         currentExerciseIndex = 0
+        currentExercise = allExercises[0]
         startTime = System.currentTimeMillis()
     }
 
@@ -85,15 +97,14 @@ class WorkoutRunnerViewModel(
     }
 
     fun nextExercise() {
-        // Reset per-exercise timer
         timerJob?.cancel()
         timerJob = null
         isTimerRunning = false
         timerSeconds = 0
 
-        if (currentExerciseIndex < exercises.size - 1) {
+        if (currentExerciseIndex < allExercises.size - 1) {
             currentExerciseIndex++
-            currentExercise = exercises[currentExerciseIndex]
+            currentExercise = allExercises[currentExerciseIndex]
         } else {
             finishWorkout()
         }

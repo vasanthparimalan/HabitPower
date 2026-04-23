@@ -1,6 +1,7 @@
 package com.example.habitpower.data
 
 import androidx.room.TypeConverter
+import com.example.habitpower.data.model.ExerciseCategory
 import com.example.habitpower.data.model.ExerciseTag
 import com.example.habitpower.data.model.HabitLifecycleStatus
 import com.example.habitpower.data.model.HabitRecurrenceType
@@ -76,5 +77,17 @@ class Converters {
     @TypeConverter
     fun habitLifecycleStatusToString(status: HabitLifecycleStatus?): String? {
         return status?.name
+    }
+
+    @TypeConverter
+    fun fromExerciseCategory(value: String?): ExerciseCategory? {
+        return value?.let {
+            runCatching { ExerciseCategory.valueOf(it) }.getOrDefault(ExerciseCategory.STRENGTH)
+        }
+    }
+
+    @TypeConverter
+    fun exerciseCategoryToString(category: ExerciseCategory?): String? {
+        return category?.name
     }
 }

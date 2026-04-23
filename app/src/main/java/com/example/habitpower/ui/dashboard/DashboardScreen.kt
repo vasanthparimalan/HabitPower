@@ -27,6 +27,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
@@ -95,6 +97,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -1353,7 +1356,7 @@ private fun LifeAreaRoseChart(
                     val petalRadius = innerRadius + ((maxRadius - innerRadius) * completionRatio)
 
                     drawArc(
-                        color = color.copy(alpha = 0.22f),
+                        color = color.copy(alpha = 0.12f),
                         startAngle = start,
                         sweepAngle = segmentSweep,
                         useCenter = true,
@@ -1413,102 +1416,174 @@ private fun ChartDetailModal(
     onClose: () -> Unit
 ) {
     val segments = data.filter { it.totalCount > 0 }
+    var expandedIds by remember { mutableStateOf(emptySet<Long>()) }
+    val palette = lifeAreaChartPalette()
 
     AlertDialog(
         onDismissRequest = onClose,
         title = {
             Text(
                 text = "Life Area Breakdown",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold
             )
         },
         text = {
             if (segments.isEmpty()) {
                 Text("No assigned life-area habits.")
             } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(segments.size) { index ->
-                        val segment = segments[index]
-                        val progress = segment.completionPercent.coerceIn(0f, 100f) / 100f
-                        val isComplete = segment.completionPercent >= 100f
+                Column {
+                    // Scrollable segment list — Column+verticalScroll avoids LazyColumn height issues inside AlertDialog
+                    Column(
+                        modifier = Modifier
+                            .heightIn(max = 380.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        segments.forEachIndexed { index, segment ->
+                            val isExpanded = segment.lifeAreaId in expandedIds
+                            val progress = segment.completionPercent.coerceIn(0f, 100f) / 100f
+                            val isComplete = segment.completionPercent >= 100f
+                            val segmentColor = palette[index % palette.size]
 
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                Text(
-                                    text = segment.emoji ?: segment.lifeAreaName.take(1).uppercase(),
-                                    style = MaterialTheme.typography.titleLarge,
-                                    modifier = Modifier.width(32.dp),
-                                    textAlign = TextAlign.Center
-                                )
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = segment.lifeAreaName,
-                                        style = MaterialTheme.typography.titleSmall,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                    Text(
-                                        text = "${segment.completedCount} of ${segment.totalCount} completed",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Text(
-                                    text = "${segment.completionPercent.toInt()}%",
-                                    style = MaterialTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (isComplete) MaterialTheme.colorScheme.primary
-                                            else MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                            LinearProgressIndicator(
-                                progress = { progress },
+                            Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(6.dp)
-                                    .clip(RoundedCornerShape(3.dp)),
-                                color = if (isComplete) MaterialTheme.colorScheme.primary
-                                        else MaterialTheme.colorScheme.secondary,
-                                trackColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
-                        }
-                        if (index < segments.size - 1) {
-                            HorizontalDivider(
-                                modifier = Modifier.padding(top = 4.dp),
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                            )
+                                    .clickable {
+                                        expandedIds = if (isExpanded)
+                                            expandedIds - segment.lifeAreaId
+                                        else
+                                            expandedIds + segment.lifeAreaId
+                                    }
+                                    .padding(vertical = 8.dp)
+                            ) {
+                                // Header row: emoji | name+count | % | chevron
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Text(
+                                        text = segment.emoji ?: segment.lifeAreaName.take(1).uppercase(),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        modifier = Modifier.width(28.dp),
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = segment.lifeAreaName,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.SemiBold,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Text(
+                                            text = "${segment.completedCount}/${segment.totalCount} done",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    Text(
+                                        text = "${segment.completionPercent.toInt()}%",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isComplete) MaterialTheme.colorScheme.primary
+                                                else MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Icon(
+                                        imageVector = if (isExpanded) Icons.Default.ArrowDropDown else Icons.Default.ArrowDropDown,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(18.dp)
+                                            .graphicsLayer(rotationZ = if (isExpanded) 180f else 0f),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(4.dp))
+
+                                // Thin progress bar in segment color
+                                LinearProgressIndicator(
+                                    progress = { progress },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(4.dp)
+                                        .clip(RoundedCornerShape(2.dp)),
+                                    color = segmentColor,
+                                    trackColor = segmentColor.copy(alpha = 0.15f)
+                                )
+
+                                // Expanded habit list
+                                if (isExpanded && segment.habits.isNotEmpty()) {
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(start = 36.dp),
+                                        verticalArrangement = Arrangement.spacedBy(3.dp)
+                                    ) {
+                                        segment.habits.forEach { habit ->
+                                            val habitDone = isCompleted(habit)
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                            ) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(6.dp)
+                                                        .background(
+                                                            color = if (habitDone) segmentColor
+                                                                    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                                            shape = CircleShape
+                                                        )
+                                                )
+                                                Text(
+                                                    text = habit.name,
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    textDecoration = if (habitDone) TextDecoration.LineThrough else null,
+                                                    color = if (habitDone)
+                                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                                    else
+                                                        MaterialTheme.colorScheme.onSurface,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (index < segments.size - 1) {
+                                HorizontalDivider(
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+                                )
+                            }
                         }
                     }
 
-                    item {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(12.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                Text(
-                                    text = "Overall Balance",
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                                Text(
-                                    text = "${segments.sumOf { it.completedCount }} / ${segments.sumOf { it.totalCount }} completed",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            }
-                        }
+                    // Overall balance — pinned below scroll, always visible
+                    HorizontalDivider(
+                        modifier = Modifier.padding(top = 8.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Total",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "${segments.sumOf { it.completedCount }} / ${segments.sumOf { it.totalCount }} completed",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
             }

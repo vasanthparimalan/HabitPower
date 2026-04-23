@@ -15,6 +15,8 @@ import com.example.habitpower.ui.dashboard.DashboardViewModel
 import com.example.habitpower.ui.execution.WorkoutRunnerViewModel
 import com.example.habitpower.ui.exercises.AddEditExerciseViewModel
 import com.example.habitpower.ui.exercises.ExercisesViewModel
+import com.example.habitpower.ui.exercises.ImportPackViewModel
+import com.example.habitpower.ui.exercises.LibraryBrowseViewModel
 import com.example.habitpower.ui.routines.AddEditRoutineViewModel
 import com.example.habitpower.ui.routines.ExecuteRoutineRouterViewModel
 import com.example.habitpower.ui.routines.RoutinesViewModel
@@ -28,7 +30,8 @@ object AppViewModelProvider {
         initializer {
             AddEditExerciseViewModel(
                 this.createSavedStateHandle(),
-                habitPowerApplication().container.habitPowerRepository
+                habitPowerApplication().container.habitPowerRepository,
+                habitPowerApplication().container.exerciseLibraryRepository
             )
         }
         initializer {
@@ -118,6 +121,15 @@ object AppViewModelProvider {
                 habitPowerApplication().container.habitPowerRepository,
                 habitPowerApplication().container.gamificationRepository
             )
+        }
+        initializer {
+            LibraryBrowseViewModel(
+                habitPowerApplication().container.exerciseLibraryRepository,
+                habitPowerApplication().container.habitPowerRepository
+            )
+        }
+        initializer {
+            ImportPackViewModel(habitPowerApplication().container.habitPowerRepository)
         }
         // Add other ViewModels here as we create them
     }

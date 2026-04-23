@@ -38,7 +38,8 @@ data class LifeAreaCompletion(
     val emoji: String?,
     val completedCount: Int,
     val totalCount: Int,
-    val completionPercent: Float
+    val completionPercent: Float,
+    val habits: List<DailyHabitItem> = emptyList()
 )
 
 data class CompletionFeedback(
@@ -159,7 +160,10 @@ class DashboardViewModel(
             if (user == null) {
                 flowOf(emptyList())
             } else {
-                repository.getDailyHabitItems(user.id, date).map { habits ->
+                // getFocusHabitItems (not getDailyHabitItems) so TIMER habits are included:
+                // TIMER habits have showInDailyCheckIn=false and are excluded by getDailyHabitItems,
+                // but they are real habits that count toward life area and progress tracking.
+                repository.getFocusHabitItems(user.id, date).map { habits ->
                     val scopedHabits = filterDailyItemsByAssignedAreas(habits, assignedAreaIds)
                     computeLifeAreaCompletion(areas = areas, habits = scopedHabits)
                 }
@@ -348,7 +352,8 @@ class DashboardViewModel(
                 emoji = area.emoji,
                 completedCount = completed,
                 totalCount = total,
-                completionPercent = percent
+                completionPercent = percent,
+                habits = areaHabits
             )
         }
     }

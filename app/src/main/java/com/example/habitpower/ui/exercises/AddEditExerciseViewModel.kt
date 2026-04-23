@@ -2,14 +2,18 @@ package com.example.habitpower.ui.exercises
 
 import android.content.Context
 import android.net.Uri
+import android.webkit.MimeTypeMap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.habitpower.data.ExerciseLibraryRepository
 import com.example.habitpower.data.HabitPowerRepository
 import com.example.habitpower.data.model.Exercise
+import com.example.habitpower.data.model.ExerciseCategory
+import com.example.habitpower.data.model.ExerciseLibraryItem
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
@@ -18,7 +22,8 @@ import java.util.UUID
 
 class AddEditExerciseViewModel(
     savedStateHandle: SavedStateHandle,
-    private val repository: HabitPowerRepository
+    private val repository: HabitPowerRepository,
+    val libraryRepository: ExerciseLibraryRepository
 ) : ViewModel() {
 
     private val exerciseId: Long? = savedStateHandle.get<String>("exerciseId")?.toLongOrNull()?.takeIf { it != -1L }
@@ -41,9 +46,10 @@ class AddEditExerciseViewModel(
     var instructions by mutableStateOf("")
         private set
     var tags by mutableStateOf("")
-        private set  // CSV format: "gym,yoga,flexibility"
+        private set
+    var category by mutableStateOf(ExerciseCategory.STRENGTH)
+        private set
 
-    // Helper state to toggle UI between Reps and Duration
     var isTimeBased by mutableStateOf(false)
         private set
 
@@ -70,6 +76,7 @@ class AddEditExerciseViewModel(
                     notes = exercise.notes ?: ""
                     instructions = exercise.instructions ?: ""
                     tags = exercise.tags
+                    category = exercise.category
                 }
             }
         }
@@ -89,7 +96,16 @@ class AddEditExerciseViewModel(
                     if (!directory.exists()) {
                         directory.mkdirs()
                     }
-                    val fileName = "${UUID.randomUUID()}.jpg"
+                    val mimeType = context.contentResolver.getType(uri)
+                    val extensionFromMimeType = mimeType
+                        ?.let { MimeTypeMap.getSingleton().getExtensionFromMimeType(it) }
+                        ?.lowercase()
+                    val extensionFromUri = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
+                        ?.lowercase()
+                        ?.takeIf { it.isNotBlank() }
+                    val extension = (extensionFromMimeType ?: extensionFromUri ?: "jpg")
+                        .removePrefix(".")
+                    val fileName = "${UUID.randomUUID()}.$extension"
                     val file = File(directory, fileName)
                     val outputStream = FileOutputStream(file)
 
@@ -123,6 +139,18 @@ class AddEditExerciseViewModel(
     fun updateNotes(input: String) { notes = input }
     fun updateInstructions(input: String) { instructions = input }
     fun updateTags(input: String) { tags = input }
+    fun updateCategory(cat: ExerciseCategory) { category = cat }
+
+    fun prefillFromLibrary(item: ExerciseLibraryItem) {
+        name = item.name
+        description = item.primaryMuscle ?: ""
+        instructions = item.instructions ?: ""
+        imageUri = item.imageUri
+        category = item.category
+        if (tags.isBlank()) {
+            tags = item.category.name.lowercase()
+        }
+    }
 
     fun saveExercise() {
         if (name.isBlank()) return
@@ -137,7 +165,8 @@ class AddEditExerciseViewModel(
             targetReps = if (!isTimeBased) targetReps.toIntOrNull() else null,
             notes = notes,
             instructions = instructions.ifBlank { null },
-            tags = tags
+            tags = tags,
+            category = category
         )
 
         viewModelScope.launch {

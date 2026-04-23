@@ -3,9 +3,9 @@ package com.example.habitpower.data.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-enum class RoutineType {
-    NORMAL,      // User marks exercises complete, shows next one
-    TIMED        // Auto-switch with exercise duration + rest time
+enum class RoutineType(val displayName: String) {
+    NORMAL("Normal"),
+    TIMED("Timed")
 }
 
 @Entity(tableName = "routines")
@@ -14,6 +14,8 @@ data class Routine(
     val id: Long = 0,
     val name: String,
     val description: String,
-    val type: RoutineType = RoutineType.NORMAL, // Type of routine
-    val restTimeSeconds: Int = 0 // Rest time between exercises in timed routines
+    val type: RoutineType = RoutineType.NORMAL,
+    val restTimeSeconds: Int = 0,
+    /** How many times the full exercise list repeats. 1 = single pass (default). */
+    val repeatCount: Int = 1
 )

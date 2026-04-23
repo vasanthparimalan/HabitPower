@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.habitpower.util.NotificationSoundOption
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
@@ -105,5 +106,42 @@ class UserPreferencesRepository(private val context: Context) {
 
     suspend fun saveRoutineEndSoundId(id: String) {
         context.dataStore.edit { it[ROUTINE_END_SOUND_ID_KEY] = id }
+    }
+
+    // ── TTS ──────────────────────────────────────────────────────────────────
+
+    private val TTS_ENABLED_KEY = booleanPreferencesKey("routine_tts_enabled")
+
+    val routineTtsEnabled: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[TTS_ENABLED_KEY] ?: false
+    }
+
+    suspend fun saveRoutineTtsEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[TTS_ENABLED_KEY] = enabled }
+    }
+
+    // ── Pomodoro settings ──────────────────────────────────────────────────────
+
+    private val POMODORO_FOCUS_MINUTES_KEY = intPreferencesKey("pomodoro_focus_minutes")
+    private val POMODORO_SHORT_BREAK_MINUTES_KEY = intPreferencesKey("pomodoro_short_break_minutes")
+    private val POMODORO_LONG_BREAK_MINUTES_KEY = intPreferencesKey("pomodoro_long_break_minutes")
+    private val POMODORO_CYCLES_BEFORE_LONG_BREAK_KEY = intPreferencesKey("pomodoro_cycles_before_long_break")
+
+    val pomodoroSettings: Flow<PomodoroSettings> = combine(
+        context.dataStore.data.map { it[POMODORO_FOCUS_MINUTES_KEY] ?: 25 },
+        context.dataStore.data.map { it[POMODORO_SHORT_BREAK_MINUTES_KEY] ?: 5 },
+        context.dataStore.data.map { it[POMODORO_LONG_BREAK_MINUTES_KEY] ?: 15 },
+        context.dataStore.data.map { it[POMODORO_CYCLES_BEFORE_LONG_BREAK_KEY] ?: 4 }
+    ) { focus, shortBreak, longBreak, cycles ->
+        PomodoroSettings(focus, shortBreak, longBreak, cycles)
+    }
+
+    suspend fun savePomodoroSettings(settings: PomodoroSettings) {
+        context.dataStore.edit {
+            it[POMODORO_FOCUS_MINUTES_KEY] = settings.focusMinutes
+            it[POMODORO_SHORT_BREAK_MINUTES_KEY] = settings.shortBreakMinutes
+            it[POMODORO_LONG_BREAK_MINUTES_KEY] = settings.longBreakMinutes
+            it[POMODORO_CYCLES_BEFORE_LONG_BREAK_KEY] = settings.cyclesBeforeLongBreak
+        }
     }
 }

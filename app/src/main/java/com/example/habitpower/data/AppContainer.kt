@@ -8,6 +8,7 @@ interface AppContainer {
     val lifeAreaRepository: com.example.habitpower.data.repository.LifeAreaRepository
     val userPreferencesRepository: UserPreferencesRepository
     val gamificationRepository: GamificationRepository
+    val exerciseLibraryRepository: ExerciseLibraryRepository
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -24,8 +25,9 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
             database.habitTrackingDao(),
             database.lifeAreaDao(),
             database.quoteDao(),
-              UserPreferencesRepository(context),
-              database.routineNotificationSettingsDao()
+            UserPreferencesRepository(context),
+            database.routineNotificationSettingsDao(),
+            database.pomodoroSessionDao()
         )
     }
 
@@ -43,5 +45,9 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
             database.habitTrackingDao(),
             database.lifeAreaDao()
         )
+    }
+
+    override val exerciseLibraryRepository: ExerciseLibraryRepository by lazy {
+        ExerciseLibraryRepository(context)
     }
 }
