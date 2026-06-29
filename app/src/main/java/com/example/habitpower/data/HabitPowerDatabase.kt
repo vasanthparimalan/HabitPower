@@ -74,7 +74,7 @@ import com.example.habitpower.data.model.WorkoutSession
         ChecklistItem::class,
         MeditationSession::class
     ],
-    version = 34,
+    version = 35,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -478,9 +478,67 @@ abstract class HabitPowerDatabase : RoomDatabase() {
 
         val MIGRATION_33_34 = object : Migration(33, 34) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // pausedUntil: the date a time-bound hold ends. NULL = no scheduled end.
-                // Stored as TEXT (ISO-8601 yyyy-MM-dd) via Room's LocalDate TypeConverter.
+                // Originally added pausedUntil as TEXT — wrong type (LocalDate uses epoch-day
+                // Long, so Room expects INTEGER). Fixed in MIGRATION_34_35 below.
                 db.execSQL("ALTER TABLE habit_definitions ADD COLUMN pausedUntil TEXT")
+            }
+        }
+
+        val MIGRATION_34_35 = object : Migration(34, 35) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // MIGRATION_33_34 added `pausedUntil TEXT` but the LocalDate TypeConverter
+                // stores dates as epoch-day Long, which Room maps to INTEGER affinity. The
+                // type mismatch caused a "Migration didn't properly handle habit_definitions"
+                // crash on every upgrade. Fix: recreate the table with the correct type.
+                // All `pausedUntil` values are NULL in practice (the app was crashing before
+                // any user could set a hold), so no data is lost.
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `habit_definitions_new` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `name` TEXT NOT NULL,
+                        `goalIdentityStatement` TEXT NOT NULL,
+                        `description` TEXT NOT NULL,
+                        `commitmentTime` TEXT,
+                        `commitmentLocation` TEXT NOT NULL,
+                        `preReminderMinutes` INTEGER,
+                        `recurrenceType` TEXT NOT NULL,
+                        `recurrenceInterval` INTEGER NOT NULL,
+                        `recurrenceDaysOfWeekMask` INTEGER NOT NULL,
+                        `recurrenceDayOfMonth` INTEGER,
+                        `recurrenceWeekOfMonth` INTEGER,
+                        `recurrenceWeekday` INTEGER,
+                        `recurrenceYearlyDates` TEXT NOT NULL,
+                        `recurrenceAnchorDate` INTEGER,
+                        `recurrenceStartDate` INTEGER,
+                        `recurrenceEndDate` INTEGER,
+                        `type` TEXT NOT NULL,
+                        `unit` TEXT,
+                        `targetValue` REAL,
+                        `showInWidget` INTEGER NOT NULL,
+                        `showInDailyCheckIn` INTEGER NOT NULL,
+                        `displayOrder` INTEGER NOT NULL,
+                        `isActive` INTEGER NOT NULL,
+                        `operator` TEXT NOT NULL,
+                        `lifeAreaId` INTEGER,
+                        `routineId` INTEGER,
+                        `lifecycleStatus` TEXT NOT NULL,
+                        `pausedUntil` INTEGER
+                    )
+                """.trimIndent())
+                db.execSQL("""
+                    INSERT INTO `habit_definitions_new` SELECT
+                        `id`, `name`, `goalIdentityStatement`, `description`, `commitmentTime`,
+                        `commitmentLocation`, `preReminderMinutes`, `recurrenceType`,
+                        `recurrenceInterval`, `recurrenceDaysOfWeekMask`, `recurrenceDayOfMonth`,
+                        `recurrenceWeekOfMonth`, `recurrenceWeekday`, `recurrenceYearlyDates`,
+                        `recurrenceAnchorDate`, `recurrenceStartDate`, `recurrenceEndDate`,
+                        `type`, `unit`, `targetValue`, `showInWidget`, `showInDailyCheckIn`,
+                        `displayOrder`, `isActive`, `operator`, `lifeAreaId`, `routineId`,
+                        `lifecycleStatus`, NULL
+                    FROM `habit_definitions`
+                """.trimIndent())
+                db.execSQL("DROP TABLE `habit_definitions`")
+                db.execSQL("ALTER TABLE `habit_definitions_new` RENAME TO `habit_definitions`")
             }
         }
 
@@ -518,7 +576,8 @@ abstract class HabitPowerDatabase : RoomDatabase() {
                         MIGRATION_30_31,
                         MIGRATION_31_32,
                         MIGRATION_32_33,
-                        MIGRATION_33_34
+                        MIGRATION_33_34,
+                        MIGRATION_34_35
                     )
                     .build()
                 INSTANCE = instance
