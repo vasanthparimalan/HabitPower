@@ -1,28 +1,37 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.ksp)
     id("org.jlleitschuh.gradle.ktlint")
+    alias(libs.plugins.googleServices)
+    alias(libs.plugins.firebaseCrashlytics)
 }
 
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
+val keystoreProperties = Properties().apply {
+    val f = rootProject.file("keystore.properties")
+    if (f.exists()) load(f.inputStream())
+}
+
 android {
     namespace = "com.example.habitpower"
-    compileSdk = 34
+    compileSdk = 35
 
     sourceSets {
         getByName("androidTest").assets.srcDirs("$projectDir/schemas")
     }
 
     defaultConfig {
-        applicationId = "com.example.healthtrack"
+        applicationId = "com.vasanthparimalan.habitpower"
         minSdk = 26
-        targetSdk = 34
-        versionCode = 4
-        versionName = "1.3"
+        targetSdk = 35
+        versionCode = 12
+        versionName = "1.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -30,8 +39,18 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = rootProject.file(keystoreProperties["storeFile"] as String)
+            storePassword = keystoreProperties["storePassword"] as String
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -98,4 +117,13 @@ dependencies {
     // Glance (Widgets)
     implementation(libs.glanceAppwidget)
     implementation(libs.glanceMaterial3)
+
+    // Google Drive Sync
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
+
+    // Firebase / Crashlytics
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
 }

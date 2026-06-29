@@ -20,9 +20,12 @@ suspend fun Context.saveWidgetState(state: WidgetState) {
             userName = InputSanitizer.sanitize(state.userName, 100) ?: "",
             habits = state.habits.map { h ->
                 WidgetHabit(
+                    habitId = h.habitId,
                     name = InputSanitizer.sanitize(h.name, 120) ?: "",
                     streak = h.streak,
-                    navigateTo = h.navigateTo
+                    navigateTo = h.navigateTo,
+                    isCompleted = h.isCompleted,
+                    isBoolean = h.isBoolean
                 )
             }
         )
@@ -40,13 +43,17 @@ private fun WidgetState.toJson(): String {
         put("userName", userName)
         put("completedCount", completedCount)
         put("totalCount", totalCount)
+        put("dailyIntention", dailyIntention)
         val habitsArray = JSONArray()
         habits.forEach { habit ->
             habitsArray.put(
                 JSONObject().apply {
+                    put("habitId", habit.habitId)
                     put("name", habit.name)
                     put("streak", habit.streak)
                     put("navigateTo", habit.navigateTo)
+                    put("isCompleted", habit.isCompleted)
+                    put("isBoolean", habit.isBoolean)
                 }
             )
         }
@@ -61,6 +68,7 @@ private fun String.toWidgetState(): WidgetState {
         val userName = InputSanitizer.sanitize(json.optString("userName", ""), 100) ?: ""
         val completedCount = json.optInt("completedCount", 0)
         val totalCount = json.optInt("totalCount", 0)
+        val dailyIntention = InputSanitizer.sanitize(json.optString("dailyIntention", ""), 280) ?: ""
         val habitsArray = json.optJSONArray("habits") ?: JSONArray()
         val habits = mutableListOf<WidgetHabit>()
         for (i in 0 until habitsArray.length()) {
@@ -68,9 +76,12 @@ private fun String.toWidgetState(): WidgetState {
             val safeName = InputSanitizer.sanitize(obj.optString("name", ""), 120) ?: ""
             habits.add(
                 WidgetHabit(
+                    habitId = obj.optLong("habitId", 0L),
                     name = safeName,
                     streak = obj.optInt("streak", 0),
-                    navigateTo = obj.optString("navigateTo", "daily_check_in")
+                    navigateTo = obj.optString("navigateTo", "daily_check_in"),
+                    isCompleted = obj.optBoolean("isCompleted", false),
+                    isBoolean = obj.optBoolean("isBoolean", false)
                 )
             )
         }
@@ -78,7 +89,8 @@ private fun String.toWidgetState(): WidgetState {
             userName = userName,
             habits = habits,
             completedCount = completedCount,
-            totalCount = totalCount
+            totalCount = totalCount,
+            dailyIntention = dailyIntention
         )
     } catch (e: Exception) {
         WidgetState()

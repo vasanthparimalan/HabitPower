@@ -25,5 +25,7 @@ data class UserStats(
     val lastCheckInStreakBefore: Int = 0,
     val lastCheckInLongestBefore: Int = 0,
     /** Bitmask of earned badge IDs from GamificationEngine.Badge */
-    val earnedBadgesMask: Long = 0L
+    val earnedBadgesMask: Long = 0L,
+    /** Asymptotic practice depth — accumulates forever, never resets on a missed day. */
+    val practiceDepth: Double = 0.0
 )

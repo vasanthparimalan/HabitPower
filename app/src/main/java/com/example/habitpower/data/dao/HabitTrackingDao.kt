@@ -102,6 +102,12 @@ interface HabitTrackingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertDailyEntry(entry: DailyHabitEntry)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllEntries(entries: List<DailyHabitEntry>)
+
+    @Query("UPDATE daily_habit_entries SET quality = :quality WHERE userId = :userId AND habitId = :habitId AND date = :date")
+    suspend fun updateEntryQuality(userId: Long, habitId: Long, date: LocalDate, quality: Int)
+
     @Query(
         """
         DELETE FROM daily_habit_entries
@@ -122,6 +128,9 @@ interface HabitTrackingDao {
     @Query("SELECT * FROM daily_habit_entries WHERE userId = :userId ORDER BY date DESC")
     suspend fun getAllEntriesForUser(userId: Long): List<DailyHabitEntry>
 
+    @Query("SELECT * FROM user_habit_assignments")
+    suspend fun getAllAssignments(): List<UserHabitAssignment>
+
     @Query(
         """
         SELECT hd.*
@@ -132,4 +141,34 @@ interface HabitTrackingDao {
         """
     )
     fun getGraduatedHabitsForUser(userId: Long): Flow<List<HabitDefinition>>
+
+    // Time-bound paused habits only (pausedUntil IS NOT NULL), sorted by return date.
+    // Indefinite pauses (pausedUntil = NULL) are not shown in the On Hold section.
+    @Query(
+        """
+        SELECT hd.*
+        FROM habit_definitions hd
+        INNER JOIN user_habit_assignments ua ON ua.habitId = hd.id
+        WHERE ua.userId = :userId
+            AND hd.lifecycleStatus = 'PAUSED'
+            AND hd.pausedUntil IS NOT NULL
+        ORDER BY hd.pausedUntil ASC, hd.name ASC
+        """
+    )
+    fun getOnHoldHabitsForUser(userId: Long): Flow<List<HabitDefinition>>
+
+    // Auto-resume: flip all time-bound holds whose end date is strictly before today.
+    // Called once at app launch so habits resume the morning after the hold ends.
+    @Query(
+        """
+        UPDATE habit_definitions
+        SET lifecycleStatus = 'ACTIVE',
+            isActive = 1,
+            pausedUntil = NULL
+        WHERE lifecycleStatus = 'PAUSED'
+            AND pausedUntil IS NOT NULL
+            AND pausedUntil < :today
+        """
+    )
+    suspend fun autoResumeExpiredHolds(today: LocalDate)
 }

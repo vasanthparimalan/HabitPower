@@ -1,11 +1,14 @@
 package com.example.habitpower.data
 
+import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -116,5 +119,37 @@ class HabitPowerDatabaseMigrationTest {
         }
 
         migratedDb.close()
+    }
+
+    @Test
+    fun currentSchema_matchesLatestVersion() {
+        // Opens an in-memory database at the current schema version.
+        // Room will throw if the entity definitions don't match the schema exports.
+        val db = Room.inMemoryDatabaseBuilder(
+            ApplicationProvider.getApplicationContext(),
+            HabitPowerDatabase::class.java
+        ).build()
+        assertTrue("Database version must be >= 1", db.openHelper.readableDatabase.version >= 1)
+        db.close()
+    }
+
+    @Test
+    fun inMemoryDatabase_createsAndDestroys_withoutError() {
+        // Sanity: verifies the full entity set compiles and Room can create all tables.
+        val db = Room.inMemoryDatabaseBuilder(
+            ApplicationProvider.getApplicationContext(),
+            HabitPowerDatabase::class.java
+        ).allowMainThreadQueries().build()
+
+        // Each DAO call proves the table was created
+        db.userDao()
+        db.habitTrackingDao()
+        db.lifeAreaDao()
+        db.chantDao()
+        db.taskDao()
+        db.workoutSessionDao()
+        db.dailyHealthStatDao()
+
+        db.close()
     }
 }

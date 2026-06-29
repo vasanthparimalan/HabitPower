@@ -33,6 +33,10 @@ data class HabitDefinition(
     val isActive: Boolean = true,
     val operator: TargetOperator = TargetOperator.GREATER_THAN_OR_EQUAL,
     val lifeAreaId: Long? = null,
-    val routineId: Long? = null, // For ROUTINE type habits, reference the routine
-    val lifecycleStatus: HabitLifecycleStatus = HabitLifecycleStatus.ACTIVE
+    val routineId: Long? = null,
+    val lifecycleStatus: HabitLifecycleStatus = HabitLifecycleStatus.ACTIVE,
+    // When non-null, the habit is on hold until this date (inclusive). On the morning
+    // after this date the app auto-resumes the habit back to ACTIVE. Null means the
+    // hold has no scheduled end — the user must resume manually.
+    val pausedUntil: LocalDate? = null
 )

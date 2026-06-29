@@ -15,6 +15,8 @@ data class NotificationToneState(
     val soundEnabled: Boolean = true,
     val selectedSoundId: String = NotificationSoundOption.SHORT_BEEP.id,
     val vibrationEnabled: Boolean = true,
+    val habitCompletionSoundEnabled: Boolean = true,
+    val habitCompletionSoundId: String = NotificationSoundOption.POSITIVE.id,
     val routineStartSoundEnabled: Boolean = true,
     val routineStartSoundId: String = NotificationSoundOption.SHORT_BEEP.id,
     val routineEndSoundEnabled: Boolean = true,
@@ -45,6 +47,10 @@ class AdminNotificationToneViewModel(
                     prefsRepository.completionVibrationEnabled
                 ) { enabled, soundId, vibration -> Triple(enabled, soundId, vibration) },
                 combine(
+                    prefsRepository.habitCompletionSoundEnabled,
+                    prefsRepository.habitCompletionSoundId
+                ) { enabled, id -> enabled to id },
+                combine(
                     prefsRepository.routineStartSoundEnabled,
                     prefsRepository.routineStartSoundId,
                     prefsRepository.routineEndSoundEnabled,
@@ -57,11 +63,13 @@ class AdminNotificationToneViewModel(
                         endSoundId = routineEndId
                     )
                 }
-            ) { completionSound, routineSounds ->
+            ) { completionSound, habitSound, routineSounds ->
                 NotificationToneState(
                     soundEnabled = completionSound.first,
                     selectedSoundId = completionSound.second,
                     vibrationEnabled = completionSound.third,
+                    habitCompletionSoundEnabled = habitSound.first,
+                    habitCompletionSoundId = habitSound.second,
                     routineStartSoundEnabled = routineSounds.startEnabled,
                     routineStartSoundId = routineSounds.startSoundId,
                     routineEndSoundEnabled = routineSounds.endEnabled,
@@ -89,6 +97,17 @@ class AdminNotificationToneViewModel(
         val new = !_state.value.vibrationEnabled
         _state.update { it.copy(vibrationEnabled = new) }
         viewModelScope.launch { prefsRepository.saveCompletionVibrationEnabled(new) }
+    }
+
+    fun toggleHabitCompletionSound() {
+        val new = !_state.value.habitCompletionSoundEnabled
+        _state.update { it.copy(habitCompletionSoundEnabled = new) }
+        viewModelScope.launch { prefsRepository.saveHabitCompletionSoundEnabled(new) }
+    }
+
+    fun selectHabitCompletionSound(option: NotificationSoundOption) {
+        _state.update { it.copy(habitCompletionSoundId = option.id) }
+        viewModelScope.launch { prefsRepository.saveHabitCompletionSoundId(option.id) }
     }
 
     fun toggleRoutineStartSound() {

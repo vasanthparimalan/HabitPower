@@ -149,7 +149,7 @@ private fun RoutinesList(
     } else {
         LazyColumn(
             modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 88.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(routines, key = { it.id }) { routine ->
@@ -185,21 +185,9 @@ private fun ExercisesList(
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 88.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        item("exercise_library_hint") {
-            Text(
-                text = if (exercises.isEmpty()) {
-                    "Your exercise space is ready. Bundled exercises appear here automatically, and you can still add your own with +."
-                } else {
-                    "Collapse sections to scan faster, or open any exercise to adjust its details."
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-
         ExerciseCategory.entries.forEach { category ->
             val itemsInCategory = grouped.getValue(category)
             item(key = "${category.name}_header") {

@@ -8,10 +8,19 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.habitpower.data.HabitPowerRepository
-import com.example.habitpower.data.model.Exercise
+import com.example.habitpower.data.model.HabitDefinition
+import com.example.habitpower.data.model.HabitType
+import com.example.habitpower.data.model.RoutineExerciseWithDetails
 import com.example.habitpower.data.model.WorkoutSession
+import com.example.habitpower.util.SoundPlayer
+import com.example.habitpower.util.TtsPlayer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -24,25 +33,31 @@ class WorkoutRunnerViewModel(
 
     var routineName by mutableStateOf("")
         private set
-    var allExercises by mutableStateOf<List<Exercise>>(emptyList())
+    var allExercises by mutableStateOf<List<RoutineExerciseWithDetails>>(emptyList())
         private set
 
     var currentExerciseIndex by mutableIntStateOf(0)
         private set
     var totalExercises by mutableIntStateOf(0)
         private set
-    var currentExercise by mutableStateOf<Exercise?>(null)
+    var currentExercise by mutableStateOf<RoutineExerciseWithDetails?>(null)
         private set
 
     val isLastExercise: Boolean
         get() = currentExerciseIndex >= allExercises.size - 1
 
-    /** True once the user taps "Start" on the idle screen. */
     var isStarted by mutableStateOf(false)
         private set
 
     var isWorkoutComplete by mutableStateOf(false)
         private set
+
+    var linkedHabitName by mutableStateOf<String?>(null)
+        private set
+
+    val habitsForLinking: StateFlow<List<HabitDefinition>> = repository.getAllHabits()
+        .map { habits -> habits.filter { it.type != HabitType.TEXT } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     var timerSeconds by mutableIntStateOf(0)
         private set
@@ -59,10 +74,9 @@ class WorkoutRunnerViewModel(
                 routineName = routine?.name ?: ""
             }
             viewModelScope.launch {
-                repository.getExercisesForRoutine(routineId).collect { loaded ->
+                repository.getRoutineExercisesWithDetails(routineId).collect { loaded ->
                     allExercises = loaded
                     totalExercises = loaded.size
-                    // Pre-load first exercise for the idle screen preview — don't start timer
                     if (loaded.isNotEmpty() && currentExercise == null) {
                         currentExercise = loaded[0]
                     }
@@ -71,13 +85,13 @@ class WorkoutRunnerViewModel(
         }
     }
 
-    /** User tapped Start on the idle preview screen. */
     fun confirmStart() {
         if (allExercises.isEmpty()) return
         isStarted = true
         currentExerciseIndex = 0
         currentExercise = allExercises[0]
         startTime = System.currentTimeMillis()
+        announceExercise(allExercises[0])
     }
 
     fun toggleTimer() {
@@ -105,7 +119,9 @@ class WorkoutRunnerViewModel(
         if (currentExerciseIndex < allExercises.size - 1) {
             currentExerciseIndex++
             currentExercise = allExercises[currentExerciseIndex]
+            announceExercise(allExercises[currentExerciseIndex])
         } else {
+            announceComplete()
             finishWorkout()
         }
     }
@@ -125,6 +141,45 @@ class WorkoutRunnerViewModel(
                 )
             )
             repository.completeRoutineLinkedHabits(routineId)
+        }
+    }
+
+    private fun announceExercise(entry: RoutineExerciseWithDetails) {
+        viewModelScope.launch {
+            val soundEnabled = repository.getRoutineStartSoundEnabled().first()
+            val soundId = repository.getRoutineStartSoundId().first()
+            val ttsOn = repository.getRoutineTtsEnabled().first()
+            if (soundEnabled) SoundPlayer.playById(soundId)
+            if (ttsOn) TtsPlayer.speak(entry.exercise.name)
+        }
+    }
+
+    private fun announceComplete() {
+        viewModelScope.launch {
+            val soundEnabled = repository.getRoutineEndSoundEnabled().first()
+            val soundId = repository.getRoutineEndSoundId().first()
+            val ttsOn = repository.getRoutineTtsEnabled().first()
+            if (soundEnabled) SoundPlayer.playById(soundId)
+            if (ttsOn) TtsPlayer.speak("Routine complete. Well done.")
+        }
+    }
+
+    fun linkSessionToHabit(habitId: Long) {
+        viewModelScope.launch {
+            val user = repository.getResolvedActiveUser().first() ?: return@launch
+            val habit = habitsForLinking.value.firstOrNull { it.id == habitId } ?: return@launch
+            repository.saveDailyHabitEntry(
+                userId = user.id,
+                date = LocalDate.now(),
+                habitId = habitId,
+                type = habit.type,
+                booleanValue = true,
+                numericValue = when (habit.type) {
+                    HabitType.COUNT, HabitType.DURATION, HabitType.TIMER, HabitType.NUMBER -> habit.targetValue ?: 1.0
+                    else -> null
+                }
+            )
+            linkedHabitName = habit.name
         }
     }
 

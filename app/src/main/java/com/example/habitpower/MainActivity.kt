@@ -30,6 +30,7 @@ import com.example.habitpower.ui.admin.AdminHomeScreen
 import com.example.habitpower.ui.admin.AdminLifeAreasScreen
 import com.example.habitpower.ui.admin.AdminUsersScreen
 import com.example.habitpower.ui.admin.ExportScreen
+import com.example.habitpower.ui.admin.ImportScreen
 import com.example.habitpower.ui.dashboard.DashboardScreen
 import com.example.habitpower.ui.execution.WorkoutRunnerScreen
 import com.example.habitpower.ui.exercises.AddEditExerciseScreen
@@ -42,8 +43,11 @@ import com.example.habitpower.ui.routines.RoutinesSection
 import com.example.habitpower.ui.routines.RoutinesScreen
 import com.example.habitpower.ui.theme.AppIconography
 import com.example.habitpower.ui.theme.HabitPowerTheme
+import com.example.habitpower.ui.welcome.MissedDayWelcomeScreen
 import com.example.habitpower.reminder.HabitReminderScheduler
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,8 +63,10 @@ class MainActivity : ComponentActivity() {
         }
 
         lifecycleScope.launch {
+            repository.autoResumeExpiredHolds()   // resume time-bound holds whose date passed
             repository.seedHabitTrackingIfNeeded()
             repository.prepopulateRoutinesIfNeeded()
+            repository.patchExerciseInstructionsAndSeedYoga()
             repository.syncHabitReminders()
         }
 
@@ -79,13 +85,16 @@ fun HabitPowerAppContent() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    // Handle deep link from widget
+    // Handle deep link from widget and missed-day welcome on launch
+    val prefsRepository = (context.applicationContext as HabitPowerApp).container.userPreferencesRepository
     androidx.compose.runtime.LaunchedEffect(Unit) {
         val activity = context as? ComponentActivity
         val screen = activity?.intent?.getStringExtra("screen")
         val userId = activity?.intent
             ?.getLongExtra("userId", -1L)
             ?.takeIf { it >= 0L }
+
+        // Widget deep link takes priority — skip welcome screen if navigating somewhere specific
         if (screen != null) {
             val route = if (screen == Screen.DailyCheckIn.baseRoute && userId != null) {
                 Screen.DailyCheckIn.createRoute(userId)
@@ -100,11 +109,26 @@ fun HabitPowerAppContent() {
                 }
                 launchSingleTop = true
             }
+        } else {
+            // Check for missed-day welcome (2+ days since last open)
+            val lastEpochDay = prefsRepository.lastOpenedEpochDay.first()
+            val todayEpochDay = LocalDate.now().toEpochDay()
+            if (lastEpochDay != null) {
+                val daysAbsent = todayEpochDay - lastEpochDay
+                if (daysAbsent >= 2) {
+                    navController.navigate(Screen.MissedDayWelcome.createRoute(daysAbsent)) {
+                        launchSingleTop = true
+                    }
+                }
+            }
+            // Save today's open date (whether welcome shown or not)
+            prefsRepository.saveLastOpenedEpochDay(todayEpochDay)
         }
     }
 
     val items = listOf(
         Screen.Dashboard,
+        Screen.Tasks,
         Screen.Routines,
         Screen.Focus,
         Screen.Report
@@ -120,6 +144,7 @@ fun HabitPowerAppContent() {
                             icon = {
                                 when (screen) {
                                     Screen.Dashboard -> Icon(AppIconography.Dashboard, contentDescription = "Dashboard")
+                                    Screen.Tasks -> Icon(AppIconography.Tasks, contentDescription = "Tasks")
                                     Screen.Routines -> Icon(AppIconography.Routines, contentDescription = "Routines")
                                     Screen.Focus -> Icon(AppIconography.Focus, contentDescription = "Focus")
                                     Screen.Report -> Icon(AppIconography.Analytics, contentDescription = "Analytics")
@@ -130,6 +155,7 @@ fun HabitPowerAppContent() {
                                 Text(
                                     when (screen) {
                                         Screen.Dashboard -> "Dashboard"
+                                        Screen.Tasks -> "Tasks"
                                         Screen.Routines -> "Routines"
                                         Screen.Focus -> "Focus"
                                         Screen.Report -> "Analytics"
@@ -139,11 +165,7 @@ fun HabitPowerAppContent() {
                             },
                             selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                             onClick = {
-                                val targetRoute = when (screen) {
-                                    Screen.Focus -> Screen.Focus.createRoute()
-                                    else -> screen.route
-                                }
-                                navController.navigate(targetRoute) {
+                                navController.navigate(screen.route) {
                                     popUpTo(navController.graph.findStartDestination().id) {
                                         saveState = true
                                     }
@@ -160,10 +182,13 @@ fun HabitPowerAppContent() {
         NavHost(
             navController = navController,
             startDestination = Screen.Dashboard.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
         ) {
             composable(Screen.Dashboard.route) {
                 DashboardScreen(onNavigate = { route -> navController.navigate(route) })
+            }
+            composable(Screen.Tasks.route) {
+                com.example.habitpower.ui.tasks.TasksScreen()
             }
             composable(Screen.Routines.route) {
                 RoutinesScreen(onNavigate = { route -> navController.navigate(route) })
@@ -175,7 +200,52 @@ fun HabitPowerAppContent() {
                 )
             }
             composable(Screen.Focus.route) {
-                com.example.habitpower.ui.pomodoro.PomodoroScreen()
+                com.example.habitpower.ui.focus.FocusLauncherScreen(
+                    onStartPomodoro = {
+                        navController.navigate(Screen.FocusPomodoro.createRoute())
+                    },
+                    onStartMeditation = {
+                        navController.navigate(Screen.Meditation.route)
+                    },
+                    onStartChant = {
+                        navController.navigate(Screen.Chant.route)
+                    }
+                )
+            }
+            composable(Screen.Meditation.route) {
+                com.example.habitpower.ui.meditation.MeditationScreen(
+                    navigateBack = { navController.popBackStack() },
+                    onSessionComplete = {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(navController.graph.findStartDestination().id) { inclusive = false }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+            composable(Screen.Chant.route) {
+                com.example.habitpower.ui.chant.ChantScreen(
+                    navigateBack = { navController.popBackStack() },
+                    onSessionComplete = {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(navController.graph.findStartDestination().id) { inclusive = false }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+            composable(Screen.FocusPomodoro.route) {
+                com.example.habitpower.ui.pomodoro.PomodoroScreen(
+                    navigateBack = {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
             }
             composable(Screen.AddEditExercise.route) {
                 AddEditExerciseScreen(navigateBack = { navController.popBackStack() })
@@ -186,7 +256,12 @@ fun HabitPowerAppContent() {
             composable(Screen.ExecuteRoutine.route) {
                 ExecuteRoutineScreen(
                     navigateBack = { navController.popBackStack() },
-                    onRoutineComplete = { navController.popBackStack() }
+                    onRoutineComplete = {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(navController.graph.findStartDestination().id) { inclusive = false }
+                            launchSingleTop = true
+                        }
+                    }
                 )
             }
             composable(Screen.DailyCheckIn.route) { backStackEntry ->
@@ -203,7 +278,10 @@ fun HabitPowerAppContent() {
             }
             composable(Screen.Report.route) {
                 com.example.habitpower.ui.report.ReportScreen(
-                    onNavigateToYearInReview = { navController.navigate(Screen.YearInReview.route) }
+                    onNavigateToYearInReview = { navController.navigate(Screen.YearInReview.route) },
+                    onNavigateToSeasonReview = { navController.navigate(Screen.SeasonReview.route) },
+                    onNavigateToHabitInventory = { navController.navigate(Screen.HabitInventory.route) },
+                    onNavigateToStandup = { navController.navigate(Screen.SelfStandup.route) }
                 )
             }
             composable(Screen.Help.route) {
@@ -220,14 +298,32 @@ fun HabitPowerAppContent() {
             composable(Screen.AdminUsers.route) {
                 AdminUsersScreen(navigateBack = { navController.popBackStack() })
             }
-            composable(Screen.AdminHabits.route) {
-                AdminHabitsScreen(navigateBack = { navController.popBackStack() })
+            composable(
+                route = Screen.AdminHabits.route,
+                arguments = listOf(
+                    androidx.navigation.navArgument("editHabitId") {
+                        type = androidx.navigation.NavType.LongType
+                        defaultValue = -1L
+                    }
+                )
+            ) { backStackEntry ->
+                val editHabitId = backStackEntry.arguments?.getLong("editHabitId")
+                    ?.takeIf { it > 0 }
+                AdminHabitsScreen(
+                    navigateBack = { navController.popBackStack() },
+                    editHabitId = editHabitId
+                )
             }
             composable(Screen.AdminLifeAreas.route) {
                 AdminLifeAreasScreen(navigateBack = { navController.popBackStack() })
             }
             composable(Screen.AdminNotificationTone.route) {
                 com.example.habitpower.ui.admin.AdminNotificationToneScreen(
+                    navigateBack = { navController.popBackStack() }
+                )
+            }
+            composable(Screen.AdminNotificationChannels.route) {
+                com.example.habitpower.ui.admin.AdminNotificationChannelsScreen(
                     navigateBack = { navController.popBackStack() }
                 )
             }
@@ -240,6 +336,9 @@ fun HabitPowerAppContent() {
             composable(Screen.AdminExport.route) {
                 ExportScreen(navigateBack = { navController.popBackStack() })
             }
+            composable(Screen.AdminImport.route) {
+                ImportScreen(navigateBack = { navController.popBackStack() })
+            }
             composable(Screen.YearInReview.route) {
                 com.example.habitpower.ui.report.YearInReviewScreen(
                     navigateBack = { navController.popBackStack() }
@@ -250,6 +349,48 @@ fun HabitPowerAppContent() {
             }
             composable(Screen.ImportPack.route) {
                 ImportPackScreen(navigateBack = { navController.popBackStack() })
+            }
+            composable(Screen.StepBack.route) {
+                com.example.habitpower.ui.dashboard.StepBackScreen(
+                    navigateBack = { navController.popBackStack() }
+                )
+            }
+            composable(Screen.MissedDayWelcome.route) {
+                MissedDayWelcomeScreen(
+                    navigateToDashboard = {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(Screen.MissedDayWelcome.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+            composable(Screen.AdminDriveSync.route) {
+                com.example.habitpower.ui.admin.DriveSyncScreen(
+                    navigateBack = { navController.popBackStack() }
+                )
+            }
+            composable(Screen.SeasonReview.route) {
+                com.example.habitpower.ui.report.SeasonReviewScreen(
+                    navigateBack = { navController.popBackStack() },
+                    onOpenTemplates = { navController.navigate(Screen.HabitLibrary.route) }
+                )
+            }
+            composable(Screen.HabitInventory.route) {
+                com.example.habitpower.ui.report.HabitInventoryScreen(
+                    navigateBack = { navController.popBackStack() }
+                )
+            }
+            composable(Screen.SelfStandup.route) {
+                com.example.habitpower.ui.standup.SelfStandupScreen(
+                    navigateBack = { navController.popBackStack() },
+                    onNavigateToAdminHabits = { navController.navigate(Screen.AdminHabits.createRoute()) }
+                )
+            }
+            composable(Screen.HabitLibrary.route) {
+                com.example.habitpower.ui.habits.HabitLibraryScreen(
+                    navigateBack = { navController.popBackStack() }
+                )
             }
         }
     }

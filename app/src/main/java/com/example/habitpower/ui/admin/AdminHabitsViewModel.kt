@@ -9,6 +9,7 @@ import com.example.habitpower.data.HabitPowerRepository
 import com.example.habitpower.data.model.HabitDefinition
 import com.example.habitpower.data.model.HabitLifecycleStatus
 import com.example.habitpower.data.model.HabitRecurrenceType
+import com.example.habitpower.data.model.HabitTemplate
 import com.example.habitpower.data.model.HabitType
 import com.example.habitpower.data.model.LifeArea
 import com.example.habitpower.data.model.Routine
@@ -100,6 +101,15 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
     fun updateName(value: String) { name = value }
     fun updateGoalIdentityStatement(value: String) { goalIdentityStatement = value }
     fun updateDescription(value: String) { description = value }
+
+    fun applyTemplate(template: HabitTemplate) {
+        name = template.name
+        description = template.description
+        goalIdentityStatement = "I am someone who ${template.identityStatement}."
+        selectedType = template.type
+        targetValue = template.targetValue?.toInt()?.toString() ?: ""
+        updateCommitmentTime(template.commitmentHour, template.commitmentMinute)
+    }
     fun updateSelectedRoutine(routineId: Long?) { selectedRoutineId = routineId }
 
     fun updateType(type: HabitType) {
@@ -308,10 +318,16 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
         habit: HabitDefinition,
         newName: String,
         newDescription: String,
+        newGoalIdentityStatement: String,
         newTarget: String?,
         newOp: TargetOperator,
+        newUnit: String?,
         newRoutineId: Long?,
         newLifeAreaId: Long?,
+        newCommitmentTime: String?,
+        newCommitmentLocation: String,
+        newShowInWidget: Boolean,
+        newShowInDailyCheckIn: Boolean,
         recurrenceType: HabitRecurrenceType,
         recurrenceDaysOfWeekMask: Int,
         recurrenceIntervalText: String,
@@ -384,10 +400,16 @@ class AdminHabitsViewModel(private val repository: HabitPowerRepository) : ViewM
                 habit.copy(
                     name = trimmed,
                     description = newDescription.trim(),
+                    goalIdentityStatement = newGoalIdentityStatement.trim(),
                     targetValue = resolvedTarget,
                     operator = newOp,
+                    unit = newUnit?.trim()?.takeIf { it.isNotBlank() },
                     routineId = if (habit.type == HabitType.ROUTINE) newRoutineId else habit.routineId,
                     lifeAreaId = newLifeAreaId,
+                    commitmentTime = newCommitmentTime?.takeIf { it.isNotBlank() },
+                    commitmentLocation = newCommitmentLocation.trim(),
+                    showInWidget = newShowInWidget,
+                    showInDailyCheckIn = newShowInDailyCheckIn,
                     recurrenceType = recurrenceType,
                     recurrenceDaysOfWeekMask = normalizedWeekMask,
                     recurrenceInterval = recurrenceInterval,

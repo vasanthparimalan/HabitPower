@@ -5,5 +5,7 @@ plugins {
     alias(libs.plugins.kotlinAndroid) apply false
     alias(libs.plugins.ksp) apply false
     id("org.jlleitschuh.gradle.ktlint") version "11.6.0" apply false
+    alias(libs.plugins.googleServices) apply false
+    alias(libs.plugins.firebaseCrashlytics) apply false
 }
 

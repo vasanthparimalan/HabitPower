@@ -27,7 +27,11 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
             database.quoteDao(),
             UserPreferencesRepository(context),
             database.routineNotificationSettingsDao(),
-            database.pomodoroSessionDao()
+            database.pomodoroSessionDao(),
+            database.chantDao(),
+            database.meditationDao(),
+            database.taskDao(),
+            database
         )
     }
 

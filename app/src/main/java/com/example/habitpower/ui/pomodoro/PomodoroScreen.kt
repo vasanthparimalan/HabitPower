@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.material3.FilterChip
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -85,6 +87,7 @@ fun KeepScreenOn() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PomodoroScreen(
+    navigateBack: () -> Unit = {},
     viewModel: PomodoroViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -153,6 +156,14 @@ fun PomodoroScreen(
                 confirmButton = {
                     Button(onClick = { viewModel.dismissCelebration() }) {
                         Text("Keep Going")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        viewModel.dismissCelebration()
+                        navigateBack()
+                    }) {
+                        Text("Done")
                     }
                 }
             )
@@ -316,9 +327,24 @@ private fun ColumnScope.RunningSessionContent(state: PomodoroState, viewModel: P
     Spacer(modifier = Modifier.weight(1f))
 }
 
+private data class PomodoroPreset(
+    val name: String,
+    val settings: PomodoroSettings
+)
+
+private val pomodoroPresets = listOf(
+    PomodoroPreset("Classic", PomodoroSettings(25, 5, 15, 4)),
+    PomodoroPreset("Deep Work", PomodoroSettings(50, 10, 20, 3)),
+    PomodoroPreset("Study Sprint", PomodoroSettings(45, 15, 30, 3)),
+    PomodoroPreset("Flow State", PomodoroSettings(90, 20, 30, 2)),
+    PomodoroPreset("Quick Focus", PomodoroSettings(15, 5, 10, 4))
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun IdleContent(state: PomodoroState, viewModel: PomodoroViewModel) {
     val scrollState = rememberScrollState()
+    val chipsScrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -334,7 +360,7 @@ private fun IdleContent(state: PomodoroState, viewModel: PomodoroViewModel) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "💡 You have ${state.unlinkedSessions.size} unlinked session(s) today — link them to a habit or they'll clear at midnight.",
+                    text = "${state.unlinkedSessions.size} unlinked session(s) — clears at midnight.",
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(12.dp),
                     color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -342,15 +368,34 @@ private fun IdleContent(state: PomodoroState, viewModel: PomodoroViewModel) {
             }
         }
 
-        // Settings summary
-        val s = state.settings
+        // Preset chips + Custom
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(chipsScrollState),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            pomodoroPresets.forEach { preset ->
+                val isActive = state.settings == preset.settings
+                FilterChip(
+                    selected = isActive,
+                    onClick = { viewModel.saveSettings(preset.settings) },
+                    label = { Text(preset.name) }
+                )
+            }
+            FilterChip(
+                selected = pomodoroPresets.none { it.settings == state.settings },
+                onClick = { viewModel.openSettings() },
+                label = { Text("Custom") }
+            )
+        }
+
+        // Free Focus section
         Text(
-            text = "⏱ ${s.focusMinutes} min focus · ${s.shortBreakMinutes} min break · ${s.longBreakMinutes} min long break · ${s.cyclesBeforeLongBreak} cycles",
-            style = MaterialTheme.typography.bodySmall,
+            text = "FREE FOCUS",
+            style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-
-        // Free session card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -364,12 +409,12 @@ private fun IdleContent(state: PomodoroState, viewModel: PomodoroViewModel) {
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "⚡ Start Free Focus Session",
+                        text = "⚡ Free Focus Session",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "No habit needed — link sessions to a habit after",
+                        text = "${state.settings.focusMinutes} min · no habit linked",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -378,12 +423,17 @@ private fun IdleContent(state: PomodoroState, viewModel: PomodoroViewModel) {
                 Button(onClick = { viewModel.startFreeSession() }) {
                     Icon(Icons.Default.PlayArrow, contentDescription = null)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Start Free")
+                    Text("Start")
                 }
             }
         }
 
-        // Habit-linked section
+        // Planned habits section
+        Text(
+            text = "PLANNED HABITS",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         if (state.pomodoroHabits.isEmpty()) {
             Text(
                 text = "No active Pomodoro or Timer habits found for today.",
@@ -391,12 +441,6 @@ private fun IdleContent(state: PomodoroState, viewModel: PomodoroViewModel) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         } else {
-            Text(
-                text = "Or focus on a habit:",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.align(Alignment.Start)
-            )
-
             state.pomodoroHabits.forEach { habit ->
                 val isSelected = state.selectedHabit?.habitId == habit.habitId
                 Card(

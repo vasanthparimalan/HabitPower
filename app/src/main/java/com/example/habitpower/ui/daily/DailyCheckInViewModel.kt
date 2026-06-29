@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.habitpower.data.HabitPowerRepository
+import com.example.habitpower.data.UserPreferencesRepository
 import com.example.habitpower.data.model.DailyHabitItem
 import com.example.habitpower.data.model.HabitType
 import com.example.habitpower.gamification.GamificationRepository
@@ -71,8 +72,15 @@ data class DailyCheckInUiState(
 class DailyCheckInViewModel(
     savedStateHandle: SavedStateHandle,
     private val repository: HabitPowerRepository,
-    private val gamificationRepository: GamificationRepository
+    private val gamificationRepository: GamificationRepository,
+    private val prefsRepository: UserPreferencesRepository
 ) : ViewModel() {
+
+    val completionSoundEnabled: StateFlow<Boolean> = prefsRepository.habitCompletionSoundEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), true)
+
+    val completionSoundId: StateFlow<String> = prefsRepository.habitCompletionSoundId
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "positive")
     private val maxBackfillDays = 3L
     private val requestedUserId = (
         savedStateHandle.get<String>("userId")?.toLongOrNull()

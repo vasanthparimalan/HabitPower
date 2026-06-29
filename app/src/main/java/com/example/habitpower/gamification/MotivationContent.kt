@@ -16,7 +16,7 @@ object MotivationContent {
         "Done! The discipline you build today shapes who you are tomorrow.",
         "That might have been hard. You did it anyway. That's the definition of growth.",
         "Progress over perfection — and you just made progress.",
-        "One habit closer to the best version of you. Keep the streak alive!",
+        "One habit closer to the best version of you. Each day builds depth.",
         "Champions are built one habit at a time. There you go.",
         "Your future self is cheering you on right now.",
         "Habits are identity. You just proved who you are.",
@@ -35,7 +35,7 @@ object MotivationContent {
         "100%. Every habit. Every promise to yourself — kept. Sleep like a champion tonight.",
         "You did everything you set out to do today. That's identity-level consistency.",
         "Full day complete! The compound interest of habits is quietly making you extraordinary.",
-        "Look at that — a perfect day. Your streak is more than numbers; it's a testament to who you are.",
+        "Look at that — a perfect day. Your practice is more than numbers; it's a testament to who you are.",
         "Everything on your list, done. You're not just building habits — you're building a life.",
         "Total commitment. Today you proved it again: you are the real deal.",
         "ALL habits complete! Tomorrow you get to do it again — and you already know you can. 💪"
@@ -53,7 +53,7 @@ object MotivationContent {
         streak == 90 -> "⭐ 90 DAYS!\nA full quarter of life transformation. The world is starting to notice."
         streak == 100 -> "👑 100-DAY STREAK!\nYou are in the top fraction of a percent. CENTURY achieved. Legendary."
         streak % 100 == 0 -> "🔮 $streak DAYS!!\nYou have transcended ordinary discipline. Truly extraordinary."
-        else -> "🔥 $streak-day streak! You're on fire — don't stop now."
+        else -> "🔥 $streak-day run! Your practice is building quietly — keep going."
     }
 
     // ── Level-up messages ─────────────────────────────────────────────────────
@@ -115,7 +115,7 @@ object MotivationContent {
         val pct = if (yesterdayTotal > 0) (yesterdayCompleted * 100 / yesterdayTotal) else 0
         if (userName.isNotBlank()) appendLine("$userName, here's your momentum snapshot:")
         appendLine("Yesterday: $yesterdayCompleted / $yesterdayTotal habits ($pct%)")
-        if (streak > 0) appendLine("Current streak: ${GamificationEngine.streakLabel(streak)}")
+        if (streak > 0) appendLine("Current run: $streak day${if (streak != 1) "s" else ""}")
         appendLine("Level: ${GamificationEngine.levelName(level)} (Lvl $level)")
         if (weakestAreaName != null) appendLine("Focus area today: $weakestAreaName ⬆")
         appendLine()
@@ -142,7 +142,7 @@ object MotivationContent {
 
     fun dayCrushedBody(total: Int, streak: Int, xpGained: Int): String = buildString {
         appendLine("All $total habits complete! 🎉")
-        if (streak > 0) appendLine("Streak: ${GamificationEngine.streakLabel(streak)}")
+        if (streak > 0) appendLine("Current run: $streak day${if (streak != 1) "s" else ""}")
         append("+$xpGained XP earned. You're becoming the person you want to be. 💪")
     }.trim()
 
@@ -152,6 +152,34 @@ object MotivationContent {
 
     fun midDayNudgeBody(total: Int): String =
         "You have $total habit${if (total != 1) "s" else ""} to check off today. A small step now beats regret tonight."
+
+    // ── Weekly insight notification ───────────────────────────────────────────
+    fun weeklyInsightTitle(name: String): String =
+        "📊 Your week in review, ${name.ifBlank { "Champion" }}!"
+
+    fun weeklyInsightBody(
+        perfectDays: Int,
+        totalCompleted: Int,
+        totalScheduled: Int,
+        streak: Int
+    ): String = buildString {
+        val pct = if (totalScheduled > 0) (totalCompleted * 100 / totalScheduled) else 0
+        appendLine("This week: $totalCompleted / $totalScheduled habits ($pct%)")
+        if (perfectDays > 0) {
+            appendLine("Perfect days: $perfectDays / 7 ⭐")
+        } else {
+            appendLine("No perfect days yet — this week is a fresh shot.")
+        }
+        if (streak > 0) appendLine("Current run: $streak day${if (streak != 1) "s" else ""} 🔥")
+        append(
+            when {
+                pct >= 90 -> "Outstanding week. You're building something real. Keep going."
+                pct >= 70 -> "Solid week. The foundation is holding — now build on it."
+                pct >= 50 -> "More hits than misses. Raise the floor this week."
+                else -> "Tough week. Reset, recommit, and attack this one differently."
+            }
+        )
+    }.trim()
 
     // ── Random pick helpers ───────────────────────────────────────────────────
     fun randomHabitCheer(): String =

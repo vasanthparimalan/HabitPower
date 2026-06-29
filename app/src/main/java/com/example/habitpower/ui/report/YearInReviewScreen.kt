@@ -282,7 +282,7 @@ fun YearInReviewScreen(
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
                     ) {
                         Text(
-                            text = "This data is yours. No server, no algorithm, no judgment — just a clear record of the work you've put in. The next year starts tomorrow.",
+                            text = "This data is yours. No server, no algorithm, no judgment — just a clear record of the work you've put in.",
                             modifier = Modifier.padding(16.dp),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onTertiaryContainer,

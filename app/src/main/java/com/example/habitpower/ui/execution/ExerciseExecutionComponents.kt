@@ -15,17 +15,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.habitpower.data.model.Exercise
+import com.example.habitpower.data.model.RoutineExerciseWithDetails
 
 @Composable
 internal fun ExerciseSpecsRow(
-    exercise: Exercise,
+    sets: Int? = null,
+    reps: Int? = null,
+    durationSeconds: Int? = null,
     modifier: Modifier = Modifier,
     extraSpecs: List<Pair<String, String>> = emptyList()
 ) {
     val specs = buildList {
-        exercise.targetSets?.let { add("Sets" to it.toString()) }
-        exercise.targetReps?.let { add("Reps" to it.toString()) }
-        exercise.targetDurationSeconds?.let { add("Target" to formatExerciseTime(it)) }
+        sets?.let { add("Sets" to it.toString()) }
+        reps?.let { add("Reps" to it.toString()) }
+        durationSeconds?.let { add("Target" to formatExerciseTime(it)) }
         addAll(extraSpecs)
     }
 
@@ -137,12 +140,12 @@ internal fun formatExerciseTime(seconds: Int): String {
 }
 
 internal fun estimateTimedRoutineSeconds(
-    exercises: List<Exercise>,
+    exercises: List<RoutineExerciseWithDetails>,
     totalRounds: Int,
     restTimeSeconds: Int
 ): Int {
     if (exercises.isEmpty()) return 0
-    val totalExerciseTime = exercises.sumOf { it.targetDurationSeconds ?: 60 } * totalRounds.coerceAtLeast(1)
+    val totalExerciseTime = exercises.sumOf { it.crossRef.durationSeconds ?: 60 } * totalRounds.coerceAtLeast(1)
     val restTransitionsPerRound = (exercises.size - 1).coerceAtLeast(0)
     val totalRestTransitions = restTransitionsPerRound * totalRounds.coerceAtLeast(1) +
         (totalRounds.coerceAtLeast(1) - 1)
@@ -150,17 +153,17 @@ internal fun estimateTimedRoutineSeconds(
 }
 
 internal fun describeNextTimedStep(
-    exercises: List<Exercise>,
+    exercises: List<RoutineExerciseWithDetails>,
     currentExerciseIndex: Int,
     currentRound: Int,
     totalRounds: Int
 ): String? {
     val nextExercise = exercises.getOrNull(currentExerciseIndex + 1)
     if (nextExercise != null) {
-        return nextExercise.name
+        return nextExercise.exercise.name
     }
     if (currentRound < totalRounds && exercises.isNotEmpty()) {
-        return "Round ${currentRound + 1}: ${exercises.first().name}"
+        return "Round ${currentRound + 1}: ${exercises.first().exercise.name}"
     }
     return null
 }

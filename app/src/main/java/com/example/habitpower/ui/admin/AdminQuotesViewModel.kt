@@ -23,6 +23,13 @@ class AdminQuotesViewModel(private val repository: HabitPowerRepository) : ViewM
         }
     }
 
+    fun updateQuote(quote: Quote) {
+        if (quote.text.isBlank()) return
+        viewModelScope.launch {
+            repository.insertQuote(quote)
+        }
+    }
+
     fun deleteQuote(quote: Quote) {
         viewModelScope.launch {
             repository.deleteQuote(quote)

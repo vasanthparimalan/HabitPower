@@ -18,6 +18,9 @@ ksp = "1.9.24-1.0.20"
 datastore = "1.2.1"
 glance = "1.1.1"
 
+# Firebase / Crashlytics
+firebaseBom = "33.7.0"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -48,7 +51,14 @@ datastorePreferences = { group = "androidx.datastore", name = "datastore-prefere
 glanceAppwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
 glanceMaterial3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glance" }
 
+# Firebase / Crashlytics (version managed by BOM)
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+googleServices = { id = "com.google.gms.google-services", version = "4.4.2" }
+firebaseCrashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.2" }

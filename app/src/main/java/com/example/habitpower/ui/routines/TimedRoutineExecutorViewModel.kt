@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.habitpower.data.HabitPowerRepository
 import com.example.habitpower.data.model.Exercise
 import com.example.habitpower.data.model.Routine
+import com.example.habitpower.data.model.RoutineExerciseWithDetails
 import com.example.habitpower.data.model.RoutineType
 import com.example.habitpower.data.model.WorkoutSession
 import com.example.habitpower.util.SoundPlayer
@@ -23,7 +24,14 @@ import java.time.LocalDate
 
 sealed class ExecutionPhase {
     object Idle : ExecutionPhase()
-    data class ExercisePhase(val exercise: Exercise, val position: Int, val timeRemaining: Int) : ExecutionPhase()
+    data class ExercisePhase(
+        val exercise: Exercise,
+        val position: Int,
+        val timeRemaining: Int,
+        val totalDuration: Int,
+        val sets: Int? = null,
+        val reps: Int? = null
+    ) : ExecutionPhase()
     data class RestPhase(val timeRemaining: Int) : ExecutionPhase()
     object Completed : ExecutionPhase()
 }
@@ -37,7 +45,7 @@ class TimedRoutineExecutorViewModel(
 
     var routine by mutableStateOf<Routine?>(null)
         private set
-    var exercises by mutableStateOf<List<Exercise>>(emptyList())
+    var exercises by mutableStateOf<List<RoutineExerciseWithDetails>>(emptyList())
         private set
     var currentPhase by mutableStateOf<ExecutionPhase>(ExecutionPhase.Idle)
         private set
@@ -69,7 +77,7 @@ class TimedRoutineExecutorViewModel(
             routine = r
             if (r != null && r.type == RoutineType.TIMED) {
                 totalRounds = r.repeatCount.coerceAtLeast(1)
-                repository.getExercisesForRoutine(routineId).collect { loaded ->
+                repository.getRoutineExercisesWithDetails(routineId).collect { loaded ->
                     exercises = loaded
                 }
             }
@@ -86,7 +94,7 @@ class TimedRoutineExecutorViewModel(
         startTime = System.currentTimeMillis()
         if (totalRounds > 1 && ttsEnabled) TtsPlayer.speak("Round 1")
         executionJob = viewModelScope.launch {
-            runExerciseCountdown(0, exercises[0].targetDurationSeconds ?: 60)
+            runExerciseCountdown(0, exercises[0].crossRef.durationSeconds ?: 60)
         }
     }
 
@@ -124,13 +132,13 @@ class TimedRoutineExecutorViewModel(
             when {
                 !isLastInRound -> {
                     currentExerciseIndex++
-                    runExerciseCountdown(currentExerciseIndex, exercises[currentExerciseIndex].targetDurationSeconds ?: 60)
+                    runExerciseCountdown(currentExerciseIndex, exercises[currentExerciseIndex].crossRef.durationSeconds ?: 60)
                 }
                 !isLastRound -> {
                     currentRound++
                     currentExerciseIndex = 0
                     if (ttsEnabled) TtsPlayer.speak("Round $currentRound")
-                    runExerciseCountdown(0, exercises[0].targetDurationSeconds ?: 60)
+                    runExerciseCountdown(0, exercises[0].crossRef.durationSeconds ?: 60)
                 }
                 else -> finishRoutine()
             }
@@ -170,7 +178,8 @@ class TimedRoutineExecutorViewModel(
     // ── Internal execution engine ─────────────────────────────────────────────
 
     private suspend fun runExerciseCountdown(index: Int, fromSeconds: Int) {
-        val exercise = exercises.getOrNull(index) ?: return
+        val entry = exercises.getOrNull(index) ?: return
+        val exercise = entry.exercise
 
         val playStartSound = repository.getRoutineStartSoundEnabled().first()
         val startSoundId = repository.getRoutineStartSoundId().first()
@@ -179,14 +188,22 @@ class TimedRoutineExecutorViewModel(
 
         if (playStartSound) SoundPlayer.playById(startSoundId)
         if (ttsEnabled) {
-            val durationText = exercise.targetDurationSeconds
+            val durationText = entry.crossRef.durationSeconds
                 ?.let { s -> if (s >= 60) ", ${s / 60} minute${if (s / 60 > 1) "s" else ""}" else ", $s seconds" }
                 ?: ""
             TtsPlayer.speak("${exercise.name}$durationText")
         }
 
+        val totalDuration = entry.crossRef.durationSeconds ?: 60
         for (timeRemaining in fromSeconds downTo 0) {
-            currentPhase = ExecutionPhase.ExercisePhase(exercise, index, timeRemaining)
+            currentPhase = ExecutionPhase.ExercisePhase(
+                exercise = exercise,
+                position = index,
+                timeRemaining = timeRemaining,
+                totalDuration = totalDuration,
+                sets = entry.crossRef.sets,
+                reps = entry.crossRef.reps
+            )
             delay(1000)
         }
 
@@ -198,7 +215,6 @@ class TimedRoutineExecutorViewModel(
 
         when {
             !isLastInRound -> {
-                // More exercises in this round
                 nextIndexAfterRest = index + 1
                 nextRoundAfterRest = currentRound
                 if (restTime > 0) {
@@ -206,10 +222,9 @@ class TimedRoutineExecutorViewModel(
                     runRestCountdown(restTime)
                 }
                 currentExerciseIndex = nextIndexAfterRest
-                runExerciseCountdown(currentExerciseIndex, exercises[currentExerciseIndex].targetDurationSeconds ?: 60)
+                runExerciseCountdown(currentExerciseIndex, exercises[currentExerciseIndex].crossRef.durationSeconds ?: 60)
             }
             !isLastRound -> {
-                // End of round — more rounds to go
                 nextIndexAfterRest = 0
                 nextRoundAfterRest = currentRound + 1
                 if (restTime > 0) {
@@ -219,7 +234,7 @@ class TimedRoutineExecutorViewModel(
                 currentRound = nextRoundAfterRest
                 currentExerciseIndex = 0
                 if (ttsEnabled) TtsPlayer.speak("Round $currentRound")
-                runExerciseCountdown(0, exercises[0].targetDurationSeconds ?: 60)
+                runExerciseCountdown(0, exercises[0].crossRef.durationSeconds ?: 60)
             }
             else -> finishRoutine()
         }
@@ -237,10 +252,10 @@ class TimedRoutineExecutorViewModel(
     private suspend fun advanceAfterRest() {
         currentRound = nextRoundAfterRest
         currentExerciseIndex = nextIndexAfterRest
-        val exercise = exercises.getOrNull(currentExerciseIndex) ?: return
+        if (exercises.getOrNull(currentExerciseIndex) == null) return
         if (ttsEnabled && nextIndexAfterRest == 0 && nextRoundAfterRest > 1) {
             TtsPlayer.speak("Round $currentRound")
         }
-        runExerciseCountdown(currentExerciseIndex, exercise.targetDurationSeconds ?: 60)
+        runExerciseCountdown(currentExerciseIndex, exercises[currentExerciseIndex].crossRef.durationSeconds ?: 60)
     }
 }

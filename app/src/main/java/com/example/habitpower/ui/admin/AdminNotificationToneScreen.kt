@@ -47,7 +47,7 @@ fun AdminNotificationToneScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Notification Sound") },
+                title = { Text("Sound Settings") },
                 navigationIcon = {
                     IconButton(onClick = navigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -100,6 +100,33 @@ fun AdminNotificationToneScreen(
                 )
             }
 
+            // ── Habit completion sound ──────────────────────────────────────────
+            item {
+                Spacer(Modifier.height(16.dp))
+                androidx.compose.material3.Text(
+                    text = "Habit Completion",
+                    style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+                    modifier = androidx.compose.ui.Modifier.padding(bottom = 4.dp)
+                )
+                ToneToggleCard(
+                    title = "Completion Tone",
+                    subtitle = if (state.habitCompletionSoundEnabled)
+                        "Plays when you mark a habit done" else "Silent on habit completion",
+                    enabled = state.habitCompletionSoundEnabled,
+                    onToggle = { viewModel.toggleHabitCompletionSound() }
+                )
+            }
+
+            items(state.availableOptions) { option ->
+                val isSelected = option.id == state.habitCompletionSoundId
+                ToneOptionRow(
+                    option = option,
+                    isSelected = isSelected,
+                    onSelect = { viewModel.selectHabitCompletionSound(option) }
+                )
+            }
+
+            // ── Routine sounds ─────────────────────────────────────────────────
             item {
                 Spacer(Modifier.height(16.dp))
                 ToneToggleCard(

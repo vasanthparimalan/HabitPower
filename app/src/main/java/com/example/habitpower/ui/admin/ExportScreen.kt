@@ -16,8 +16,10 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.habitpower.data.HpexSection
 import com.example.habitpower.ui.AppViewModelProvider
 import com.example.habitpower.ui.theme.SectionHeader
 
@@ -48,7 +51,10 @@ fun ExportScreen(
     val uiState = viewModel.uiState
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Two separate launchers — SAF requires MIME type at construction time
+    val hpexLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/octet-stream")
+    ) { uri -> uri?.let { viewModel.writeTo(it) } }
+
     val csvLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("text/csv")
     ) { uri -> uri?.let { viewModel.writeTo(it) } }
@@ -57,16 +63,15 @@ fun ExportScreen(
         contract = ActivityResultContracts.CreateDocument("application/json")
     ) { uri -> uri?.let { viewModel.writeTo(it) } }
 
-    // When ViewModel finishes preparing data, open the system file picker
     LaunchedEffect(uiState.pendingExport) {
         val pending = uiState.pendingExport ?: return@LaunchedEffect
         when (pending.mimeType) {
+            "application/octet-stream" -> hpexLauncher.launch(pending.suggestedFileName)
             "text/csv" -> csvLauncher.launch(pending.suggestedFileName)
             "application/json" -> jsonLauncher.launch(pending.suggestedFileName)
         }
     }
 
-    // Show success/error message
     LaunchedEffect(uiState.resultMessage) {
         val msg = uiState.resultMessage ?: return@LaunchedEffect
         snackbarHostState.showSnackbar(msg)
@@ -100,17 +105,35 @@ fun ExportScreen(
                 )
             }
 
+            // ── .hpex backup ──────────────────────────────────────────────────
+            item {
+                HpexExportCard(
+                    selectedSections = uiState.selectedHpexSections,
+                    onToggleSection = { viewModel.toggleHpexSection(it) },
+                    isPreparing = uiState.isPreparing,
+                    onExport = { viewModel.prepareHpexExport() }
+                )
+            }
+
+            // ── Spreadsheet / Analysis exports ─────────────────────────────────
+            item {
+                SectionHeader(
+                    title = "Spreadsheet Exports",
+                    subtitle = "Open in Excel or Google Sheets for analysis."
+                )
+            }
+
             item {
                 ExportFormatCard(
-                    title = "Analysis Export",
+                    title = "Habit History",
                     format = "CSV",
-                    description = "Opens in Excel, Google Sheets, or any spreadsheet app. One row per habit entry with date, user, habit name, type, and value.",
+                    description = "One row per habit entry — ready to open in Excel or Google Sheets.",
                     includes = listOf(
-                        "All habit completion entries",
-                        "User names and habit names included as columns",
-                        "Compatible with any spreadsheet tool"
+                        "Columns: date, user, habit_name, type, life_area, value, target, completed",
+                        "ISO 8601 dates — sorts correctly in any spreadsheet",
+                        "Sorted newest-first"
                     ),
-                    buttonLabel = "Save CSV File",
+                    buttonLabel = "Save Habits CSV",
                     isPreparing = uiState.isPreparing,
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     onExport = { viewModel.prepareExport(ExportFormat.CSV) }
@@ -119,42 +142,74 @@ fun ExportScreen(
 
             item {
                 ExportFormatCard(
-                    title = "Full Backup",
-                    format = "JSON",
-                    description = "A complete structured snapshot of everything in the app. Use this to safeguard your data or transfer it to a new device manually.",
+                    title = "Routines",
+                    format = "CSV",
+                    description = "All your routines and their exercises.",
                     includes = listOf(
-                        "All users and habit definitions",
-                        "Complete entry history",
-                        "Health stats and gamification progress",
-                        "Human-readable, structured format"
+                        "Columns: routine_name, exercise, sets, reps, duration_s, order",
+                        "One row per exercise in each routine"
                     ),
-                    buttonLabel = "Save JSON Backup",
+                    buttonLabel = "Save Routines CSV",
                     isPreparing = uiState.isPreparing,
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    onExport = { viewModel.prepareExport(ExportFormat.JSON) }
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    onExport = { viewModel.prepareExport(ExportFormat.ROUTINES_CSV) }
+                )
+            }
+
+            item {
+                ExportFormatCard(
+                    title = "Health Stats",
+                    format = "CSV",
+                    description = "Daily health data. Columns: date, sleep_hours, steps.",
+                    includes = listOf("Sorted newest-first"),
+                    buttonLabel = "Save Health CSV",
+                    isPreparing = uiState.isPreparing,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    onExport = { viewModel.prepareExport(ExportFormat.HEALTH_CSV) }
                 )
             }
 
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Text(
-                            "About your backup",
+                            "Opening in Excel or Google Sheets",
                             style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
                         )
+                        listOf(
+                            "1. Open Excel → File → Open → choose the CSV file",
+                            "2. Freeze top row: View → Freeze Panes → Freeze Top Row",
+                            "3. Filter by habit: Data → Filter → click dropdown on habit_name",
+                            "4. Dates are ISO 8601 (YYYY-MM-DD) — sort correctly without reformatting"
+                        ).forEach {
+                            Text(it, style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer)
+                        }
+                    }
+                }
+            }
+
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("About your backup",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(
-                            "Your data is also automatically backed up by Android's Google Backup on your regular device backup schedule. This export is an additional option for your own records or analysis.",
+                            "Your data is also automatically backed up by Android's Google Backup on your regular device backup schedule. The .hpex backup above is an additional manual option for full control.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -164,11 +219,78 @@ fun ExportScreen(
         }
 
         if (uiState.isPreparing) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(modifier = Modifier.size(48.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun HpexExportCard(
+    selectedSections: Set<HpexSection>,
+    onToggleSection: (HpexSection) -> Unit,
+    isPreparing: Boolean,
+    onExport: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("HabitPower Backup", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(
+                    ".hpex",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            Text(
+                "A complete, portable snapshot of your app. Restore it on any device with a single tap — everything comes back exactly as it was.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+            Text(
+                "Choose what to include:",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            HpexSection.entries.forEach { section ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = section in selectedSections,
+                        onCheckedChange = { onToggleSection(section) }
+                    )
+                    Text(
+                        section.displayName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+
+            Button(
+                onClick = onExport,
+                enabled = !isPreparing && selectedSections.isNotEmpty(),
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text("Save Backup")
             }
         }
     }
@@ -190,9 +312,7 @@ private fun ExportFormatCard(
         colors = CardDefaults.cardColors(containerColor = containerColor)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
@@ -208,17 +328,9 @@ private fun ExportFormatCard(
                     color = MaterialTheme.colorScheme.primary
                 )
             }
-            Text(
-                description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Text(description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             includes.forEach { item ->
-                Text(
-                    "• $item",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Text("• $item", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Button(
                 onClick = onExport,

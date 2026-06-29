@@ -63,14 +63,16 @@ object AppViewModelProvider {
         }
         initializer {
             DashboardViewModel(
-                habitPowerApplication().container.habitPowerRepository
+                habitPowerApplication().container.habitPowerRepository,
+                habitPowerApplication().container.userPreferencesRepository
             )
         }
         initializer {
             DailyCheckInViewModel(
                 this.createSavedStateHandle(),
                 habitPowerApplication().container.habitPowerRepository,
-                habitPowerApplication().container.gamificationRepository
+                habitPowerApplication().container.gamificationRepository,
+                habitPowerApplication().container.userPreferencesRepository
             )
         }
         initializer {
@@ -117,6 +119,13 @@ object AppViewModelProvider {
             )
         }
         initializer {
+            com.example.habitpower.ui.admin.ImportViewModel(
+                habitPowerApplication().container.habitPowerRepository,
+                habitPowerApplication().container.gamificationRepository,
+                habitPowerApplication()
+            )
+        }
+        initializer {
             com.example.habitpower.ui.report.YearInReviewViewModel(
                 habitPowerApplication().container.habitPowerRepository,
                 habitPowerApplication().container.gamificationRepository
@@ -131,7 +140,58 @@ object AppViewModelProvider {
         initializer {
             ImportPackViewModel(habitPowerApplication().container.habitPowerRepository)
         }
-        // Add other ViewModels here as we create them
+        initializer {
+            com.example.habitpower.ui.welcome.MissedDayWelcomeViewModel(
+                this.createSavedStateHandle(),
+                habitPowerApplication().container.habitPowerRepository,
+                habitPowerApplication().container.userPreferencesRepository
+            )
+        }
+        initializer {
+            com.example.habitpower.ui.chant.ChantViewModel(
+                application = habitPowerApplication(),
+                repository = habitPowerApplication().container.habitPowerRepository,
+                prefsRepository = habitPowerApplication().container.userPreferencesRepository
+            )
+        }
+        initializer {
+            com.example.habitpower.ui.tasks.TasksViewModel(
+                habitPowerApplication().container.habitPowerRepository,
+                habitPowerApplication().container.userPreferencesRepository
+            )
+        }
+        initializer {
+            com.example.habitpower.ui.admin.DriveSyncViewModel(
+                habitPowerApplication().container.userPreferencesRepository
+            )
+        }
+        initializer {
+            com.example.habitpower.ui.report.SeasonReviewViewModel(
+                habitPowerApplication().container.habitPowerRepository,
+                habitPowerApplication().container.userPreferencesRepository
+            )
+        }
+        initializer {
+            com.example.habitpower.ui.report.HabitInventoryViewModel(
+                habitPowerApplication().container.habitPowerRepository
+            )
+        }
+        initializer {
+            com.example.habitpower.ui.standup.SelfStandupViewModel(
+                habitPowerApplication().container.habitPowerRepository,
+                habitPowerApplication().container.userPreferencesRepository
+            )
+        }
+        initializer {
+            com.example.habitpower.ui.meditation.MeditationViewModel(
+                habitPowerApplication().container.habitPowerRepository
+            )
+        }
+        initializer {
+            com.example.habitpower.ui.habits.HabitLibraryViewModel(
+                habitPowerApplication().container.habitPowerRepository
+            )
+        }
     }
 }
 

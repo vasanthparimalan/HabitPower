@@ -190,9 +190,6 @@ fun ExerciseItem(
     onDeleteClick: () -> Unit
 ) {
     val attributes = buildList {
-        exercise.targetSets?.let { add("Sets" to it.toString()) }
-        exercise.targetReps?.let { add("Reps" to it.toString()) }
-        exercise.targetDurationSeconds?.let { add("Duration" to "${it}s") }
         val tagsSummary = exercise.tags.split(',').map { it.trim() }.filter { it.isNotBlank() }.take(2).joinToString(", ")
         if (tagsSummary.isNotBlank()) add("Tags" to tagsSummary)
     }

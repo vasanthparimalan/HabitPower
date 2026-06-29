@@ -34,13 +34,6 @@ class AddEditExerciseViewModel(
         private set
     var imageUri by mutableStateOf<String?>(null)
         private set
-    var targetSets by mutableStateOf("")
-        private set
-
-    var targetDuration by mutableStateOf("")
-        private set
-    var targetReps by mutableStateOf("")
-        private set
     var notes by mutableStateOf("")
         private set
     var instructions by mutableStateOf("")
@@ -50,9 +43,6 @@ class AddEditExerciseViewModel(
     var category by mutableStateOf(ExerciseCategory.STRENGTH)
         private set
 
-    var isTimeBased by mutableStateOf(false)
-        private set
-
     init {
         if (exerciseId != null) {
             viewModelScope.launch {
@@ -60,19 +50,6 @@ class AddEditExerciseViewModel(
                     name = exercise.name
                     description = exercise.description
                     imageUri = exercise.imageUri
-                    targetSets = exercise.targetSets?.toString() ?: ""
-
-                    // Determine initial mode based on data
-                    if (exercise.targetDurationSeconds != null) {
-                        isTimeBased = true
-                        targetDuration = exercise.targetDurationSeconds.toString()
-                        targetReps = ""
-                    } else {
-                        isTimeBased = false
-                        targetReps = exercise.targetReps?.toString() ?: ""
-                        targetDuration = ""
-                    }
-
                     notes = exercise.notes ?: ""
                     instructions = exercise.instructions ?: ""
                     tags = exercise.tags
@@ -85,7 +62,6 @@ class AddEditExerciseViewModel(
     fun updateName(input: String) { name = input }
     fun updateDescription(input: String) { description = input }
     fun updateImageUri(input: String?) { imageUri = input }
-    fun updateTargetSets(input: String) { targetSets = input }
 
     fun processImage(context: Context, uri: Uri) {
         viewModelScope.launch {
@@ -123,19 +99,6 @@ class AddEditExerciseViewModel(
         }
     }
 
-    fun setTimeBasedMode(timeBased: Boolean) {
-        isTimeBased = timeBased
-        if (timeBased) {
-            targetReps = ""
-        } else {
-            targetDuration = ""
-        }
-    }
-
-    fun updateTargetDuration(input: String) { if (isTimeBased) targetDuration = input }
-
-    fun updateTargetReps(input: String) { if (!isTimeBased) targetReps = input }
-
     fun updateNotes(input: String) { notes = input }
     fun updateInstructions(input: String) { instructions = input }
     fun updateTags(input: String) { tags = input }
@@ -160,9 +123,6 @@ class AddEditExerciseViewModel(
             name = name,
             description = description,
             imageUri = imageUri,
-            targetSets = targetSets.toIntOrNull(),
-            targetDurationSeconds = if (isTimeBased) targetDuration.toIntOrNull() else null,
-            targetReps = if (!isTimeBased) targetReps.toIntOrNull() else null,
             notes = notes,
             instructions = instructions.ifBlank { null },
             tags = tags,

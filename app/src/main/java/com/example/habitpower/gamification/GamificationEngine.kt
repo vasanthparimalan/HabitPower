@@ -234,6 +234,25 @@ object GamificationEngine {
     }
 
     /**
+     * Practice depth gain for one day's session.
+     *
+     * Unlike streak, depth never resets — missing a day contributes 0 rather than
+     * wiping what was built. Gain compresses logarithmically as depth grows so
+     * early sessions feel meaningful and later ones still register.
+     */
+    fun computePracticeDepthGain(habitsCompleted: Int, totalHabits: Int): Double {
+        if (totalHabits == 0 || habitsCompleted == 0) return 0.0
+        val raw = when {
+            habitsCompleted >= totalHabits -> 1.0
+            else -> 0.5
+        }
+        return raw
+    }
+
+    /** Human-readable depth label, e.g. "Depth 47". */
+    fun practiceDepthLabel(depth: Double): String = "Depth ${depth.toInt()}"
+
+    /**
      * Compute updated [UserStats] after a day's check-in.
      *
      * @param existing      Current persisted stats (or default for first time).
@@ -260,6 +279,7 @@ object GamificationEngine {
         val newLevel = levelForXp(newXp)
         val newTotalHabits = existing.totalHabitsCompleted + habitsCompleted
         val newTotalDays = if (perfectDay) existing.totalDaysPerfect + 1 else existing.totalDaysPerfect
+        val newDepth = existing.practiceDepth + computePracticeDepthGain(habitsCompleted, totalHabits)
 
         val draft = existing.copy(
             currentStreak = newStreak,
@@ -267,7 +287,8 @@ object GamificationEngine {
             totalXp = newXp,
             level = newLevel,
             totalHabitsCompleted = newTotalHabits,
-            totalDaysPerfect = newTotalDays
+            totalDaysPerfect = newTotalDays,
+            practiceDepth = newDepth
         )
         val newBadges = computeNewBadgesMask(draft)
         val finalStats = draft.copy(earnedBadgesMask = draft.earnedBadgesMask or newBadges)

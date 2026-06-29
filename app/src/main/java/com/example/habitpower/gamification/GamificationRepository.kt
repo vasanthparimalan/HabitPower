@@ -23,6 +23,8 @@ class GamificationRepository(
     suspend fun getStats(userId: Long): UserStats =
         userStatsDao.getStats(userId) ?: UserStats(userId = userId)
 
+    suspend fun upsertStats(stats: UserStats) = userStatsDao.upsertStats(stats)
+
     /**
      * Called after the user saves their daily check-in.
      * Reads today's entries, recomputes the streak/XP/level, persists the result,
@@ -179,6 +181,45 @@ class GamificationRepository(
         )
     }
 
+    /**
+     * Prepare data for the Sunday evening weekly insight notification.
+     * Looks at the past 7 completed days (yesterday through 7 days ago).
+     */
+    suspend fun getWeeklyInsightData(userId: Long): WeeklyInsightData {
+        val today = LocalDate.now()
+        var totalCompleted = 0
+        var totalScheduled = 0
+        var perfectDays = 0
+        var bestDayCompleted = 0
+        var bestDayTotal = 0
+
+        for (i in 1..7) {
+            val d = today.minusDays(i.toLong())
+            val habits = habitTrackingDao.getDailyHabitItems(userId, d)
+                .map { list -> list.filter { it.isScheduledOn(d) } }
+                .first()
+            val completed = habits.count { it.isCompleted }
+            val total = habits.size
+            totalCompleted += completed
+            totalScheduled += total
+            if (total > 0 && completed == total) perfectDays++
+            if (total > 0 && completed.toDouble() / total > bestDayCompleted.toDouble() / bestDayTotal.coerceAtLeast(1)) {
+                bestDayCompleted = completed
+                bestDayTotal = total
+            }
+        }
+
+        val stats = getStats(userId)
+        return WeeklyInsightData(
+            stats = stats,
+            perfectDays = perfectDays,
+            totalCompleted = totalCompleted,
+            totalScheduled = totalScheduled,
+            bestDayCompleted = bestDayCompleted,
+            bestDayTotal = bestDayTotal
+        )
+    }
+
     // ── Data classes ──────────────────────────────────────────────────────────
 
     data class CheckInResult(
@@ -206,6 +247,15 @@ class GamificationRepository(
         val totalCount: Int,
         val pendingHabitNames: List<String>,
         val stats: UserStats
+    )
+
+    data class WeeklyInsightData(
+        val stats: UserStats,
+        val perfectDays: Int,
+        val totalCompleted: Int,
+        val totalScheduled: Int,
+        val bestDayCompleted: Int,
+        val bestDayTotal: Int
     )
 }
 

@@ -12,6 +12,7 @@ import com.example.habitpower.data.model.HabitType
 import com.example.habitpower.data.model.LifeArea
 import com.example.habitpower.data.model.TargetOperator
 import com.example.habitpower.data.model.UserProfile
+import com.example.habitpower.reminder.HabitRecurrenceCalculator
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -40,7 +41,8 @@ data class HabitConsistency(
     val habitName: String,
     val completedCount: Int,
     val totalDays: Int,
-    val consistencyRatio: Float
+    val consistencyRatio: Float,
+    val lastSevenDays: List<Float> = emptyList() // 0f=missed, 1f=done for each of last 7 days in period
 )
 
 data class LifeAreaGauge(
@@ -108,6 +110,8 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
             }
         }
     }
+
+    fun refresh() = refreshReport()
 
     private fun refreshReport() {
         viewModelScope.launch {
@@ -183,13 +187,16 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
         val entriesByKey = entries.associateBy { it.date to it.habitId }
 
         val dayRatios = dates.map { date ->
-            val completed = habits.count { habit -> isEntrySuccessful(entriesByKey[date to habit.id], habit) }
-            if (habits.isEmpty()) 0f else completed.toFloat() / habits.size.toFloat()
+            val scheduled = habits.filter { HabitRecurrenceCalculator.isScheduledOn(date, it) }
+            val completed = scheduled.count { habit -> isEntrySuccessful(entriesByKey[date to habit.id], habit) }
+            if (scheduled.isEmpty()) 0f else completed.toFloat() / scheduled.size.toFloat()
         }
 
-        val totalTasks = habits.size * dates.size
+        val totalTasks = dates.sumOf { date -> habits.count { HabitRecurrenceCalculator.isScheduledOn(date, it) } }
         val totalCompletedTasks = dates.sumOf { date ->
-            habits.count { habit -> isEntrySuccessful(entriesByKey[date to habit.id], habit) }
+            habits.count { habit ->
+                HabitRecurrenceCalculator.isScheduledOn(date, habit) && isEntrySuccessful(entriesByKey[date to habit.id], habit)
+            }
         }
         val overallRatio = if (totalTasks == 0) 0f else totalCompletedTasks.toFloat() / totalTasks.toFloat()
 
@@ -250,10 +257,14 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
         val chunkSize = if (dates.size <= 14) 1 else 7
         val fmtWeek = DateTimeFormatter.ofPattern("MMM d")
         return dates.chunked(chunkSize).map { chunk ->
-            val avg = chunk.map { date ->
-                val completed = habits.count { habit -> isEntrySuccessful(entriesByKey[date to habit.id], habit) }
-                completed.toFloat() / habits.size.toFloat()
-            }.average().toFloat()
+            val avg = run {
+                val ratios = chunk.mapNotNull { date ->
+                    val scheduled = habits.filter { HabitRecurrenceCalculator.isScheduledOn(date, it) }
+                    if (scheduled.isEmpty()) null
+                    else scheduled.count { habit -> isEntrySuccessful(entriesByKey[date to habit.id], habit) }.toFloat() / scheduled.size.toFloat()
+                }
+                if (ratios.isEmpty()) 0f else ratios.average().toFloat()
+            }
             val label = if (chunkSize == 1) chunk.first().dayOfMonth.toString()
                         else chunk.first().format(fmtWeek)
             WeekTrend(weekLabel = label, completionRatio = avg)
@@ -265,14 +276,20 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
         habits: List<HabitDefinition>,
         entriesByKey: Map<Pair<LocalDate, Long>, DailyHabitEntry>
     ): List<HabitConsistency> {
+        val last7Dates = dates.takeLast(7)
         return habits.map { habit ->
-            val completed = dates.count { date -> isEntrySuccessful(entriesByKey[date to habit.id], habit) }
-            val ratio = if (dates.isEmpty()) 0f else completed.toFloat() / dates.size.toFloat()
+            val scheduledDates = dates.filter { HabitRecurrenceCalculator.isScheduledOn(it, habit) }
+            val completed = scheduledDates.count { date -> isEntrySuccessful(entriesByKey[date to habit.id], habit) }
+            val ratio = if (scheduledDates.isEmpty()) 0f else completed.toFloat() / scheduledDates.size.toFloat()
+            val sparkline = last7Dates.map { date ->
+                if (isEntrySuccessful(entriesByKey[date to habit.id], habit)) 1f else 0f
+            }
             HabitConsistency(
                 habitName = habit.name,
                 completedCount = completed,
-                totalDays = dates.size,
-                consistencyRatio = ratio
+                totalDays = scheduledDates.size,
+                consistencyRatio = ratio,
+                lastSevenDays = sparkline
             )
         }.sortedBy { it.consistencyRatio } // worst first — most attention needed at top
     }
@@ -290,9 +307,11 @@ class ReportViewModel(private val repository: HabitPowerRepository) : ViewModel(
             val area = lifeAreaId?.let { areaById[it] }
             val name = area?.name ?: "Other"
             val emoji = area?.emoji
-            val totalCount = areaHabits.size * dates.size
+            val totalCount = dates.sumOf { date -> areaHabits.count { HabitRecurrenceCalculator.isScheduledOn(date, it) } }
             val completedCount = dates.sumOf { date ->
-                areaHabits.count { habit -> isEntrySuccessful(entriesByKey[date to habit.id], habit) }
+                areaHabits.count { habit ->
+                    HabitRecurrenceCalculator.isScheduledOn(date, habit) && isEntrySuccessful(entriesByKey[date to habit.id], habit)
+                }
             }
             val ratio = if (totalCount == 0) 0f else completedCount.toFloat() / totalCount.toFloat()
 

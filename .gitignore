@@ -49,6 +49,7 @@ captures/
 # Keystore files (IMPORTANT: Do not commit your signing keystore)
 *.jks
 *.keystore
+keystore.properties
 
 # External native build
 .externalNativeBuild
@@ -64,3 +65,6 @@ build_err.txt
 
 # MacOS
 .DS_Store
+
+# Firebase credentials (never commit — contains API keys)
+app/google-services.json

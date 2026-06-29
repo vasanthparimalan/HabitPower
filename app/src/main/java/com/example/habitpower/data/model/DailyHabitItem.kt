@@ -50,6 +50,14 @@ data class DailyHabitItem(
     val effectiveDisplayOrder: Int
         get() = if (assignmentDisplayOrder >= 0) assignmentDisplayOrder else habitDisplayOrder
 
+    val commitmentMinutes: Int?
+        get() {
+            val t = commitmentTime ?: return null
+            val parts = t.split(':')
+            return if (parts.size >= 2) (parts[0].toIntOrNull() ?: return null) * 60 + (parts[1].toIntOrNull() ?: 0)
+            else null
+        }
+
     fun isScheduledOn(date: LocalDate): Boolean {
         if (recurrenceStartDate != null && date.isBefore(recurrenceStartDate)) return false
         if (recurrenceEndDate != null && date.isAfter(recurrenceEndDate)) return false

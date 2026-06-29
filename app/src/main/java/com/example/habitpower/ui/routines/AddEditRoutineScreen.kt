@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DragHandle
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -54,7 +55,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.data.model.Exercise
 import com.example.habitpower.data.model.RoutineType
 import com.example.habitpower.ui.AppViewModelProvider
-import com.example.habitpower.ui.theme.LeafSectionItemCard
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -180,12 +180,15 @@ fun AddEditRoutineScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    itemsIndexed(viewModel.addedExercises, key = { _, ex -> ex.id }) { index, exercise ->
-                        ReorderableItem(reorderState, key = exercise.id) {
+                    itemsIndexed(viewModel.addedExercises, key = { _, entry -> entry.localId }) { index, entry ->
+                        ReorderableItem(reorderState, key = entry.localId) {
                             RoutineExerciseItem(
-                                exercise = exercise,
+                                entry = entry,
                                 position = index + 1,
-                                onRemove = { viewModel.removeExercise(exercise) },
+                                onRemove = { viewModel.removeExerciseEntry(entry.localId) },
+                                onSpecsChanged = { sets, reps, duration ->
+                                    viewModel.updateEntrySpecs(entry.localId, sets, reps, duration)
+                                },
                                 dragHandle = {
                                     IconButton(
                                         modifier = Modifier.draggableHandle(),
@@ -222,8 +225,6 @@ private fun ExercisePickerDialog(
     val allExercises by viewModel.allExercises.collectAsState()
     var exerciseSearchQuery by rememberSaveable { mutableStateOf("") }
 
-    val addedIds = viewModel.addedExercises.map { it.id }.toSet()
-
     val filteredExercises = allExercises
         .filter { exercise ->
             val query = exerciseSearchQuery.trim()
@@ -250,25 +251,17 @@ private fun ExercisePickerDialog(
                     )
                     LazyColumn(modifier = Modifier.heightIn(max = 320.dp)) {
                         items(filteredExercises, key = { it.id }) { exercise ->
-                            val alreadyAdded = exercise.id in addedIds
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable(enabled = !alreadyAdded) {
-                                        // Stay open — don't dismiss. "Done" closes.
+                                    .clickable {
                                         viewModel.addExercise(exercise)
                                     }
                                     .padding(12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = exercise.name,
-                                        color = if (alreadyAdded)
-                                            MaterialTheme.colorScheme.onSurfaceVariant
-                                        else
-                                            MaterialTheme.colorScheme.onSurface
-                                    )
+                                    Text(text = exercise.name)
                                     Text(
                                         text = exercise.category.displayName,
                                         style = MaterialTheme.typography.labelSmall,
@@ -281,14 +274,6 @@ private fun ExercisePickerDialog(
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.padding(end = 8.dp)
-                                    )
-                                }
-                                if (alreadyAdded) {
-                                    Icon(
-                                        Icons.Default.Check,
-                                        contentDescription = "Added",
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(18.dp)
                                     )
                                 }
                             }
@@ -306,30 +291,91 @@ private fun ExercisePickerDialog(
 
 @Composable
 fun RoutineExerciseItem(
-    exercise: Exercise,
+    entry: RoutineEntryDraft,
     position: Int,
     onRemove: () -> Unit,
+    onSpecsChanged: (sets: Int?, reps: Int?, durationSeconds: Int?) -> Unit = { _, _, _ -> },
     dragHandle: (@Composable () -> Unit)? = null
 ) {
-    Row(
+    // Keyed to localId so state follows the item through reorders
+    var editingSets by remember(entry.localId) { mutableStateOf(entry.sets?.toString() ?: "") }
+    var editingReps by remember(entry.localId) { mutableStateOf(entry.reps?.toString() ?: "") }
+    var editingDuration by remember(entry.localId) { mutableStateOf(entry.durationSeconds?.toString() ?: "") }
+
+    Card(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        dragHandle?.invoke()
-        LeafSectionItemCard(
-            modifier = Modifier.weight(1f),
-            title = "$position. ${exercise.name}",
-            subtitle = exercise.description.takeIf { it.isNotBlank() },
-            attributes = buildList {
-                exercise.targetSets?.let { add("Sets" to it.toString()) }
-                exercise.targetReps?.let { add("Reps" to it.toString()) }
-                exercise.targetDurationSeconds?.let { add("Duration" to "${it}s") }
-            },
-            trailingActions = {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                dragHandle?.invoke()
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "$position. ${entry.exercise.name}",
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1
+                    )
+                    if (entry.exercise.description.isNotBlank()) {
+                        Text(
+                            text = entry.exercise.description,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1
+                        )
+                    }
+                }
                 IconButton(onClick = onRemove) {
-                    Icon(Icons.Default.Clear, contentDescription = "Remove ${exercise.name}")
+                    Icon(Icons.Default.Clear, contentDescription = "Remove ${entry.exercise.name}")
                 }
             }
-        )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedTextField(
+                    value = editingSets,
+                    onValueChange = { v ->
+                        editingSets = v
+                        onSpecsChanged(v.toIntOrNull(), editingReps.toIntOrNull(), editingDuration.toIntOrNull())
+                    },
+                    label = { Text("Sets") },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = editingReps,
+                    onValueChange = { v ->
+                        editingReps = v
+                        onSpecsChanged(editingSets.toIntOrNull(), v.toIntOrNull(), editingDuration.toIntOrNull())
+                    },
+                    label = { Text("Reps") },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = editingDuration,
+                    onValueChange = { v ->
+                        editingDuration = v
+                        onSpecsChanged(editingSets.toIntOrNull(), editingReps.toIntOrNull(), v.toIntOrNull())
+                    },
+                    label = { Text("Sec") },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true
+                )
+            }
+        }
     }
 }

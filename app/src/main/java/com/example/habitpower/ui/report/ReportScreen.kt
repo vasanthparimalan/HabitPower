@@ -20,9 +20,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -37,14 +40,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -60,10 +64,15 @@ import java.time.LocalDate
 fun ReportScreen(
     navigateBack: (() -> Unit)? = null,
     onNavigateToYearInReview: (() -> Unit)? = null,
-    viewModel: ReportViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    onNavigateToSeasonReview: (() -> Unit)? = null,
+    onNavigateToHabitInventory: (() -> Unit)? = null,
+    onNavigateToStandup: (() -> Unit)? = null,
+    viewModel: ReportViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    seasonViewModel: SeasonReviewViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val context = LocalContext.current
     val state = viewModel.uiState
+    val seasonState by seasonViewModel.uiState.collectAsState()
 
     fun showDatePicker(initialDate: LocalDate, onDateSelected: (LocalDate) -> Unit) {
         DatePickerDialog(
@@ -86,6 +95,11 @@ fun ReportScreen(
                         IconButton(onClick = navigateBack) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { viewModel.refresh() }) {
+                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
                     }
                 }
             )
@@ -129,11 +143,13 @@ fun ReportScreen(
                                 modifier = Modifier.padding(start = 12.dp)
                             )
                         }
-                        Text(
-                            text = "User: ${state.activeUser?.name ?: "No active user"}",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
+                        state.activeUser?.let {
+                            Text(
+                                text = it.name,
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f)
+                            )
+                        }
                     }
                 }
             }
@@ -158,6 +174,65 @@ fun ReportScreen(
                         year = java.time.LocalDate.now().year,
                         onClick = onNavigateToYearInReview
                     )
+                }
+            }
+
+            // ── Season Review entry point (shown when due or never done) ───────
+            if (onNavigateToSeasonReview != null && seasonState.isDue) {
+                item {
+                    SeasonReviewBanner(onClick = onNavigateToSeasonReview)
+                }
+            }
+
+            // ── Habit Inventory entry point ────────────────────────────────────
+            if (onNavigateToHabitInventory != null) {
+                item {
+                    HabitInventoryBanner(onClick = onNavigateToHabitInventory)
+                }
+            }
+
+            // ── Self Standup entry point ───────────────────────────────────────
+            if (onNavigateToStandup != null) {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = onNavigateToStandup,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.55f)
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.TrendingUp,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary,
+                                modifier = androidx.compose.ui.Modifier.size(24.dp)
+                            )
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Self Standup",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    text = "Weekly review across life, work, and growth",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Text(
+                                text = "Start →",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
+                    }
                 }
             }
 
@@ -186,10 +261,7 @@ fun ReportScreen(
             } else {
                 // ══ SNAPSHOT ══════════════════════════════════════════════════
                 item {
-                    SectionHeader(
-                        title = "Snapshot",
-                        subtitle = "Where you stand in the selected period"
-                    )
+                    SectionHeader(title = "Snapshot")
                 }
 
                 // ── KPIs ───────────────────────────────────────────────────────
@@ -214,23 +286,19 @@ fun ReportScreen(
                     item {
                         Card {
                             Column(
-                                modifier = Modifier.padding(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                                verticalArrangement = Arrangement.spacedBy(0.dp)
                             ) {
                                 Text(
                                     text = "Life Areas",
                                     style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(bottom = 12.dp)
                                 )
-                                state.lifeAreaGauges.chunked(2).forEach { rowItems ->
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                    ) {
-                                        rowItems.forEach { gauge ->
-                                            LifeAreaGaugeCard(gauge = gauge, modifier = Modifier.weight(1f))
-                                        }
-                                        if (rowItems.size == 1) Spacer(modifier = Modifier.weight(1f))
+                                state.lifeAreaGauges.forEachIndexed { index, gauge ->
+                                    LifeAreaRow(gauge = gauge)
+                                    if (index < state.lifeAreaGauges.lastIndex) {
+                                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                                     }
                                 }
                             }
@@ -267,10 +335,7 @@ fun ReportScreen(
 
                 // ══ TRENDS ════════════════════════════════════════════════════
                 item {
-                    SectionHeader(
-                        title = "Trends",
-                        subtitle = "How your habits are moving over time"
-                    )
+                    SectionHeader(title = "Trends")
                 }
 
                 // ── Trend chart ────────────────────────────────────────────────
@@ -308,11 +373,6 @@ fun ReportScreen(
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                                Text(
-                                    text = "Lowest consistency first — your next focus is at the top",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
                                 state.habitConsistency.forEach { habit ->
                                     HabitConsistencyRow(habit = habit)
                                 }
@@ -321,19 +381,6 @@ fun ReportScreen(
                     }
                 }
 
-                // ── Footer ─────────────────────────────────────────────────────
-                item {
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
-                    ) {
-                        Text(
-                            text = "Your report is a mirror, not a verdict. Build one better week, then another, then another. That is how multi-year transformation quietly happens.",
-                            modifier = Modifier.padding(18.dp),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    }
-                }
             }
         }
     }
@@ -513,11 +560,36 @@ private fun HabitConsistencyRow(habit: HabitConsistency) {
                     .background(barColor, RoundedCornerShape(3.dp))
             )
         }
-        Text(
-            text = "${habit.completedCount} of ${habit.totalDays} days",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "${habit.completedCount} of ${habit.totalDays} days",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            if (habit.lastSevenDays.isNotEmpty()) {
+                SparklineDots(days = habit.lastSevenDays, color = barColor)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SparklineDots(days: List<Float>, color: androidx.compose.ui.graphics.Color) {
+    Row(horizontalArrangement = Arrangement.spacedBy(3.dp), verticalAlignment = Alignment.CenterVertically) {
+        days.forEach { value ->
+            Box(
+                modifier = Modifier
+                    .size(if (value > 0f) 7.dp else 5.dp)
+                    .background(
+                        if (value > 0f) color else color.copy(alpha = 0.2f),
+                        RoundedCornerShape(50)
+                    )
+            )
+        }
     }
 }
 
@@ -552,84 +624,43 @@ private fun AnalyticsKpiCard(
 }
 
 @Composable
-private fun LifeAreaGaugeCard(
-    gauge: LifeAreaGauge,
-    modifier: Modifier = Modifier
-) {
-    Card(modifier = modifier) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            if (gauge.emoji != null) {
-                Text(
-                    text = gauge.emoji,
-                    style = MaterialTheme.typography.headlineMedium
-                )
-            }
-            Text(
-                text = gauge.name,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-            GaugeChart(
-                progress = gauge.completionRatio,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-            )
-            Text(
-                text = "${(gauge.completionRatio * 100).toInt()}%",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = "${gauge.completedCount} / ${gauge.totalCount} completed",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = gauge.encouragement,
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-@Composable
-private fun GaugeChart(
-    progress: Float,
-    modifier: Modifier = Modifier
-) {
-    val baseArcColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
-    val progressArcColor = when {
-        progress >= 0.8f -> MaterialTheme.colorScheme.primary
-        progress >= 0.5f -> MaterialTheme.colorScheme.tertiary
+private fun LifeAreaRow(gauge: LifeAreaGauge) {
+    val barColor = when {
+        gauge.completionRatio >= 0.8f -> MaterialTheme.colorScheme.primary
+        gauge.completionRatio >= 0.5f -> MaterialTheme.colorScheme.tertiary
         else -> MaterialTheme.colorScheme.error
     }
-    Box(modifier = modifier, contentAlignment = Alignment.BottomCenter) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val strokeWidth = 16.dp.toPx()
-            drawArc(
-                color = baseArcColor,
-                startAngle = 180f,
-                sweepAngle = 180f,
-                useCenter = false,
-                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-            )
-            drawArc(
-                color = progressArcColor,
-                startAngle = 180f,
-                sweepAngle = 180f * progress.coerceIn(0f, 1f),
-                useCenter = false,
-                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-            )
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        if (gauge.emoji != null) {
+            Text(text = gauge.emoji, style = MaterialTheme.typography.bodyLarge)
         }
+        Text(
+            text = gauge.name,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.width(100.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        LinearProgressIndicator(
+            progress = { gauge.completionRatio.coerceIn(0f, 1f) },
+            modifier = Modifier
+                .weight(1f)
+                .height(6.dp),
+            color = barColor,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+        Text(
+            text = "${(gauge.completionRatio * 100).toInt()}%",
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = barColor,
+            modifier = Modifier.width(36.dp),
+            textAlign = TextAlign.End
+        )
     }
 }
 
@@ -643,6 +674,78 @@ private fun EncouragementCard(
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Text(message, style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+}
+
+@Composable
+private fun SeasonReviewBanner(onClick: () -> Unit) {
+    Card(
+        onClick = onClick,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "90-Day Season Review",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+                Text(
+                    text = "Reflect on the past season, identify your anchor habit, and set an intention for the next 90 days.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
+                )
+            }
+            Icon(
+                Icons.Default.AutoAwesome,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                modifier = Modifier.padding(start = 12.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun HabitInventoryBanner(onClick: () -> Unit) {
+    Card(
+        onClick = onClick,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Habit Inventory",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "30-day health check — see which habits are thriving, struggling, or worth retiring.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                )
+            }
+            Icon(
+                Icons.Default.Star,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 12.dp)
+            )
         }
     }
 }

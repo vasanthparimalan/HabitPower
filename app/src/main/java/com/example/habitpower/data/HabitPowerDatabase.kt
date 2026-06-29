@@ -6,6 +6,9 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.habitpower.data.dao.ChantDao
+import com.example.habitpower.data.dao.MeditationDao
+import com.example.habitpower.data.dao.TaskDao
 import com.example.habitpower.data.dao.DailyHealthStatDao
 import com.example.habitpower.data.dao.ExerciseDao
 import com.example.habitpower.data.dao.HabitTrackingDao
@@ -17,7 +20,14 @@ import com.example.habitpower.data.dao.RoutineNotificationSettingsDao
 import com.example.habitpower.data.dao.UserDao
 import com.example.habitpower.data.dao.UserStatsDao
 import com.example.habitpower.data.dao.WorkoutSessionDao
+import com.example.habitpower.data.model.Checklist
+import com.example.habitpower.data.model.ChecklistItem
+import com.example.habitpower.data.model.ChantDefinition
+import com.example.habitpower.data.model.ChantSession
+import com.example.habitpower.data.model.MeditationSession
 import com.example.habitpower.data.model.DailyHabitEntry
+import com.example.habitpower.data.model.Task
+import com.example.habitpower.data.model.TaskList
 import com.example.habitpower.data.model.DailyHealthStat
 import com.example.habitpower.data.model.PomodoroSession
 import com.example.habitpower.data.model.Exercise
@@ -55,9 +65,16 @@ import com.example.habitpower.data.model.WorkoutSession
         Quote::class,
         UserStats::class,
         RoutineNotificationSettings::class,
-        PomodoroSession::class
+        PomodoroSession::class,
+        ChantDefinition::class,
+        ChantSession::class,
+        TaskList::class,
+        Task::class,
+        Checklist::class,
+        ChecklistItem::class,
+        MeditationSession::class
     ],
-    version = 25,
+    version = 34,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -73,6 +90,9 @@ abstract class HabitPowerDatabase : RoomDatabase() {
     abstract fun userStatsDao(): UserStatsDao
     abstract fun routineNotificationSettingsDao(): RoutineNotificationSettingsDao
     abstract fun pomodoroSessionDao(): PomodoroSessionDao
+    abstract fun chantDao(): ChantDao
+    abstract fun meditationDao(): MeditationDao
+    abstract fun taskDao(): TaskDao
 
     companion object {
         @Volatile
@@ -304,6 +324,166 @@ abstract class HabitPowerDatabase : RoomDatabase() {
          * Migrations are applied explicitly; avoid destructive migration to
          * preserve user data across upgrades.
          */
+        val MIGRATION_25_26 = object : Migration(25, 26) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE user_stats ADD COLUMN practiceDepth REAL NOT NULL DEFAULT 0.0")
+            }
+        }
+
+        val MIGRATION_26_27 = object : Migration(26, 27) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE daily_habit_entries ADD COLUMN quality INTEGER")
+            }
+        }
+
+        val MIGRATION_27_28 = object : Migration(27, 28) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `routine_exercise_cross_ref_new` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `routineId` INTEGER NOT NULL,
+                        `exerciseId` INTEGER NOT NULL,
+                        `order` INTEGER NOT NULL,
+                        `sets` INTEGER,
+                        `reps` INTEGER,
+                        `durationSeconds` INTEGER
+                    )
+                """.trimIndent())
+                db.execSQL("""
+                    INSERT INTO `routine_exercise_cross_ref_new` (routineId, exerciseId, `order`, sets, reps, durationSeconds)
+                    SELECT r.routineId, r.exerciseId, r.`order`, e.targetSets, e.targetReps, e.targetDurationSeconds
+                    FROM `routine_exercise_cross_ref` r
+                    LEFT JOIN `exercises` e ON e.id = r.exerciseId
+                """.trimIndent())
+                db.execSQL("DROP TABLE `routine_exercise_cross_ref`")
+                db.execSQL("ALTER TABLE `routine_exercise_cross_ref_new` RENAME TO `routine_exercise_cross_ref`")
+            }
+        }
+
+        val MIGRATION_28_29 = object : Migration(28, 29) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS `chant_definitions` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `name` TEXT NOT NULL,
+                        `text` TEXT NOT NULL,
+                        `tradition` TEXT,
+                        `defaultCount` INTEGER NOT NULL DEFAULT 108,
+                        `isBuiltIn` INTEGER NOT NULL DEFAULT 0
+                    )"""
+                )
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS `chant_sessions` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `userId` INTEGER NOT NULL,
+                        `chantId` INTEGER NOT NULL,
+                        `targetCount` INTEGER NOT NULL,
+                        `actualCount` INTEGER NOT NULL,
+                        `durationSeconds` INTEGER NOT NULL,
+                        `completedAt` INTEGER NOT NULL
+                    )"""
+                )
+            }
+        }
+
+        val MIGRATION_30_31 = object : Migration(30, 31) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS `meditation_sessions` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `userId` INTEGER NOT NULL,
+                        `presetName` TEXT NOT NULL,
+                        `durationSeconds` INTEGER NOT NULL,
+                        `completedAt` INTEGER NOT NULL
+                    )"""
+                )
+            }
+        }
+
+        val MIGRATION_31_32 = object : Migration(31, 32) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Remove targetDurationSeconds, targetReps, targetSets from exercises.
+                // SQLite < 3.35 (Android < 12) does not support DROP COLUMN, so we recreate the table.
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `exercises_new` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `name` TEXT NOT NULL,
+                        `description` TEXT NOT NULL,
+                        `imageUri` TEXT,
+                        `notes` TEXT,
+                        `instructions` TEXT,
+                        `tags` TEXT NOT NULL DEFAULT '',
+                        `category` TEXT NOT NULL DEFAULT 'STRENGTH',
+                        `wgerExerciseId` INTEGER
+                    )
+                """.trimIndent())
+                db.execSQL("""
+                    INSERT INTO `exercises_new`
+                        (id, name, description, imageUri, notes, instructions, tags, category, wgerExerciseId)
+                    SELECT id, name, description, imageUri, notes, instructions, tags, category, wgerExerciseId
+                    FROM `exercises`
+                """.trimIndent())
+                db.execSQL("DROP TABLE `exercises`")
+                db.execSQL("ALTER TABLE `exercises_new` RENAME TO `exercises`")
+            }
+        }
+
+        val MIGRATION_29_30 = object : Migration(29, 30) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS `task_lists` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `userId` INTEGER NOT NULL,
+                        `name` TEXT NOT NULL,
+                        `createdAt` INTEGER NOT NULL
+                    )"""
+                )
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS `tasks` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `taskListId` INTEGER NOT NULL,
+                        `name` TEXT NOT NULL,
+                        `notes` TEXT,
+                        `dueDate` INTEGER,
+                        `isDone` INTEGER NOT NULL DEFAULT 0,
+                        `completedAt` INTEGER
+                    )"""
+                )
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS `checklists` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `userId` INTEGER NOT NULL,
+                        `name` TEXT NOT NULL,
+                        `resetsDaily` INTEGER NOT NULL DEFAULT 0
+                    )"""
+                )
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS `checklist_items` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `checklistId` INTEGER NOT NULL,
+                        `name` TEXT NOT NULL,
+                        `order` INTEGER NOT NULL DEFAULT 0,
+                        `isChecked` INTEGER NOT NULL DEFAULT 0,
+                        `lastCheckedAt` INTEGER
+                    )"""
+                )
+            }
+        }
+
+        val MIGRATION_32_33 = object : Migration(32, 33) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE chant_definitions ADD COLUMN audio_uri TEXT")
+            }
+        }
+
+        val MIGRATION_33_34 = object : Migration(33, 34) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // pausedUntil: the date a time-bound hold ends. NULL = no scheduled end.
+                // Stored as TEXT (ISO-8601 yyyy-MM-dd) via Room's LocalDate TypeConverter.
+                db.execSQL("ALTER TABLE habit_definitions ADD COLUMN pausedUntil TEXT")
+            }
+        }
+
         fun getDatabase(context: Context): HabitPowerDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = androidx.room.Room.databaseBuilder(
@@ -329,7 +509,16 @@ abstract class HabitPowerDatabase : RoomDatabase() {
                         MIGRATION_21_22,
                         MIGRATION_22_23,
                         MIGRATION_23_24,
-                        MIGRATION_24_25
+                        MIGRATION_24_25,
+                        MIGRATION_25_26,
+                        MIGRATION_26_27,
+                        MIGRATION_27_28,
+                        MIGRATION_28_29,
+                        MIGRATION_29_30,
+                        MIGRATION_30_31,
+                        MIGRATION_31_32,
+                        MIGRATION_32_33,
+                        MIGRATION_33_34
                     )
                     .build()
                 INSTANCE = instance

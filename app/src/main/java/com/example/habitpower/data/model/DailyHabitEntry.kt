@@ -30,5 +30,6 @@ data class DailyHabitEntry(
     val date: LocalDate,
     val booleanValue: Boolean? = null,
     val numericValue: Double? = null,
-    val textValue: String? = null
+    val textValue: String? = null,
+    val quality: Int? = null  // 1=tough, 2=steady, 3=great
 )

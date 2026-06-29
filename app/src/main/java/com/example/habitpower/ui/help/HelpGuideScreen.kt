@@ -47,7 +47,7 @@ fun HelpGuideScreen(
                 "Open Admin > Assignments to pick habits and life areas for each user.",
                 "Use Dashboard to switch user, review KPIs, and open Daily Check-In.",
                 "Use Focus for timer/pomodoro habits that need deep-work sessions.",
-                "Your data is backed up automatically via Google Backup — no setup needed. See 'Your Data & Backup' below for what to do when switching phones."
+                "Your data is backed up via Google Backup. See 'Your Data & Backup' below when switching phones."
             )
         ),
         GuideSection(
@@ -76,7 +76,7 @@ fun HelpGuideScreen(
                 "Week 2: Protect streak consistency and avoid missing two days in a row.",
                 "Week 3: Improve quality by tuning reminders and life-area assignments.",
                 "Week 4: Review weekly trends and remove any habit that feels noisy or vague.",
-                "Use this app like a long-term friend: adjust slowly, stay honest, and keep momentum."
+                "Adjust assignments weekly based on trends — slow iteration beats big resets."
             )
         ),
         GuideSection(
@@ -97,7 +97,7 @@ fun HelpGuideScreen(
                 "Track behavior trends over weeks using heatmaps and reports.",
                 "Coach weaker life areas with focused assignments and review loops.",
                 "Build accountability without nagging by combining reminders and game progress.",
-                "Turn daily check-ins into a motivating, repeatable ritual."
+                "Turn daily check-ins into a repeatable ritual."
             )
         ),
         GuideSection(
@@ -160,10 +160,7 @@ fun HelpGuideScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
-                SectionHeader(
-                    title = "How To Use HabitPower",
-                    subtitle = "Practical guidance for personal, family, and coaching use." 
-                )
+                SectionHeader(title = "How To Use HabitPower")
             }
 
             items(sections) { section ->
@@ -171,10 +168,7 @@ fun HelpGuideScreen(
             }
 
             item {
-                SectionHeader(
-                    title = "Flowcharts",
-                    subtitle = "Quick visual map of setup and daily usage in HabitPower."
-                )
+                SectionHeader(title = "Flowcharts")
             }
 
             items(flowCharts) { chart ->

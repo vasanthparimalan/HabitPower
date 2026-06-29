@@ -62,7 +62,7 @@ fun ExecuteRoutineScreen(
             )
         }
         viewModel.routineType == RoutineType.NORMAL -> {
-            WorkoutRunnerScreen(navigateBack = navigateBack)
+            WorkoutRunnerScreen(navigateBack = navigateBack, onRoutineComplete = onRoutineComplete)
         }
         else -> {
             Box(

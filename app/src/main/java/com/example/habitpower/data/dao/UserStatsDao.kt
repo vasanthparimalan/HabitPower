@@ -21,4 +21,7 @@ interface UserStatsDao {
 
     @Query("DELETE FROM user_stats WHERE userId = :userId")
     suspend fun deleteStats(userId: Long)
+
+    @Query("SELECT * FROM user_stats")
+    suspend fun getAllStats(): List<UserStats>
 }

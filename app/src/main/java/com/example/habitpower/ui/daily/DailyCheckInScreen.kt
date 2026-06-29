@@ -2,6 +2,7 @@ package com.example.habitpower.ui.daily
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,8 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.data.model.HabitType
 import com.example.habitpower.ui.AppViewModelProvider
+import com.example.habitpower.util.SoundPlayer
 import com.example.habitpower.ui.gamification.GamificationViewModel
-import com.example.habitpower.ui.theme.CelebrationOverlay
 import com.example.habitpower.ui.theme.DayCompletionKick
 import com.example.habitpower.ui.theme.SectionHeader
 import com.example.habitpower.ui.theme.StatusChip
@@ -64,27 +65,16 @@ fun DailyCheckInScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isBackfillDate = uiState.date != LocalDate.now()
-    val pendingCelebration by gamificationViewModel.pendingCelebration.collectAsState()
+    val completionSoundEnabled by viewModel.completionSoundEnabled.collectAsState()
+    val completionSoundId by viewModel.completionSoundId.collectAsState()
 
-    // State: track when save is complete so we can trigger gamification + then navigate
     var saveCompleted by remember { mutableStateOf(false) }
 
-    // After save completes → compute gamification, stay on screen until celebration dismissed
     LaunchedEffect(saveCompleted) {
         if (saveCompleted) {
             gamificationViewModel.onCheckInSaved(uiState.date)
+            navigateBack()
         }
-    }
-
-    // Show celebration overlay; on dismiss → navigate back
-    if (pendingCelebration != null) {
-        CelebrationOverlay(
-            event = pendingCelebration!!,
-            onDismiss = {
-                gamificationViewModel.clearCelebration()
-                navigateBack()
-            }
-        )
     }
 
     Scaffold(
@@ -157,48 +147,19 @@ fun DailyCheckInScreen(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(innerPadding)
-                        .padding(16.dp),
+                        .padding(innerPadding),
+                    contentPadding = PaddingValues(
+                        start = 16.dp, end = 16.dp, top = 16.dp, bottom = 96.dp
+                    ),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(12.dp),
-                                verticalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                StatusChip(
-                                    text = if (isBackfillDate) "Backfill Day" else "Today",
-                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                                )
-                                Text(
-                                    text = "Honor your commitments first. Everything beyond is a bonus.",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    }
-
-                    item {
-                        if (isBackfillDate) {
-                            Card(modifier = Modifier.fillMaxWidth()) {
-                                Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    StatusChip(
-                                        text = "Backfill Mode",
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
-                                    Text(
-                                        text = "Backfilling ${uiState.date}. Backfill is intentionally limited to recent days to keep tracking trustworthy.",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                }
-                            }
+                    if (isBackfillDate) {
+                        item {
+                            StatusChip(
+                                text = "Backfilling ${uiState.date}",
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
                         }
                     }
 
@@ -227,7 +188,10 @@ fun DailyCheckInScreen(
                             HabitInputCard(
                                 habit = habit,
                                 onTextChange = { viewModel.updateTextValue(habit.habitId, it) },
-                                onBooleanChange = { viewModel.updateBooleanValue(habit.habitId, it) },
+                                onBooleanChange = { value ->
+                                    viewModel.updateBooleanValue(habit.habitId, value)
+                                    if (value) SoundPlayer.playHabitCompletion(completionSoundEnabled, completionSoundId)
+                                },
                                 onTimeChange = { display, minFromNoon ->
                                     viewModel.updateTimeValue(habit.habitId, display, minFromNoon)
                                 }
@@ -299,13 +263,6 @@ private fun HabitInputCard(
                         )
                     }
 
-                    if (habit.booleanValue) {
-                        StatusChip(
-                            text = "Commitment honored. Keep showing up.",
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-                        )
-                    }
                 }
 
                 HabitType.NUMBER, HabitType.COUNT, HabitType.POMODORO, HabitType.TIMER -> {

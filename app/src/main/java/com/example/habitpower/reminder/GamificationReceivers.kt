@@ -9,10 +9,10 @@ import android.content.pm.PackageManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.example.habitpower.HabitPowerApp
 import com.example.habitpower.MainActivity
 import com.example.habitpower.R
 import com.example.habitpower.data.HabitPowerDatabase
-import com.example.habitpower.data.UserPreferencesRepository
 import com.example.habitpower.gamification.GamificationRepository
 import com.example.habitpower.gamification.GamificationEngine
 import com.example.habitpower.gamification.MotivationContent
@@ -35,7 +35,11 @@ class MorningBriefReceiver : BroadcastReceiver() {
             try {
                 val appCtx = context.applicationContext
                 val db = HabitPowerDatabase.getDatabase(appCtx)
-                val prefs = UserPreferencesRepository(appCtx)
+                val prefs = (appCtx as HabitPowerApp).container.userPreferencesRepository
+
+                if (PauseGuardian.isActive(prefs)) return@launch
+                val enabledChannels = prefs.enabledNotificationChannels.first()
+                if (NotificationChannelType.DAILY_BRIEF !in enabledChannels) return@launch
 
                 val activeUsers = db.userDao().getActiveUsers().first()
                 val storedId = prefs.activeUserId.first()
@@ -88,7 +92,11 @@ class MidDayNudgeReceiver : BroadcastReceiver() {
             try {
                 val appCtx = context.applicationContext
                 val db = HabitPowerDatabase.getDatabase(appCtx)
-                val prefs = UserPreferencesRepository(appCtx)
+                val prefs = (appCtx as HabitPowerApp).container.userPreferencesRepository
+
+                if (PauseGuardian.isActive(prefs)) return@launch
+                val enabledChannels = prefs.enabledNotificationChannels.first()
+                if (NotificationChannelType.PRACTICE_NUDGE !in enabledChannels) return@launch
 
                 val activeUsers = db.userDao().getActiveUsers().first()
                 val storedId = prefs.activeUserId.first()
@@ -136,7 +144,11 @@ class EveningCheckReceiver : BroadcastReceiver() {
             try {
                 val appCtx = context.applicationContext
                 val db = HabitPowerDatabase.getDatabase(appCtx)
-                val prefs = UserPreferencesRepository(appCtx)
+                val prefs = (appCtx as HabitPowerApp).container.userPreferencesRepository
+
+                if (PauseGuardian.isActive(prefs)) return@launch
+                val enabledChannels = prefs.enabledNotificationChannels.first()
+                if (NotificationChannelType.PRACTICE_NUDGE !in enabledChannels) return@launch
 
                 val activeUsers = db.userDao().getActiveUsers().first()
                 val storedId = prefs.activeUserId.first()
@@ -176,6 +188,62 @@ class EveningCheckReceiver : BroadcastReceiver() {
 
     companion object {
         const val NOTIF_ID = 9_003
+    }
+}
+
+/**
+ * Fires every Sunday at 19:00.
+ * Sends a summary of the past week's habit completion.
+ */
+class WeeklyInsightReceiver : BroadcastReceiver() {
+
+    override fun onReceive(context: Context, intent: Intent?) {
+        GamificationScheduler.createChannels(context)
+        val pendingResult = goAsync()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val appCtx = context.applicationContext
+                val db = HabitPowerDatabase.getDatabase(appCtx)
+                val prefs = (appCtx as HabitPowerApp).container.userPreferencesRepository
+
+                if (PauseGuardian.isActive(prefs)) return@launch
+                val enabledChannels = prefs.enabledNotificationChannels.first()
+                if (NotificationChannelType.WEEKLY_INSIGHT !in enabledChannels) return@launch
+
+                val activeUsers = db.userDao().getActiveUsers().first()
+                val storedId = prefs.activeUserId.first()
+                val user = when {
+                    activeUsers.isEmpty() -> return@launch
+                    storedId == null -> activeUsers.first()
+                    else -> activeUsers.firstOrNull { it.id == storedId } ?: activeUsers.first()
+                }
+
+                val repo = GamificationRepository(db.userStatsDao(), db.habitTrackingDao(), db.lifeAreaDao())
+                val data = repo.getWeeklyInsightData(user.id)
+                if (data.totalScheduled == 0) return@launch // nothing to report
+
+                val title = MotivationContent.weeklyInsightTitle(user.name)
+                val body = MotivationContent.weeklyInsightBody(
+                    perfectDays = data.perfectDays,
+                    totalCompleted = data.totalCompleted,
+                    totalScheduled = data.totalScheduled,
+                    streak = data.stats.currentStreak
+                )
+
+                sendNotification(appCtx, title, body, NOTIF_ID,
+                    channelId = GamificationScheduler.CHANNEL_ID_WEEKLY_INSIGHT)
+
+                // Reschedule for next Sunday
+                GamificationScheduler.scheduleWeeklyAlarm(appCtx)
+            } finally {
+                pendingResult.finish()
+            }
+        }
+    }
+
+    companion object {
+        const val NOTIF_ID = 9_004
     }
 }
 

@@ -17,6 +17,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+data class RoutineEntryDraft(
+    val localId: Long,
+    val exercise: Exercise,
+    val sets: Int? = null,
+    val reps: Int? = null,
+    val durationSeconds: Int? = null
+)
+
 class AddEditRoutineViewModel(
     savedStateHandle: SavedStateHandle,
     private val repository: HabitPowerRepository
@@ -38,11 +46,9 @@ class AddEditRoutineViewModel(
     var isSaving by mutableStateOf(false)
         private set
 
-    // Current Exercises in the Routine
-    private val _addedExercises = mutableStateListOf<Exercise>()
-    val addedExercises: List<Exercise> = _addedExercises
+    private val _addedExercises = mutableStateListOf<RoutineEntryDraft>()
+    val addedExercises: List<RoutineEntryDraft> = _addedExercises
 
-    // All Available Exercises for Selection
     val allExercises: StateFlow<List<Exercise>> = repository.getAllExercises()
         .stateIn(
             scope = viewModelScope,
@@ -53,7 +59,6 @@ class AddEditRoutineViewModel(
     init {
         if (routineId != null) {
             viewModelScope.launch {
-                // Load routine metadata
                 val routine = repository.getRoutineById(routineId)
                 routine?.let {
                     name = it.name
@@ -62,12 +67,17 @@ class AddEditRoutineViewModel(
                     restTimeSeconds = it.restTimeSeconds.toString()
                     repeatCount = it.repeatCount.toString()
                 }
-                // Load initially-assigned exercises ONE TIME (first real DB emission).
-                // .first() suspends until the DB query emits its first result, avoiding
-                // the race where .value returns the empty initial value before the query runs.
-                val exercises = repository.getExercisesForRoutine(routineId).first()
+                val entries = repository.getRoutineExercisesWithDetails(routineId).first()
                 _addedExercises.clear()
-                _addedExercises.addAll(exercises)
+                _addedExercises.addAll(entries.map { entry ->
+                    RoutineEntryDraft(
+                        localId = entry.crossRef.id,
+                        exercise = entry.exercise,
+                        sets = entry.crossRef.sets,
+                        reps = entry.crossRef.reps,
+                        durationSeconds = entry.crossRef.durationSeconds
+                    )
+                })
             }
         }
     }
@@ -79,13 +89,19 @@ class AddEditRoutineViewModel(
     fun updateRepeatCount(input: String) { repeatCount = input }
 
     fun addExercise(exercise: Exercise) {
-        if (_addedExercises.none { it.id == exercise.id }) {
-            _addedExercises.add(exercise)
-        }
+        _addedExercises.add(
+            RoutineEntryDraft(
+                localId = System.currentTimeMillis() + _addedExercises.size,
+                exercise = exercise,
+                sets = null,
+                reps = null,
+                durationSeconds = null
+            )
+        )
     }
 
-    fun removeExercise(exercise: Exercise) {
-        _addedExercises.remove(exercise)
+    fun removeExerciseEntry(localId: Long) {
+        _addedExercises.removeAll { it.localId == localId }
     }
 
     fun moveExercise(from: Int, to: Int) {
@@ -95,10 +111,13 @@ class AddEditRoutineViewModel(
         }
     }
 
-    /**
-     * Saves the routine and all its exercise cross-refs atomically, then calls [onSaved].
-     * Navigation should only happen inside [onSaved] so we don't race the DB write.
-     */
+    fun updateEntrySpecs(localId: Long, sets: Int?, reps: Int?, durationSeconds: Int?) {
+        val index = _addedExercises.indexOfFirst { it.localId == localId }
+        if (index >= 0) {
+            _addedExercises[index] = _addedExercises[index].copy(sets = sets, reps = reps, durationSeconds = durationSeconds)
+        }
+    }
+
     fun saveRoutine(onSaved: () -> Unit) {
         if (name.isBlank()) return
         if (isSaving) return
@@ -122,10 +141,16 @@ class AddEditRoutineViewModel(
                     routineId
                 }
 
-                // Atomically replace all cross-refs
                 repository.clearRoutineExercises(savedId)
-                _addedExercises.forEachIndexed { index, exercise ->
-                    repository.addExerciseToRoutine(savedId, exercise.id, index)
+                _addedExercises.forEachIndexed { index, entry ->
+                    repository.addExerciseToRoutine(
+                        routineId = savedId,
+                        exerciseId = entry.exercise.id,
+                        order = index,
+                        sets = entry.sets,
+                        reps = entry.reps,
+                        durationSeconds = entry.durationSeconds
+                    )
                 }
 
                 onSaved()

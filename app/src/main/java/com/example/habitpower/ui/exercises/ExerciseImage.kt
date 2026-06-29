@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessibilityNew
-import androidx.compose.material.icons.filled.DirectionsRun
+import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.SelfImprovement
 import androidx.compose.material3.Icon
@@ -161,7 +161,7 @@ private fun fallbackIcon(category: ExerciseCategory?): ImageVector {
     return when (category) {
         ExerciseCategory.YOGA -> Icons.Default.SelfImprovement
         ExerciseCategory.STRETCHING -> Icons.Default.AccessibilityNew
-        ExerciseCategory.CARDIO_OTHER -> Icons.Default.DirectionsRun
+        ExerciseCategory.CARDIO_OTHER -> Icons.AutoMirrored.Filled.DirectionsRun
         else -> Icons.Default.FitnessCenter
     }
 }

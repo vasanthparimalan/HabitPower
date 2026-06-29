@@ -21,9 +21,6 @@ object ExercisePackManager {
         val category: ExerciseCategory,
         val instructions: String?,
         val tags: String,
-        val targetReps: Int?,
-        val targetSets: Int?,
-        val targetDurationSeconds: Int?,
         val wgerExerciseId: Int?
     )
 
@@ -39,9 +36,6 @@ object ExercisePackManager {
             obj.put("category", e.category.name)
             obj.put("instructions", e.instructions ?: JSONObject.NULL)
             obj.put("tags", e.tags)
-            obj.put("targetReps", e.targetReps ?: JSONObject.NULL)
-            obj.put("targetSets", e.targetSets ?: JSONObject.NULL)
-            obj.put("targetDurationSeconds", e.targetDurationSeconds ?: JSONObject.NULL)
             obj.put("wger_id", e.wgerExerciseId ?: JSONObject.NULL)
             arr.put(obj)
         }
@@ -63,9 +57,6 @@ object ExercisePackManager {
                     }.getOrDefault(ExerciseCategory.STRENGTH),
                     instructions = obj.optString("instructions").takeIf { it.isNotBlank() && it != "null" },
                     tags = obj.optString("tags"),
-                    targetReps = obj.optInt("targetReps", -1).takeIf { it > 0 },
-                    targetSets = obj.optInt("targetSets", -1).takeIf { it > 0 },
-                    targetDurationSeconds = obj.optInt("targetDurationSeconds", -1).takeIf { it > 0 },
                     wgerExerciseId = obj.optInt("wger_id", -1).takeIf { it > 0 }
                 )
             }

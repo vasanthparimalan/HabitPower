@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.habitpower.data.model.Exercise
+import com.example.habitpower.data.model.RoutineExerciseWithDetails
 import com.example.habitpower.ui.AppViewModelProvider
 import com.example.habitpower.ui.execution.ExerciseInstructionBlock
 import com.example.habitpower.ui.execution.ExerciseSpecsRow
@@ -116,10 +117,12 @@ fun ExecuteTimedRoutineScreen(
                 ExercisePhaseUI(
                     modifier = Modifier.padding(innerPadding),
                     exercise = phase.exercise,
+                    sets = phase.sets,
+                    reps = phase.reps,
                     position = phase.position + 1,
                     totalExercises = exercises.size,
                     timeRemaining = phase.timeRemaining,
-                    totalDuration = phase.exercise.targetDurationSeconds ?: 60,
+                    totalDuration = phase.totalDuration,
                     isRunning = isRunning,
                     currentRound = currentRound,
                     totalRounds = totalRounds,
@@ -170,12 +173,12 @@ fun ExecuteTimedRoutineScreen(
 @Composable
 private fun IdlePhaseUI(
     modifier: Modifier = Modifier,
-    exercises: List<Exercise>,
+    exercises: List<RoutineExerciseWithDetails>,
     totalRounds: Int,
     restTimeSeconds: Int,
     onStart: () -> Unit
 ) {
-    val firstExercise = exercises.firstOrNull()
+    val firstEntry = exercises.firstOrNull()
     val estimatedTime = estimateTimedRoutineSeconds(exercises, totalRounds, restTimeSeconds)
 
     Column(
@@ -208,22 +211,24 @@ private fun IdlePhaseUI(
             )
 
             ExerciseSpecsRow(
-                exercise = firstExercise ?: Exercise(name = "", description = "", imageUri = null, targetDurationSeconds = null, targetReps = null, targetSets = null),
+                sets = firstEntry?.crossRef?.sets,
+                reps = firstEntry?.crossRef?.reps,
+                durationSeconds = firstEntry?.crossRef?.durationSeconds,
                 extraSpecs = buildList {
                     if (estimatedTime > 0) add("Est." to formatExerciseTime(estimatedTime))
                 }
             )
 
-            firstExercise?.let {
+            firstEntry?.let { entry ->
                 ExerciseImage(
-                    imageUri = it.imageUri,
-                    contentDescription = it.name,
+                    imageUri = entry.exercise.imageUri,
+                    contentDescription = entry.exercise.name,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(220.dp),
-                    exerciseName = it.name,
-                    category = it.category,
-                    detailLabel = it.description.takeIf { text -> text.isNotBlank() },
+                    exerciseName = entry.exercise.name,
+                    category = entry.exercise.category,
+                    detailLabel = entry.exercise.description.takeIf { it.isNotBlank() },
                     contentScale = ContentScale.Fit
                 )
             }
@@ -234,21 +239,21 @@ private fun IdlePhaseUI(
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                exercises.forEachIndexed { index, exercise ->
+                exercises.forEachIndexed { index, entry ->
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
-                            text = "${index + 1}. ${exercise.name}",
+                            text = "${index + 1}. ${entry.exercise.name}",
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium
                         )
-                        if (exercise.description.isNotBlank()) {
+                        if (entry.exercise.description.isNotBlank()) {
                             Text(
-                                text = exercise.description,
+                                text = entry.exercise.description,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        exercise.targetDurationSeconds?.let {
+                        entry.crossRef.durationSeconds?.let {
                             Text(
                                 text = formatExerciseTime(it),
                                 style = MaterialTheme.typography.labelLarge,
@@ -277,6 +282,8 @@ private fun IdlePhaseUI(
 private fun ExercisePhaseUI(
     modifier: Modifier = Modifier,
     exercise: Exercise,
+    sets: Int? = null,
+    reps: Int? = null,
     position: Int,
     totalExercises: Int,
     timeRemaining: Int,
@@ -343,7 +350,8 @@ private fun ExercisePhaseUI(
             }
 
             ExerciseSpecsRow(
-                exercise = exercise,
+                sets = sets,
+                reps = reps,
                 extraSpecs = listOf("Remaining" to formatExerciseTime(timeRemaining))
             )
 

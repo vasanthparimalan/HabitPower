@@ -102,6 +102,16 @@ class HabitPowerWidget : GlanceAppWidget() {
             }
 
             Header(state.userName)
+
+            if (state.dailyIntention.isNotBlank()) {
+                Spacer(modifier = GlanceModifier.height(4.dp))
+                Text(
+                    text = "☀ ${state.dailyIntention}",
+                    style = TextStyle(color = Gray, fontSize = 11.sp),
+                    maxLines = 1
+                )
+            }
+
             Spacer(modifier = GlanceModifier.height(6.dp))
 
             // Progress bar + count
@@ -113,6 +123,7 @@ class HabitPowerWidget : GlanceAppWidget() {
                 Spacer(modifier = GlanceModifier.height(8.dp))
             }
 
+            val pendingHabits = state.habits.filter { !it.isCompleted }
             when {
                 state.totalCount == 0 -> {
                     Text(
@@ -120,14 +131,14 @@ class HabitPowerWidget : GlanceAppWidget() {
                         style = TextStyle(color = Gray, fontSize = 12.sp)
                     )
                 }
-                state.habits.isEmpty() -> {
+                pendingHabits.isEmpty() -> {
                     // All habits are done
                     AllDoneView()
                 }
                 else -> {
                     // Pending habits list
                     LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
-                        itemsIndexed(state.habits) { index, habit ->
+                        itemsIndexed(pendingHabits) { index, habit ->
                             val bgRes = if (index == 0) R.drawable.widget_habit_bg_identity
                                         else R.drawable.widget_habit_bg
                             Column(
@@ -289,7 +300,7 @@ class HabitPowerWidget : GlanceAppWidget() {
         }
     }
 
-    private fun habitLabel(name: String, streak: Int, isPinned: Boolean): String {
+    private fun habitLabel(name: String, _streak: Int, isPinned: Boolean): String {
         val prefix = if (isPinned) "⭐ " else when {
             name.contains("Sleep", ignoreCase = true) -> "🛌 "
             name.contains("Step", ignoreCase = true) -> "🚶 "

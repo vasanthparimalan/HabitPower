@@ -56,4 +56,7 @@ interface LifeAreaDao {
 
     @Query("DELETE FROM user_life_area_assignments WHERE userId = :userId")
     suspend fun clearLifeAreaAssignmentsForUser(userId: Long)
+
+    @Query("SELECT * FROM user_life_area_assignments")
+    suspend fun getAllLifeAreaAssignments(): List<UserLifeAreaAssignment>
 }

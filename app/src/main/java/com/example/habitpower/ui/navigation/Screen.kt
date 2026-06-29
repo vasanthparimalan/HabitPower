@@ -27,11 +27,16 @@ sealed class Screen(val route: String) {
     object Help : Screen("help")
     object AdminHome : Screen("admin")
     object AdminUsers : Screen("admin/users")
-    object AdminHabits : Screen("admin/habits")
+    object AdminHabits : Screen("admin/habits?editHabitId={editHabitId}") {
+        fun createRoute(editHabitId: Long? = null): String =
+            "admin/habits?editHabitId=${editHabitId ?: -1L}"
+    }
     object AdminLifeAreas : Screen("admin/life-areas")
     object AdminAssignments : Screen("admin/assignments")
     object AdminNotificationTone : Screen("admin/notification-tone")
-    object Focus : Screen("focus?habitId={habitId}") {
+    object AdminNotificationChannels : Screen("admin/notification-channels")
+    object Focus : Screen("focus_launcher")
+    object FocusPomodoro : Screen("focus?habitId={habitId}") {
         const val baseRoute = "focus"
 
         fun createRoute(habitId: Long? = null): String {
@@ -40,7 +45,20 @@ sealed class Screen(val route: String) {
     }
     object AdminQuotes : Screen("admin/quotes")
     object AdminExport : Screen("admin/export")
+    object AdminImport : Screen("admin/import")
     object YearInReview : Screen("report/year-in-review")
     object LibraryBrowse : Screen("exercises/library")
     object ImportPack : Screen("exercises/import")
+    object MissedDayWelcome : Screen("missed_day_welcome/{daysAbsent}") {
+        fun createRoute(daysAbsent: Long) = "missed_day_welcome/$daysAbsent"
+    }
+    object StepBack : Screen("step_back")
+    object Meditation : Screen("focus/meditation")
+    object Chant : Screen("focus/chant")
+    object Tasks : Screen("tasks")
+    object AdminDriveSync : Screen("admin/drive-sync")
+    object SeasonReview : Screen("report/season-review")
+    object HabitInventory : Screen("report/habit-inventory")
+    object SelfStandup : Screen("standup")
+    object HabitLibrary : Screen("habits/library")
 }

@@ -10,12 +10,16 @@ import androidx.room.Update
 import com.example.habitpower.data.model.Exercise
 import com.example.habitpower.data.model.Routine
 import com.example.habitpower.data.model.RoutineExerciseCrossRef
+import com.example.habitpower.data.model.RoutineExerciseWithDetails
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RoutineDao {
     @Query("SELECT * FROM routines")
     fun getAllRoutines(): Flow<List<Routine>>
+
+    @Query("SELECT * FROM routines")
+    suspend fun getAllRoutinesSync(): List<Routine>
 
     @Query("SELECT * FROM routines WHERE id = :id")
     suspend fun getRoutineById(id: Long): Routine?
@@ -39,6 +43,13 @@ interface RoutineDao {
     @Query("SELECT exercises.* FROM exercises INNER JOIN routine_exercise_cross_ref ON exercises.id = routine_exercise_cross_ref.exerciseId WHERE routine_exercise_cross_ref.routineId = :routineId ORDER BY routine_exercise_cross_ref.`order` ASC")
     fun getExercisesForRoutine(routineId: Long): Flow<List<Exercise>>
 
+    @Transaction
+    @Query("SELECT * FROM routine_exercise_cross_ref WHERE routineId = :routineId ORDER BY `order` ASC")
+    fun getRoutineExercisesWithDetails(routineId: Long): Flow<List<RoutineExerciseWithDetails>>
+
     @Query("SELECT COUNT(*) FROM routine_exercise_cross_ref WHERE routineId = :routineId")
     fun getExerciseCountForRoutine(routineId: Long): Flow<Int>
+
+    @Query("SELECT * FROM routine_exercise_cross_ref")
+    suspend fun getAllCrossRefsSync(): List<RoutineExerciseCrossRef>
 }

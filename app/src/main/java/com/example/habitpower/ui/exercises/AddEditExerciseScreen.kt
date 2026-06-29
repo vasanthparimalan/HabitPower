@@ -202,54 +202,6 @@ fun AddEditExerciseScreen(
                 supportingText = { Text("e.g. 1. Warm up for 2 min\n2. Do 3 sets\n3. Rest between sets") }
             )
 
-            OutlinedTextField(
-                value = viewModel.targetSets,
-                onValueChange = viewModel::updateTargetSets,
-                label = { Text("Target Sets (Optional)") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
-
-            // Reps vs Duration Selection
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                FilterChip(
-                    selected = !viewModel.isTimeBased,
-                    onClick = { viewModel.setTimeBasedMode(false) },
-                    label = { Text("Reps Based") },
-                    leadingIcon = {
-                        if (!viewModel.isTimeBased) Icon(Icons.Default.Check, contentDescription = null)
-                    }
-                )
-                FilterChip(
-                    selected = viewModel.isTimeBased,
-                    onClick = { viewModel.setTimeBasedMode(true) },
-                    label = { Text("Time Based") },
-                    leadingIcon = {
-                        if (viewModel.isTimeBased) Icon(Icons.Default.Check, contentDescription = null)
-                    }
-                )
-            }
-
-            if (!viewModel.isTimeBased) {
-                OutlinedTextField(
-                    value = viewModel.targetReps,
-                    onValueChange = viewModel::updateTargetReps,
-                    label = { Text("Target Reps") },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-            } else {
-                OutlinedTextField(
-                    value = viewModel.targetDuration,
-                    onValueChange = viewModel::updateTargetDuration,
-                    label = { Text("Target Duration (Seconds)") },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-            }
         }
     }
 }

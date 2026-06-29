@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -18,35 +21,87 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.habitpower.data.model.Exercise
+import com.example.habitpower.data.model.HabitDefinition
+import com.example.habitpower.data.model.RoutineExerciseWithDetails
 import com.example.habitpower.ui.AppViewModelProvider
 import com.example.habitpower.ui.exercises.ExerciseImage
+
+@Composable
+private fun HabitLinkPickerDialog(
+    habits: List<HabitDefinition>,
+    onDismiss: () -> Unit,
+    onSelect: (Long) -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Link to a habit") },
+        text = {
+            LazyColumn(modifier = Modifier.heightIn(max = 320.dp)) {
+                items(habits, key = { it.id }) { habit ->
+                    TextButton(
+                        onClick = { onSelect(habit.id) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(habit.name, modifier = Modifier.weight(1f))
+                    }
+                    HorizontalDivider()
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        }
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutRunnerScreen(
     navigateBack: () -> Unit,
+    onRoutineComplete: () -> Unit,
     viewModel: WorkoutRunnerViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val habitsForLinking by viewModel.habitsForLinking.collectAsState()
+    var showHabitPicker by remember { mutableStateOf(false) }
+
     if (viewModel.isWorkoutComplete) {
+        if (showHabitPicker) {
+            HabitLinkPickerDialog(
+                habits = habitsForLinking,
+                onDismiss = { showHabitPicker = false },
+                onSelect = { habitId ->
+                    viewModel.linkSessionToHabit(habitId)
+                    showHabitPicker = false
+                }
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -73,7 +128,21 @@ fun WorkoutRunnerScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(32.dp))
-            Button(onClick = navigateBack, modifier = Modifier.fillMaxWidth()) {
+            if (viewModel.linkedHabitName != null) {
+                Text(
+                    text = "Linked to “${viewModel.linkedHabitName}”",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(Modifier.height(16.dp))
+            } else if (habitsForLinking.isNotEmpty()) {
+                TextButton(onClick = { showHabitPicker = true }) {
+                    Text("Link to a habit →")
+                }
+                Spacer(Modifier.height(8.dp))
+            }
+            Button(onClick = onRoutineComplete, modifier = Modifier.fillMaxWidth()) {
                 Text("Done")
             }
         }
@@ -124,8 +193,8 @@ fun WorkoutRunnerScreen(
             return@Scaffold
         }
 
-        val exercise = viewModel.currentExercise
-        if (exercise == null) {
+        val exerciseEntry = viewModel.currentExercise
+        if (exerciseEntry == null) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -136,12 +205,14 @@ fun WorkoutRunnerScreen(
             }
             return@Scaffold
         }
+        val exercise = exerciseEntry.exercise
+        val crossRef = exerciseEntry.crossRef
 
         val totalExercises = viewModel.totalExercises.coerceAtLeast(1)
         val progress = (viewModel.currentExerciseIndex + 1).toFloat() / totalExercises.toFloat()
         val nextExerciseName = viewModel.allExercises
             .getOrNull(viewModel.currentExerciseIndex + 1)
-            ?.name
+            ?.exercise?.name
 
         Column(
             modifier = Modifier
@@ -175,7 +246,9 @@ fun WorkoutRunnerScreen(
                 }
 
                 ExerciseSpecsRow(
-                    exercise = exercise,
+                    sets = crossRef.sets,
+                    reps = crossRef.reps,
+                    durationSeconds = crossRef.durationSeconds,
                     extraSpecs = buildList {
                         if (viewModel.isTimerRunning || viewModel.timerSeconds > 0) {
                             add("Timer" to formatExerciseTime(viewModel.timerSeconds))
@@ -236,10 +309,10 @@ fun WorkoutRunnerScreen(
 @Composable
 private fun NormalRoutineIdleScreen(
     modifier: Modifier = Modifier,
-    exercises: List<Exercise>,
+    exercises: List<RoutineExerciseWithDetails>,
     onStart: () -> Unit
 ) {
-    val firstExercise = exercises.firstOrNull()
+    val firstEntry = exercises.firstOrNull()
 
     Column(
         modifier = modifier
@@ -265,16 +338,16 @@ private fun NormalRoutineIdleScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            firstExercise?.let {
+            firstEntry?.let { entry ->
                 ExerciseImage(
-                    imageUri = it.imageUri,
-                    contentDescription = it.name,
+                    imageUri = entry.exercise.imageUri,
+                    contentDescription = entry.exercise.name,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(220.dp),
-                    exerciseName = it.name,
-                    category = it.category,
-                    detailLabel = it.description.takeIf { text -> text.isNotBlank() },
+                    exerciseName = entry.exercise.name,
+                    category = entry.exercise.category,
+                    detailLabel = entry.exercise.description.takeIf { it.isNotBlank() },
                     contentScale = ContentScale.Fit
                 )
             }
@@ -285,28 +358,30 @@ private fun NormalRoutineIdleScreen(
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                exercises.forEachIndexed { index, exercise ->
+                exercises.forEachIndexed { index, entry ->
+                    val ex = entry.exercise
+                    val cr = entry.crossRef
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
-                            text = "${index + 1}. ${exercise.name}",
+                            text = "${index + 1}. ${ex.name}",
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium
                         )
-                        if (exercise.description.isNotBlank()) {
+                        if (ex.description.isNotBlank()) {
                             Text(
-                                text = exercise.description,
+                                text = ex.description,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         val plan = buildString {
-                            exercise.targetSets?.let { append("$it sets") }
-                            exercise.targetReps?.let {
-                                if (isNotBlank()) append(" - ")
+                            cr.sets?.let { append("$it sets") }
+                            cr.reps?.let {
+                                if (isNotBlank()) append(" · ")
                                 append("$it reps")
                             }
-                            exercise.targetDurationSeconds?.let {
-                                if (isNotBlank()) append(" - ")
+                            cr.durationSeconds?.let {
+                                if (isNotBlank()) append(" · ")
                                 append(formatExerciseTime(it))
                             }
                         }

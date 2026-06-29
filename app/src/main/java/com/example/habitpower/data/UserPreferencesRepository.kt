@@ -6,7 +6,11 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
+import java.time.LocalDate
+import com.example.habitpower.reminder.NotificationChannelType
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.habitpower.util.NotificationSoundOption
 import kotlinx.coroutines.flow.Flow
@@ -27,6 +31,13 @@ class UserPreferencesRepository(private val context: Context) {
             preferences[ACTIVE_USER_ID_KEY] = userId.toInt()
         }
     }
+
+    suspend fun clearActiveUserId() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(ACTIVE_USER_ID_KEY)
+        }
+    }
+
     private val STREAK_BASE_DAYS_KEY = intPreferencesKey("streak_base_days")
 
     val streakBaseDays: Flow<Int> = context.dataStore.data.map { preferences ->
@@ -142,6 +153,148 @@ class UserPreferencesRepository(private val context: Context) {
             it[POMODORO_SHORT_BREAK_MINUTES_KEY] = settings.shortBreakMinutes
             it[POMODORO_LONG_BREAK_MINUTES_KEY] = settings.longBreakMinutes
             it[POMODORO_CYCLES_BEFORE_LONG_BREAK_KEY] = settings.cyclesBeforeLongBreak
+        }
+    }
+
+    // ── App open date tracking (for Missed-Day Welcome) ────────────────────────
+
+    private val LAST_OPENED_EPOCH_DAY_KEY = longPreferencesKey("last_opened_epoch_day")
+
+    val lastOpenedEpochDay: Flow<Long?> = context.dataStore.data.map { preferences ->
+        preferences[LAST_OPENED_EPOCH_DAY_KEY]
+    }
+
+    suspend fun saveLastOpenedEpochDay(epochDay: Long) {
+        context.dataStore.edit { it[LAST_OPENED_EPOCH_DAY_KEY] = epochDay }
+    }
+
+    // ── Notification channel preferences ──────────────────────────────────────
+
+    private val ENABLED_NOTIFICATION_CHANNELS_KEY =
+        stringSetPreferencesKey("enabled_notification_channels")
+
+    val enabledNotificationChannels: Flow<Set<NotificationChannelType>> =
+        context.dataStore.data.map { prefs ->
+            prefs[ENABLED_NOTIFICATION_CHANNELS_KEY]
+                ?.mapNotNull { name -> runCatching { NotificationChannelType.valueOf(name) }.getOrNull() }
+                ?.toSet()
+                ?: setOf(NotificationChannelType.HABIT_REMINDERS, NotificationChannelType.PRACTICE_NUDGE)
+        }
+
+    suspend fun setEnabledNotificationChannels(channels: Set<NotificationChannelType>) {
+        context.dataStore.edit { prefs ->
+            prefs[ENABLED_NOTIFICATION_CHANNELS_KEY] = channels.map { it.name }.toSet()
+        }
+    }
+
+    // ── Step-Back Mode ────────────────────────────────────────────────────────
+
+    private val STEP_BACK_ACTIVE_KEY = booleanPreferencesKey("step_back_active")
+    private val STEP_BACK_RETURN_EPOCH_DAY_KEY = longPreferencesKey("step_back_return_epoch_day")
+
+    val stepBackActive: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[STEP_BACK_ACTIVE_KEY] ?: false
+    }
+
+    val stepBackReturnEpochDay: Flow<Long?> = context.dataStore.data.map { prefs ->
+        prefs[STEP_BACK_RETURN_EPOCH_DAY_KEY]
+    }
+
+    suspend fun setStepBack(active: Boolean, returnEpochDay: Long?) {
+        context.dataStore.edit { prefs ->
+            prefs[STEP_BACK_ACTIVE_KEY] = active
+            if (returnEpochDay != null) {
+                prefs[STEP_BACK_RETURN_EPOCH_DAY_KEY] = returnEpochDay
+            } else {
+                prefs.remove(STEP_BACK_RETURN_EPOCH_DAY_KEY)
+            }
+        }
+    }
+
+    // ── Habit completion sound ────────────────────────────────────────────────
+
+    private val HABIT_COMPLETION_SOUND_ENABLED_KEY = booleanPreferencesKey("habit_completion_sound_enabled")
+    private val HABIT_COMPLETION_SOUND_ID_KEY = stringPreferencesKey("habit_completion_sound_id")
+
+    val habitCompletionSoundEnabled: Flow<Boolean> = context.dataStore.data.map {
+        it[HABIT_COMPLETION_SOUND_ENABLED_KEY] ?: true
+    }
+
+    val habitCompletionSoundId: Flow<String> = context.dataStore.data.map {
+        it[HABIT_COMPLETION_SOUND_ID_KEY] ?: NotificationSoundOption.POSITIVE.id
+    }
+
+    suspend fun saveHabitCompletionSoundEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[HABIT_COMPLETION_SOUND_ENABLED_KEY] = enabled }
+    }
+
+    suspend fun saveHabitCompletionSoundId(id: String) {
+        context.dataStore.edit { it[HABIT_COMPLETION_SOUND_ID_KEY] = id }
+    }
+
+    private val LAST_SEASON_REVIEW_EPOCH_DAY_KEY = longPreferencesKey("last_season_review_epoch_day")
+
+    val lastSeasonReviewEpochDay: Flow<Long?> = context.dataStore.data.map { it[LAST_SEASON_REVIEW_EPOCH_DAY_KEY] }
+
+    suspend fun saveLastSeasonReviewEpochDay(epochDay: Long) {
+        context.dataStore.edit { it[LAST_SEASON_REVIEW_EPOCH_DAY_KEY] = epochDay }
+    }
+
+    private val DRIVE_ACCOUNT_NAME_KEY = stringPreferencesKey("drive_account_name")
+    private val DRIVE_LAST_SYNC_AT_KEY = longPreferencesKey("drive_last_sync_at")
+
+    val driveAccountName: Flow<String?> = context.dataStore.data.map { it[DRIVE_ACCOUNT_NAME_KEY] }
+    val driveLastSyncAt: Flow<Long?> = context.dataStore.data.map { it[DRIVE_LAST_SYNC_AT_KEY] }
+
+    suspend fun setDriveAccount(name: String?) {
+        context.dataStore.edit { prefs ->
+            if (name != null) prefs[DRIVE_ACCOUNT_NAME_KEY] = name
+            else prefs.remove(DRIVE_ACCOUNT_NAME_KEY)
+        }
+    }
+
+    suspend fun setDriveLastSyncAt(timeMs: Long) {
+        context.dataStore.edit { it[DRIVE_LAST_SYNC_AT_KEY] = timeMs }
+    }
+
+    // ── Self Standup commitments ───────────────────────────────────────────────
+
+    fun getStandupCommitment(cadence: String): Flow<String> = context.dataStore.data.map {
+        it[stringPreferencesKey("standup_commitment_$cadence")] ?: ""
+    }
+
+    suspend fun saveStandupCommitment(cadence: String, text: String) {
+        context.dataStore.edit {
+            it[stringPreferencesKey("standup_commitment_$cadence")] = text
+            it[longPreferencesKey("standup_done_ms_$cadence")] = System.currentTimeMillis()
+        }
+    }
+
+    fun getStandupLastCompletedMs(cadence: String): Flow<Long?> = context.dataStore.data.map {
+        it[longPreferencesKey("standup_done_ms_$cadence")]
+    }
+
+    // ── Daily intention ───────────────────────────────────────────────────────
+
+    fun getDailyIntention(date: String): Flow<String> = context.dataStore.data.map {
+        it[stringPreferencesKey("daily_intention_$date")] ?: ""
+    }
+
+    suspend fun saveDailyIntention(date: String, text: String) {
+        context.dataStore.edit { prefs ->
+            prefs[stringPreferencesKey("daily_intention_$date")] = text
+            // Remove entries older than 30 days to prevent unbounded growth
+            val cutoff = runCatching { LocalDate.parse(date).minusDays(30) }.getOrNull() ?: return@edit
+            prefs.asMap().keys
+                .filter { it.name.startsWith("daily_intention_") }
+                .forEach { key ->
+                    val keyDate = runCatching {
+                        LocalDate.parse(key.name.removePrefix("daily_intention_"))
+                    }.getOrNull()
+                    if (keyDate != null && keyDate.isBefore(cutoff)) {
+                        prefs.remove(stringPreferencesKey(key.name))
+                    }
+                }
         }
     }
 }

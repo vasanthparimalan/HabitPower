@@ -59,16 +59,36 @@ object SoundPlayer {
         try {
             val toneGen = ToneGenerator(AudioManager.STREAM_NOTIFICATION, volumePercent)
             toneGen.startTone(option.toneType, option.durationMs)
-            // Release after tone finishes + small buffer
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                 toneGen.release()
             }, (option.durationMs + 200).toLong())
-        } catch (_: Exception) {
-            // Ignore — device may not support ToneGenerator in all states
-        }
+        } catch (_: Exception) {}
     }
 
     fun playById(id: String, volumePercent: Int = 80) {
+        if (id == "none") return
         play(NotificationSoundOption.fromId(id), volumePercent)
+    }
+
+    /** Plays habit completion tone if sound is enabled. */
+    fun playHabitCompletion(enabled: Boolean, soundId: String = NotificationSoundOption.POSITIVE.id) {
+        if (enabled) playById(soundId, 70)
+    }
+
+    /**
+     * Unified session-end bell: a double tone that signals the end of any Focus
+     * session (Pomodoro, Meditation, Chant). Distinct from single-tap completion tones.
+     */
+    fun playSessionEnd(volumePercent: Int = 85) {
+        try {
+            val toneGen = ToneGenerator(AudioManager.STREAM_NOTIFICATION, volumePercent)
+            toneGen.startTone(ToneGenerator.TONE_PROP_ACK, 500)
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                toneGen.startTone(ToneGenerator.TONE_PROP_ACK, 700)
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    toneGen.release()
+                }, 1000)
+            }, 700)
+        } catch (_: Exception) {}
     }
 }

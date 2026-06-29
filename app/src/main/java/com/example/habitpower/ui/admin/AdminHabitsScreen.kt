@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -45,9 +46,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import com.example.habitpower.data.model.HabitDefinition
 import com.example.habitpower.data.model.HabitLifecycleStatus
 import com.example.habitpower.data.model.HabitRecurrenceType
+import com.example.habitpower.data.model.HabitTemplate
+import com.example.habitpower.data.model.HabitTemplates
 import com.example.habitpower.data.model.HabitType
 import com.example.habitpower.data.model.TargetOperator
 import com.example.habitpower.reminder.HabitReminderScheduler
@@ -61,6 +70,7 @@ import java.time.DayOfWeek
 @Composable
 fun AdminHabitsScreen(
     navigateBack: () -> Unit,
+    editHabitId: Long? = null,
     viewModel: AdminHabitsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val habits by viewModel.habits.collectAsState()
@@ -69,6 +79,12 @@ fun AdminHabitsScreen(
     val context = LocalContext.current
 
     var editingHabit by remember { mutableStateOf<HabitDefinition?>(null) }
+
+    LaunchedEffect(editHabitId, habits) {
+        if (editHabitId != null && editHabitId > 0 && editingHabit == null) {
+            habits.find { it.id == editHabitId }?.let { editingHabit = it }
+        }
+    }
     var habitToDelete by remember { mutableStateOf<HabitDefinition?>(null) }
     var showHabitTypeInfo by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -107,8 +123,14 @@ fun AdminHabitsScreen(
     editingHabit?.let { habit ->
         var editName by remember { mutableStateOf(habit.name) }
         var editDesc by remember { mutableStateOf(habit.description) }
+        var editGoalIdentity by remember { mutableStateOf(habit.goalIdentityStatement) }
         var editTarget by remember { mutableStateOf(habit.targetValue?.toString() ?: "") }
         var editOp by remember { mutableStateOf(habit.operator) }
+        var editUnit by remember { mutableStateOf(habit.unit ?: "") }
+        var editCommitmentTime by remember { mutableStateOf(habit.commitmentTime) }
+        var editCommitmentLocation by remember { mutableStateOf(habit.commitmentLocation) }
+        var editShowInWidget by remember { mutableStateOf(habit.showInWidget) }
+        var editShowInDailyCheckIn by remember { mutableStateOf(habit.showInDailyCheckIn) }
         var editRoutineId by remember { mutableStateOf(habit.routineId) }
         var editLifeAreaId by remember { mutableStateOf(habit.lifeAreaId) }
         var editRecurrenceType by remember { mutableStateOf(habit.recurrenceType) }
@@ -152,7 +174,10 @@ fun AdminHabitsScreen(
             onDismissRequest = { editingHabit = null },
             title = { Text("Edit Habit") },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     OutlinedTextField(
                         value = editName,
                         onValueChange = { editName = it },
@@ -163,16 +188,33 @@ fun AdminHabitsScreen(
                         value = editDesc,
                         onValueChange = { editDesc = it },
                         label = { Text("Description") },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 2
                     )
-                    if (habit.type != HabitType.BOOLEAN && habit.type != HabitType.TEXT) {
+                    OutlinedTextField(
+                        value = editGoalIdentity,
+                        onValueChange = { editGoalIdentity = it },
+                        label = { Text("Who you are becoming") },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 2
+                    )
+                    if (habit.type != HabitType.BOOLEAN && habit.type != HabitType.TEXT && habit.type != HabitType.ROUTINE) {
                         OutlinedTextField(
                             value = editTarget,
                             onValueChange = { editTarget = it },
                             label = { Text("Target Value") },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal
+                            )
                         )
                         OperatorSelector(selected = editOp, onSelected = { editOp = it })
+                        OutlinedTextField(
+                            value = editUnit,
+                            onValueChange = { editUnit = it },
+                            label = { Text("Unit (e.g. km, pages, hours)") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
 
                     if (habit.type == HabitType.ROUTINE) {
@@ -215,6 +257,51 @@ fun AdminHabitsScreen(
                                 )
                             }
                         }
+                    }
+
+                    OutlinedTextField(
+                        value = editCommitmentLocation,
+                        onValueChange = { editCommitmentLocation = it },
+                        label = { Text("Commitment location") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    val ctx = LocalContext.current
+                    val timeLabel = editCommitmentTime?.takeIf { it.isNotBlank() } ?: "Not set"
+                    androidx.compose.material3.OutlinedButton(
+                        onClick = {
+                            val now = java.time.LocalTime.now()
+                            val initH = editCommitmentTime
+                                ?.split(":")?.firstOrNull()?.toIntOrNull() ?: now.hour
+                            val initM = editCommitmentTime
+                                ?.split(":")?.getOrNull(1)?.toIntOrNull() ?: now.minute
+                            TimePickerDialog(ctx, { _, h, m ->
+                                editCommitmentTime = "%02d:%02d".format(h, m)
+                            }, initH, initM, true).show()
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text("Commitment time: $timeLabel") }
+                    if (editCommitmentTime != null) {
+                        TextButton(onClick = { editCommitmentTime = null }) {
+                            Text("Clear time", style = MaterialTheme.typography.labelSmall)
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    ) {
+                        Text("Show in widget", style = MaterialTheme.typography.bodyMedium)
+                        Switch(checked = editShowInWidget, onCheckedChange = { editShowInWidget = it })
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    ) {
+                        Text("Show in daily check-in", style = MaterialTheme.typography.bodyMedium)
+                        Switch(checked = editShowInDailyCheckIn, onCheckedChange = { editShowInDailyCheckIn = it })
                     }
 
                     Text("Schedule", style = MaterialTheme.typography.titleSmall)
@@ -315,10 +402,16 @@ fun AdminHabitsScreen(
                         habit = habit,
                         newName = editName,
                         newDescription = editDesc,
+                        newGoalIdentityStatement = editGoalIdentity,
                         newTarget = editTarget,
                         newOp = editOp,
+                        newUnit = editUnit.takeIf { it.isNotBlank() },
                         newRoutineId = editRoutineId,
                         newLifeAreaId = editLifeAreaId,
+                        newCommitmentTime = editCommitmentTime,
+                        newCommitmentLocation = editCommitmentLocation,
+                        newShowInWidget = editShowInWidget,
+                        newShowInDailyCheckIn = editShowInDailyCheckIn,
                         recurrenceType = editRecurrenceType,
                         recurrenceDaysOfWeekMask = editWeekMask,
                         recurrenceIntervalText = editIntervalText,
@@ -416,6 +509,24 @@ fun AdminHabitsScreen(
                             title = "Add Habit",
                             subtitle = "Set your minimum — the version you'll do even on your worst day. Required fields are marked with *."
                         )
+
+                        var showTemplatePicker by remember { mutableStateOf(false) }
+                        TextButton(
+                            onClick = { showTemplatePicker = true },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Start from a template →")
+                        }
+                        if (showTemplatePicker) {
+                            HabitTemplatePickerDialog(
+                                onDismiss = { showTemplatePicker = false },
+                                onSelected = { template ->
+                                    viewModel.applyTemplate(template)
+                                    showTemplatePicker = false
+                                }
+                            )
+                        }
+
                         Text(
                             text = "Fields marked * are required",
                             style = MaterialTheme.typography.labelSmall,
@@ -1013,4 +1124,71 @@ private fun WeekdayMaskEditor(
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HabitTemplatePickerDialog(
+    onDismiss: () -> Unit,
+    onSelected: (HabitTemplate) -> Unit
+) {
+    val byArchetype = remember { HabitTemplates.byArchetype() }
+    var selectedArchetype by remember { mutableStateOf(HabitTemplate.Archetype.BUILDER) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Start from a Template") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    HabitTemplate.Archetype.entries.take(2).forEach { archetype ->
+                        FilterChip(
+                            selected = selectedArchetype == archetype,
+                            onClick = { selectedArchetype = archetype },
+                            label = { Text(archetype.label) },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    HabitTemplate.Archetype.entries.drop(2).forEach { archetype ->
+                        FilterChip(
+                            selected = selectedArchetype == archetype,
+                            onClick = { selectedArchetype = archetype },
+                            label = { Text(archetype.label) },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+                LazyColumn(modifier = Modifier.heightIn(max = 360.dp)) {
+                    items(byArchetype[selectedArchetype] ?: emptyList()) { template ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onSelected(template) }
+                                .padding(vertical = 10.dp, horizontal = 4.dp),
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            Text(template.name, style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                template.description,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        HorizontalDivider()
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        }
+    )
 }
