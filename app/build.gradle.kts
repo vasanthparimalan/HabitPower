@@ -30,7 +30,7 @@ android {
         applicationId = "com.vasanthparimalan.habitpower"
         minSdk = 26
         targetSdk = 35
-        versionCode = 12
+        versionCode = 13
         versionName = "1.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
