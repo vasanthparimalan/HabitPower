@@ -89,7 +89,7 @@ class HabitReminderReceiver : BroadcastReceiver() {
                         }
 
                         val notification = NotificationCompat.Builder(appCtx, HabitReminderScheduler.CHANNEL_ID)
-                            .setSmallIcon(R.drawable.ic_habit_power)
+                            .setSmallIcon(R.drawable.ic_stat_notification)
                             .setContentTitle(title)
                             .setContentText(body)
                             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
@@ -98,7 +98,7 @@ class HabitReminderReceiver : BroadcastReceiver() {
                             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                             .setAutoCancel(true)
                             .setContentIntent(openPendingIntent)
-                            .addAction(R.drawable.ic_habit_power, "Done ✓", quickCompletePendingIntent)
+                            .addAction(R.drawable.ic_stat_notification, "Done ✓", quickCompletePendingIntent)
                             .build()
 
                         if (ContextCompat.checkSelfPermission(appCtx, Manifest.permission.POST_NOTIFICATIONS)

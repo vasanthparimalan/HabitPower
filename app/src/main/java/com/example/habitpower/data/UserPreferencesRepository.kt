@@ -178,7 +178,7 @@ class UserPreferencesRepository(private val context: Context) {
             prefs[ENABLED_NOTIFICATION_CHANNELS_KEY]
                 ?.mapNotNull { name -> runCatching { NotificationChannelType.valueOf(name) }.getOrNull() }
                 ?.toSet()
-                ?: setOf(NotificationChannelType.HABIT_REMINDERS, NotificationChannelType.PRACTICE_NUDGE)
+                ?: NotificationChannelType.values().filter { !it.isComingSoon }.toSet()
         }
 
     suspend fun setEnabledNotificationChannels(channels: Set<NotificationChannelType>) {

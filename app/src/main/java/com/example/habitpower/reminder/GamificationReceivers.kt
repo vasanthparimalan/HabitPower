@@ -270,7 +270,7 @@ private fun sendNotification(
     )
 
     val notification = NotificationCompat.Builder(context, channelId)
-        .setSmallIcon(R.drawable.ic_habit_power)
+        .setSmallIcon(R.drawable.ic_stat_notification)
         .setContentTitle(title)
         .setContentText(body)
         .setStyle(NotificationCompat.BigTextStyle().bigText(body))

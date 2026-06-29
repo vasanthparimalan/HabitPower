@@ -40,7 +40,7 @@ class StepBackReturnReceiver : BroadcastReceiver() {
                     android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                 )
                 val notification = NotificationCompat.Builder(appCtx, HabitReminderScheduler.CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_habit_power)
+                    .setSmallIcon(R.drawable.ic_stat_notification)
                     .setContentTitle("You set aside some time.")
                     .setContentText("Ready to return whenever you are.")
                     .setStyle(NotificationCompat.BigTextStyle()
