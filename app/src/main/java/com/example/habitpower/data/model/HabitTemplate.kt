@@ -109,6 +109,64 @@ object HabitTemplates {
             commitmentHour = 7, commitmentMinute = 30,
             archetype = HabitTemplate.Archetype.HUMAN
         ),
+        HabitTemplate(
+            name = "Morning Sunlight Exposure",
+            description = "15 minutes of direct outdoor light within 30-60 minutes of waking. This is one single habit that does more for modern health than almost anything else. Morning sunlight triggers a timed cortisol pulse that sets your energy arc for the day, starts a 12-16 hour melatonin countdown for natural sleep onset tonight, and synthesises the serotonin that converts to melatonin at dusk. Glass windows, car windscreens, and office lighting do not count — the specific wavelengths that drive this response are filtered out. Most people working indoors get less than 30 minutes of outdoor light daily; the body never properly wakes up or sleeps.",
+            identityStatement = "steps outside every morning to set my body's clock before the day begins",
+            type = HabitType.DURATION,
+            unit = "mins",
+            targetValue = 15.0,
+            commitmentHour = 7, commitmentMinute = 0,
+            archetype = HabitTemplate.Archetype.HUMAN
+        ),
+        HabitTemplate(
+            name = "Hourly Movement Break",
+            description = "Stand, stretch, or walk for 5 minutes every hour at your desk. Sitting for 60+ consecutive minutes turns off lipoprotein lipase — the enzyme that clears fat and sugar from the bloodstream — regardless of whether you exercised that morning. Researchers call this 'active couch potato syndrome': people who run 5km and then sit for 8 hours get little of the metabolic benefit. A 5-minute break every hour restores circulatory function, reduces lumbar disc pressure by 80%, and measurably improves afternoon cognitive performance. Set a timer — willpower alone won't do it.",
+            identityStatement = "refuses to let a full hour pass without moving my body",
+            type = HabitType.BOOLEAN,
+            commitmentHour = 12, commitmentMinute = 0,
+            archetype = HabitTemplate.Archetype.HUMAN
+        ),
+        HabitTemplate(
+            name = "Midday Outdoor Break",
+            description = "Step outside for 10-15 minutes during your lunch break. Office workers average under 30 minutes of outdoor time per day — far below the threshold for Vitamin D synthesis and circadian light entrainment. Midday light reaches 50,000-100,000 lux; the brightest office is 500 lux. Even an overcast sky at 10,000 lux delivers the photon dose that reinforces your circadian signal and breaks the cortisol slope causing the 2pm energy crash. It is also the simplest antidepressant available without a prescription.",
+            identityStatement = "refuses to be someone who spends an entire day without touching the outside world",
+            type = HabitType.BOOLEAN,
+            commitmentHour = 13, commitmentMinute = 0,
+            archetype = HabitTemplate.Archetype.HUMAN
+        ),
+        HabitTemplate(
+            name = "20-20-20 Eye Rest",
+            description = "Every 20 minutes of screen work, look at something at least 20 feet away for 20 seconds. Computer Vision Syndrome affects 60-90% of screen workers — dry eyes, headaches, blurred vision, and neck pain from the constant near-focus posture. The ciliary muscle inside the eye is clenched for hours during screen use, just like a fist held closed all day. The 20-20-20 rule relaxes it before fatigue becomes strain. Pair this with conscious blinking — screen users blink 60% less than normal.",
+            identityStatement = "protects my eyes, the tool my entire working life depends on",
+            type = HabitType.BOOLEAN,
+            commitmentHour = 12, commitmentMinute = 0,
+            archetype = HabitTemplate.Archetype.HUMAN
+        ),
+        HabitTemplate(
+            name = "Caffeine Cutoff",
+            description = "No coffee, tea, or energy drink after 2pm. Caffeine has a 5-6 hour half-life — a 3pm coffee means half its stimulant load is still active at 9pm. This silently delays sleep onset, reduces deep NREM sleep by up to 20%, and fragments REM without making you feel obviously alert. The '4 hours before bed' rule means a 10pm sleeper should stop by 6pm; 2pm is the conservative standard that covers variable schedules. Most people underestimate caffeine's latency because stimulation isn't the only sign it's working.",
+            identityStatement = "stops borrowing tomorrow's energy by cutting caffeine before it steals my sleep",
+            type = HabitType.BOOLEAN,
+            commitmentHour = 14, commitmentMinute = 0,
+            archetype = HabitTemplate.Archetype.HUMAN
+        ),
+        HabitTemplate(
+            name = "Early Dinner",
+            description = "Finish eating 3 hours before bed. Late meals keep core body temperature elevated and insulin active — both of which suppress the deep-sleep signal. The body secretes roughly 70% of its daily growth hormone during the first two hours of sleep, a process blunted by elevated blood glucose from a late meal. Eating early also initiates a 12-14 hour overnight fast with independent metabolic benefits: improved insulin sensitivity, lower triglycerides, and reduced inflammatory markers — without any additional effort.",
+            identityStatement = "finishes eating early enough that sleep can do its full repair work",
+            type = HabitType.BOOLEAN,
+            commitmentHour = 19, commitmentMinute = 0,
+            archetype = HabitTemplate.Archetype.HUMAN
+        ),
+        HabitTemplate(
+            name = "Front-Load Hydration",
+            description = "Drink most of your daily water before 6pm, tapering to small sips only in the 2 hours before bed. This is not about dehydrating yourself — it's about timing. Waking once for the bathroom fragments slow-wave and REM sleep; waking twice essentially destroys the night. People who drink large amounts of water late often do so because they were under-hydrated all day. Fix the daytime, and the nighttime problem disappears. Aim for 2 glasses before 10am, and you'll naturally be done by evening.",
+            identityStatement = "plans my water intake so my sleep is never interrupted",
+            type = HabitType.BOOLEAN,
+            commitmentHour = 18, commitmentMinute = 0,
+            archetype = HabitTemplate.Archetype.HUMAN
+        ),
 
         // ── Builder ───────────────────────────────────────────────────────────
         HabitTemplate(
